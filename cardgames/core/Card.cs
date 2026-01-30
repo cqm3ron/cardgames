@@ -11,9 +11,9 @@ namespace cardgames.core
         public enum Suit { heart, diamond, spade, club }
         public enum Rank : int { ace = 1, two, three, four, five, six, seven, eight, nine, ten, jack, queen, king }
 
-        private Rank rank;
-        private Suit suit;
-        private bool face;
+        private readonly Rank rank;
+        private readonly Suit suit;
+        private readonly bool isFace;
         public Card(Rank rank, Suit suit)
         {
             this.rank = rank;
@@ -21,11 +21,11 @@ namespace cardgames.core
 
             if (rank == Rank.jack || rank == Rank.queen || rank == Rank.king)
             {
-                face = true;
+                isFace = true;
             }
             else
             {
-                face = false;
+                isFace = false;
             }
         }
 
@@ -92,7 +92,7 @@ namespace cardgames.core
         }
         public Rank GetRank() => rank;
         public Suit GetSuit() => suit;
-        public bool IsFaceCard() => face;
+        public bool IsFaceCard() => isFace;
 
         public override string ToString() => ParseName();
         public string GetName() => ParseName();

@@ -73,4 +73,16 @@ internal static class Utilities
     {
         return Enum.Parse<T>(input, true);
     }
+
+    public static string StripCurrencySymbols(string input)
+    {
+        foreach (char c in input)
+        {
+            if (!char.IsDigit(c) && c != '.' && c != '-' && c != ',')
+            {
+                input = input.Replace(c.ToString(), "");
+            }
+        }
+        return input;
+    }
 }

@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace cardgames.core
 {
-    public interface IGame
+    interface IGame
     {
         void Start();
-        void PlayRound();
-        void GameOver();
     }
 }
