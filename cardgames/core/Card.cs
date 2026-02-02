@@ -93,7 +93,6 @@ namespace cardgames.core
         public Rank GetRank() => rank;
         public Suit GetSuit() => suit;
         public bool IsFaceCard() => isFace;
-
         public override string ToString() => ParseName();
         public string GetName() => ParseName();
 

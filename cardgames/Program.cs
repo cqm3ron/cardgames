@@ -1,4 +1,5 @@
-﻿using cardgames.core;
+﻿using cardgames.accounts;
+using cardgames.core;
 using cardgames.games.blackjack;
 
 namespace cardgames
@@ -7,7 +8,11 @@ namespace cardgames
     {
         static void Main(string[] args)
         {
-            BlackjackGame game = new();
+            AccountManager accountManager = new AccountManager();
+            User user = new User();
+            
+
+            //BlackjackGame game = new();
         }
     }
 }

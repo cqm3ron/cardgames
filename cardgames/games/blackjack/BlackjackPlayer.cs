@@ -20,7 +20,7 @@ namespace cardgames.games.blackjack
             bool validBet = false;
             while (!validBet)
             {
-                Console.Write($"Input bet amount (0 < bet ≤ {Balance}): ");
+                Console.Write($"Input bet amount (0 < bet <= {Balance}): ");
                 string input = Console.ReadLine();
                 input = StripCurrencySymbols(input);
                 if (double.TryParse(input, out bet))
@@ -64,11 +64,12 @@ namespace cardgames.games.blackjack
             return total;
         }
 
-        public void TakeTurn(BlackjackParser parser, Dealer dealer, Deck deck)
+        public void TakeTurn(BlackjackParser parser, Dealer dealer, Deck deck, List<BlackjackPlayer> players, bool betting)
         {
             while (!standing && !bust)
             {
                 Console.Clear();
+                if (betting) BlackjackDisplay.DisplayPlayerInfo(players);
                 if (Name.EndsWith('s')) Console.WriteLine($"{Name}' turn");
                 else Console.WriteLine($"{Name}'s turn");
                 Console.WriteLine($"Current hand value: {GetHandValue()}");
@@ -108,6 +109,7 @@ namespace cardgames.games.blackjack
                 }
                 else if (choice == Choice.doubledown)
                 {
+                    bet *= 2;
                     AddCardToHand(deck.Draw());
                     Console.WriteLine($"You drew: {Hand[^1]}");
                     Console.WriteLine($"This brings your total to {GetHandValue()}");

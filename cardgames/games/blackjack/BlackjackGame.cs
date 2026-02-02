@@ -19,19 +19,34 @@ namespace cardgames.games.blackjack
         public override void Start()
         {
             YesNoParser ynp = new();
-            Console.WriteLine("Do you want to enable betting?");
-            string? input = Console.ReadLine();
-            if (ynp.TryParseChoice(input ?? "", out YesNoParser.Choice? choice))
+            string? input = null;
+            while (input == null)
             {
-                if (choice == YesNoParser.Choice.yes)
+                Console.WriteLine("Do you want to enable betting?");
+                input = Console.ReadLine();
+                if (string.IsNullOrEmpty((input)) || string.IsNullOrWhiteSpace(input))
                 {
-                    betting = true;
-                    Console.WriteLine("You have enabled betting.");
+                    input = null;
+                    continue;
                 }
-                else
+                else if (ynp.TryParseChoice(input ?? "", out YesNoParser.Choice? choice))
                 {
-                    betting = false;
-                    Console.WriteLine("You won't be betting on this game.");
+                    if (choice == null)
+                    {
+                        Console.WriteLine("That didn't seem like a valid input. Please try again!");
+                        input = null;
+                    }
+
+                    if (choice == YesNoParser.Choice.yes)
+                    {
+                        betting = true;
+                        Console.WriteLine("You have enabled betting.");
+                    }
+                    else
+                    {
+                        betting = false;
+                        Console.WriteLine("You won't be betting on this game.");
+                    }
                 }
             }
 
@@ -53,7 +68,7 @@ namespace cardgames.games.blackjack
         {
             for (int currentPlayer = 0; currentPlayer < players.Count; currentPlayer++)
             {
-                players[currentPlayer].TakeTurn(parser, dealer, gameDeck);
+                players[currentPlayer].TakeTurn(parser, dealer, gameDeck, players, betting);
             }
 
             dealer.Draw(gameDeck);
