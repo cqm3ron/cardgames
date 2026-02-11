@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("cardgames")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ebed9677ba3bf94b5f831cb8b2f46abf66b869b2")]
 [assembly: System.Reflection.AssemblyProductAttribute("cardgames")]
 [assembly: System.Reflection.AssemblyTitleAttribute("cardgames")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
