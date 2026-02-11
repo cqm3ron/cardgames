@@ -114,6 +114,7 @@ namespace cardgames.core
         {
             return input.ToLower().Replace("of", "").Replace(",", "").Replace(".", "").Trim();
         } // remove unnecessary characters & standardise formatting
+        
         protected private int Levenshtein(string string1, string string2)
         {
             // Store length of each string in variable; this will be used a lot.

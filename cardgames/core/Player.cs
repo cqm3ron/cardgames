@@ -8,23 +8,23 @@ namespace cardgames.core
 {
     internal abstract class Player
     {
-        public string name { get; }
-        public List<Card> hand { get; } = [];
-
+        public string Name { get; }
+        public double Balance { get; set; } = 100.0;
+        public List<Card> Hand { get; } = [];
         protected Player(string _name)
         {
-            name = _name;
+            Name = _name;
         }
 
-        public void AddCardToHand(Card card) => hand.Add(card);
+        public void AddCardToHand(Card card) => Hand.Add(card);
 
-        public void AddCardsToHand(List<Card> cards) => hand.AddRange(cards);
+        public void AddCardsToHand(List<Card> cards) => Hand.AddRange(cards);
         
-        public void RemoveCard(Card card) => hand.Remove(card);
+        public void RemoveCard(Card card) => Hand.Remove(card);
         
         public virtual void SortHand()
         {
-            hand.Sort((a, b) =>
+            Hand.Sort((a, b) =>
             {
                 int rankComparison = a.GetRank().CompareTo(b.GetRank());
                 if (rankComparison != 0) return rankComparison;

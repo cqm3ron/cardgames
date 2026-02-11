@@ -1,0 +1,14 @@
+U:\Visual Studio 2022\NEA\cardgames-master\cardgames\bin\Debug\net9.0\cardgames.exe
+U:\Visual Studio 2022\NEA\cardgames-master\cardgames\bin\Debug\net9.0\cardgames.deps.json
+U:\Visual Studio 2022\NEA\cardgames-master\cardgames\bin\Debug\net9.0\cardgames.runtimeconfig.json
+U:\Visual Studio 2022\NEA\cardgames-master\cardgames\bin\Debug\net9.0\cardgames.dll
+U:\Visual Studio 2022\NEA\cardgames-master\cardgames\bin\Debug\net9.0\cardgames.pdb
+U:\Visual Studio 2022\NEA\cardgames-master\cardgames\obj\Debug\net9.0\cardgames.GeneratedMSBuildEditorConfig.editorconfig
+U:\Visual Studio 2022\NEA\cardgames-master\cardgames\obj\Debug\net9.0\cardgames.AssemblyInfoInputs.cache
+U:\Visual Studio 2022\NEA\cardgames-master\cardgames\obj\Debug\net9.0\cardgames.AssemblyInfo.cs
+U:\Visual Studio 2022\NEA\cardgames-master\cardgames\obj\Debug\net9.0\cardgames.csproj.CoreCompileInputs.cache
+U:\Visual Studio 2022\NEA\cardgames-master\cardgames\obj\Debug\net9.0\cardgames.dll
+U:\Visual Studio 2022\NEA\cardgames-master\cardgames\obj\Debug\net9.0\refint\cardgames.dll
+U:\Visual Studio 2022\NEA\cardgames-master\cardgames\obj\Debug\net9.0\cardgames.pdb
+U:\Visual Studio 2022\NEA\cardgames-master\cardgames\obj\Debug\net9.0\cardgames.genruntimeconfig.cache
+U:\Visual Studio 2022\NEA\cardgames-master\cardgames\obj\Debug\net9.0\ref\cardgames.dll

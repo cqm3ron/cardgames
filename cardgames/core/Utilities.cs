@@ -1,7 +1,11 @@
-﻿namespace cardgames.core;
+﻿using System.Reflection.PortableExecutable;
+
+namespace cardgames.core;
 
 internal static class Utilities
 {
+    public static int WindowSize => Console.WindowWidth;
+
     public static char ConvertSuitToSymbol(Card.Suit suit)
     {
         if (true) // need to fix, set to ifUnicode = true eventually
@@ -72,5 +76,35 @@ internal static class Utilities
     public static T ConvertStringToEnum<T>(string input) where T : struct, Enum
     {
         return Enum.Parse<T>(input, true);
+    }
+    public static string StripCurrencySymbols(string input)
+    {
+        foreach (char c in input)
+        {
+            if (!char.IsDigit(c) && c != '.' && c != '-' && c != ',')
+            {
+                input = input.Replace(c.ToString(), "");
+            }
+        }
+        return input;
+    }
+
+    public static void WriteLineBackwards(string input)
+    {
+        Console.SetCursorPosition(Console.WindowWidth - 1, Console.GetCursorPosition().Top);
+        char[] characters = input.ToCharArray();
+
+        (int, int) initialCursorPos = Console.GetCursorPosition();
+
+        //if (characters.Length > (Console.WindowWidth - Console.GetCursorPosition().Left)) throw new IndexOutOfRangeException("Not enough space to write!");
+
+        for (int c = characters.Length - 1; c >= 0; c--)
+        {
+            (int, int) cursorPos = Console.GetCursorPosition();
+            Console.Write(characters[c]);
+            Console.SetCursorPosition(cursorPos.Item1 - 1, cursorPos.Item2);
+        }
+
+        Console.SetCursorPosition(0, initialCursorPos.Item2 + 1);
     }
 }

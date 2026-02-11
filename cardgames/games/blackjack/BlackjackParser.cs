@@ -14,7 +14,8 @@ namespace cardgames.games.blackjack
         public enum Choice
         {
             hit,
-            stand
+            stand,
+            doubledown
         }
 
         private Dictionary<string, Choice> choiceMap;
