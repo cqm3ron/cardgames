@@ -9,7 +9,8 @@ namespace cardgames.core
     internal abstract class Player
     {
         public string Name { get; }
-        public double Balance { get; set; } = 100.0;
+        public double Balance { get; protected set; } = 100.0;
+        public double Bet { get; protected set; }
         public List<Card> Hand { get; } = [];
         protected Player(string _name)
         {

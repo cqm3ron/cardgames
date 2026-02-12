@@ -1,9 +1,4 @@
 ﻿using cardgames.core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static cardgames.core.Card;
 
 namespace cardgames.games.cheat

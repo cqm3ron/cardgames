@@ -1,5 +1,4 @@
-﻿using cardgames.accounts;
-using cardgames.core;
+﻿using cardgames.core;
 using cardgames.games.blackjack;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,13 +7,13 @@ namespace cardgames
 {
     internal class Program
     {
-        static async Task Main(string[] args)
+        public static void Main(string[] args)
         {
-            AccountManager accountManager = new AccountManager();
-            User user = new User();
-            
+            bool Betting = false;
+            List<Player> players = [];
+            GameBase game;
 
-            //BlackjackGame game = new();
+            game = new BlackjackGame();
         }
     }
 }

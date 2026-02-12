@@ -1,10 +1,10 @@
 ﻿using cardgames.core;
+using cardgames.core.parsers;
 
 namespace cardgames.games.blackjack
 {
     internal class BlackjackGame : GameBase
     {
-        bool betting;
         private const int DECKCOUNT = 6;
         private Deck gameDeck;
         private readonly BlackjackParser parser = new();
@@ -18,46 +18,6 @@ namespace cardgames.games.blackjack
 
         public override void Start()
         {
-            YesNoParser ynp = new();
-            string? input = null;
-            while (input == null)
-            {
-                Console.WriteLine("Do you want to enable betting?");
-                input = Console.ReadLine();
-                if (string.IsNullOrEmpty((input)) || string.IsNullOrWhiteSpace(input))
-                {
-                    input = null;
-                    continue;
-                }
-                else if (ynp.TryParseChoice(input ?? "", out YesNoParser.Choice? choice))
-                {
-                    if (choice == null)
-                    {
-                        Console.WriteLine("That didn't seem like a valid input. Please try again!");
-                        input = null;
-                    }
-
-                    if (choice == YesNoParser.Choice.yes)
-                    {
-                        betting = true;
-                        Console.WriteLine("You have enabled betting.");
-                    }
-                    else
-                    {
-                        betting = false;
-                        Console.WriteLine("You won't be betting on this game.");
-                    }
-                }
-            }
-
-            if (betting)
-            {
-                PlayerSetup(true);
-            }
-            else
-            {
-                PlayerSetup(false);
-            }
 
             DeckSetup();
 
@@ -68,7 +28,7 @@ namespace cardgames.games.blackjack
         {
             for (int currentPlayer = 0; currentPlayer < players.Count; currentPlayer++)
             {
-                players[currentPlayer].TakeTurn(parser, dealer, gameDeck, players, betting);
+                players[currentPlayer].TakeTurn(parser, dealer, gameDeck, players, Betting);
             }
 
             dealer.Draw(gameDeck);
@@ -85,26 +45,42 @@ namespace cardgames.games.blackjack
             foreach (BlackjackPlayer player in players)
             {
                 Console.WriteLine($"Player {player.Name} - {player.GetWinState()} with a hand value of {player.GetHandValue()}");
-                // add betting logic here, if they win tell them how much, etc.
             }
-        }
-
-        private void PlayerSetup(bool betting)
-        {
-            string? input;
-            Console.Write("Enter playercount, 2-7: ");
-            input = Console.ReadLine();
-            input = input ?? "2";
-            if (int.TryParse(input, out int playerCount))
+            if (Betting)
             {
-                if (playerCount < 2 || playerCount > 7)
+                Console.WriteLine("Payouts have been calculated & paid!");
+                foreach (BlackjackPlayer player in players)
                 {
-                    playerCount = 2;
+                    Console.WriteLine($"Player {player.Name} - Bet ${player.GetBet()} - {player.GetWinState()} - New Balance ${player.Balance + player.CalculatePayout()}");
+                    player.Payout();
                 }
             }
-            else
+
+        }
+
+        private void PlayerSetup(bool betting) 
+            // TODO: move to cross-game player system so names, bets, etc. can be carried across multiple games.
+            // TODO: store players in files; leaderboards?
+        {
+            int min = 2;
+            int max = 7;
+            string? input;
+            int playerCount = -1;
+            while (playerCount == -1)
             {
-                playerCount = 2;
+                Console.Write($"Enter playercount, {min}-{max}: ");
+                input = Console.ReadLine();
+                if (int.TryParse(input, out playerCount))
+                {
+                    if (playerCount < min || playerCount > max)
+                    {
+                        playerCount = -1;
+                    }
+                }
+                else
+                {
+                    playerCount = -1;
+                }
             }
 
             for (int p = 0; p < playerCount; p++)
@@ -117,7 +93,7 @@ namespace cardgames.games.blackjack
                 {
                     newPlayer = new BlackjackPlayer(input, true);
                 }
-                else 
+                else
                 {
                     newPlayer = new BlackjackPlayer(input);
                 }
@@ -125,6 +101,7 @@ namespace cardgames.games.blackjack
                 newPlayer = null;
             }
         }
+
         private void DeckSetup()
         {
             gameDeck = new Deck(DECKCOUNT);

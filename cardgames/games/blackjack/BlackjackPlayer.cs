@@ -9,7 +9,6 @@ namespace cardgames.games.blackjack
         public bool standing { get; private set; }
         public bool bust { get; private set; }
         public bool doubled { get; private set; }
-        public double bet { get; private set; }
         private bool hasWon;
         private bool hasDrawn;
         private bool hasLost;
@@ -25,16 +24,11 @@ namespace cardgames.games.blackjack
                 input = StripCurrencySymbols(input);
                 if (double.TryParse(input, out bet))
                 {
-                    validBet = ValidateBet(bet);
+                    validBet = bet > 0 && bet <= Balance;
                 }
             }
 
-            this.bet = bet;
-        }
-
-        private bool ValidateBet(double bet)
-        {
-            return bet > 0 && bet <= Balance;
+            this.Bet = bet;
         }
 
         public int GetHandValue()
@@ -109,7 +103,7 @@ namespace cardgames.games.blackjack
                 }
                 else if (choice == Choice.doubledown)
                 {
-                    bet *= 2;
+                    Bet *= 2;
                     AddCardToHand(deck.Draw());
                     Console.WriteLine($"You drew: {Hand[^1]}");
                     Console.WriteLine($"This brings your total to {GetHandValue()}");
@@ -192,25 +186,25 @@ namespace cardgames.games.blackjack
         // Betting
         public void PlaceBet(double amount)
         {
-            bet = amount;
+            Bet = amount;
         }
         public void ClearBet()
         {
-            bet = 0;
+            Bet = 0;
         }
         public double GetBet()
         {
-            return bet;
+            return Bet;
         }
         public double CalculatePayout()
         {
             if (hasWon && doubled)
             {
-                return bet * 2.0;
+                return Bet * 2.0;
             }
             else if (hasWon)
             {
-                return bet;
+                return Bet;
             }
             else if (hasDrawn)
             {
@@ -218,8 +212,14 @@ namespace cardgames.games.blackjack
             }
             else
             {
-                return -bet;
+                return -Bet;
             }
+        }
+
+        public void Payout()
+        {
+            Balance += CalculatePayout();
+            ClearBet();
         }
     }
 }

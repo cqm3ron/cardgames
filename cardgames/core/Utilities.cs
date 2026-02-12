@@ -96,7 +96,7 @@ internal static class Utilities
 
         (int, int) initialCursorPos = Console.GetCursorPosition();
 
-        //if (characters.Length > (Console.WindowWidth - Console.GetCursorPosition().Left)) throw new IndexOutOfRangeException("Not enough space to write!");
+        if (characters.Length > (Console.WindowWidth - Console.GetCursorPosition().Left)) throw new IndexOutOfRangeException("Not enough space to write!");
 
         for (int c = characters.Length - 1; c >= 0; c--)
         {
