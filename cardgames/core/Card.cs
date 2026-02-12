@@ -95,18 +95,6 @@ namespace cardgames.core
         public bool IsFaceCard() => isFace;
         public override string ToString() => ParseName();
         public string GetName() => ParseName();
-
         public int GetRankValue() { return (int)rank; }
-        public int GetBlackjackValue()
-        {
-            return rank switch
-            {
-                Rank.ace => 11,
-                Rank.jack => 10,
-                Rank.queen => 10,
-                Rank.king => 10,
-                _ => (int)rank
-            };
-        }
     }
 }
