@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -37,5 +38,37 @@ namespace cardgames.core.extensions
             }
         }
 
+        public static void RemoveFirstOccurrence<T>(this Stack<T> stack, T itemToRemove) // referenced https://www.w3resource.com/csharp-exercises/stack/csharp-stack-exercise-8.php
+        {
+            Stack<T> temp = [];
+            bool firstOccurrenceRemoved = false;
+
+            while (stack.Count > 0)
+            {
+                T element = stack.Pop();
+
+                if (!Equals(element, itemToRemove))
+                {
+                    temp.Push(element);
+                }
+                else
+                {
+                    if (!firstOccurrenceRemoved)
+                    {
+                        firstOccurrenceRemoved = true;
+                    }
+                    else
+                    {
+                        temp.Push(element);
+                    }
+                }
+            }
+
+            while (temp.Count > 0)
+            {
+                stack.Push(temp.Pop());
+            }
+
+        }
     }
 }

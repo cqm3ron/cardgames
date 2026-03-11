@@ -1,0 +1,14 @@
+{
+  "Blackjack.Hit": "Hit",
+  "Blackjack.Stand": "Stand",
+  "Blackjack.Double": "Double Down",
+  "Blackjack.PlayerHand": "Player {name}'s hand:",
+  "Blackjack.HandValueInfo": "Hand Total Value: ",
+  "Blackjack.Player.Lost": "You lost! Your new balance is cr{balance}",
+  "Blackjack.Player.LostDouble": "You lost after choosing to double down! Your new balance is cr{balance}",
+  "Blackjack.Player.Won": "You won! Your new balance is cr{balance}",
+  "Blackjack.Player.WonDouble": "You won after choosing to double down! Your new balance is cr{balance}",
+  "Blackjack.Player.Drew": "You drew! Your balance hasn't changed.",
+  "Blackjack.Player.WinSummary": "Player {player} bet cr{bet}.",
+  "Blackjack.Player.WinSummary.Doubled": "They also chose to double down."
+}

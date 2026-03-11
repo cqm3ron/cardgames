@@ -5,20 +5,21 @@
         clockwise,
         anticlockwise
     }
-    internal class GameState
+    internal class GameState<TPlayer> where TPlayer : Player
     {
-        private protected List<Player> players;
+        private protected Deck gameDeck;
+        private protected List<TPlayer> players;
         private protected int currentPlayer;
         private protected string gamePhase;
         private protected Direction direction;
 
-        public GameState(List<Player> _players)
+        public GameState(IEnumerable<TPlayer> _players)
         {
-            players = _players;
+            players = [.. _players];
             currentPlayer = 0;
         }
 
-        public Player GetCurrentPlayer()
+        public TPlayer GetCurrentPlayer()
         {
             return players[currentPlayer];
         }
@@ -33,9 +34,25 @@
                 currentPlayer = (currentPlayer - 1 + players.Count) % players.Count;
             }
         }
+
+        public List<TPlayer> GetPlayerList()
+        {
+            return players;
+        }
+
         public void SetDirection(Direction _direction)
         {
             direction = _direction;
+        }
+
+        public Deck GetDeck()
+        {
+            return gameDeck;
+        }
+
+        public Card DrawCard()
+        {
+            return gameDeck.Draw();
         }
     }
 }

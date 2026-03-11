@@ -1,6 +1,7 @@
-﻿using static cardgames.core.Translator;
+﻿using static cardgames.core.Language;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.VisualBasic;
 
 namespace cardgames.core
 {
@@ -12,8 +13,8 @@ namespace cardgames.core
         private protected string name;
         private protected string uname;
         private protected double balance;
-        private protected double bet;
-        private protected List<Card> hand;
+        public double Bet { get; private set; }
+        private protected List<Card> hand = [];
 
         #region GETTERS & SETTERS
 
@@ -237,7 +238,7 @@ namespace cardgames.core
             }
             else
             {
-                Console.WriteLine("playernotfound");
+                Console.WriteLine(T("Err.PlayerNotFound"));
                 return null;
             }
         }
@@ -288,9 +289,52 @@ namespace cardgames.core
             }
         }
 
+        public static void SavePlayers(List<Player> players)
+        {
+            if (players.Count == 0) return;
+            foreach (Player player in players)
+            {
+                player.SaveUserData();
+            }
+        }
+
+        // Balance & Betting
+
+        public void PlaceBet(double amountToBet) 
+        {
+            Bet += amountToBet;
+        }
+
+        public void DoubleBet()
+        {
+            Bet *= 2;
+        }
+
+        public void DeductFromBalance(double amountToDeduct)
+        {
+            if (amountToDeduct > 0)
+            {
+                balance -= amountToDeduct;
+            }
+        }
+
+        public void DeductBetFromBalance()
+        {
+            balance -= Bet;
+            Bet = 0;
+        }
+
+        public void AddBetToBalance()
+        {
+            balance += Bet;
+            Bet = 0;
+        }
+
         // Gameplay
-
-
+        public List<Card> GetHand()
+        {
+            return hand;
+        }
 
 
     }

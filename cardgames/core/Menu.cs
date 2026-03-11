@@ -1,18 +1,23 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
-using static cardgames.core.Translator;
+using System.Xml.Linq;
+using static cardgames.core.Language;
 
 namespace cardgames.core
 {
     internal static class Menu
     {
         const string GAMES_PATH = "..\\..\\..\\games\\";
-
-        public static List<Player> StartupMenu()
+        public static List<Player> StartupMenu(List<Player>? players = null)
         {
             bool goToGames = false;
-            List<Player> players = [];
+            
+            if (players == null)
+            {
+                players = [];
+            }
+
             while (!goToGames)
             {
                 Player? player = null;
@@ -57,6 +62,7 @@ namespace cardgames.core
                             break;
 
                         case 3:
+                            Player.SavePlayers(players);
                             Environment.Exit(0);
                             break;
 
@@ -74,6 +80,26 @@ namespace cardgames.core
                             Console.WriteLine();
                             Console.WriteLine(T("Menu.Input.Username"));
                             string username = Console.ReadLine();
+
+                            bool loggedInAlready = false;
+
+                            foreach (Player playerToCheck in players)
+                            {
+                                if (playerToCheck.GetUsername() == username)
+                                {
+                                    Console.WriteLine(T("Err.AlreadyLoggedIn")); // TODO: add translation key to dictionary
+                                    Console.WriteLine(T("Util.PressKey"));
+                                    Console.ReadKey(true);
+                                    loggedInAlready = true;
+                                    break;
+                                }
+                            }
+
+                            if (loggedInAlready)
+                            {
+                                break;
+                            }
+
                             Console.WriteLine(T("Menu.Input.Password"));
                             string password = Util.GetPassword();
                             player = Player.LogIn(username, password);
@@ -110,21 +136,24 @@ namespace cardgames.core
                 }
             }
             return players;
-            Console.Clear();
         }
 
-        
-
-        public static GameBase GameMenu()
+        public static GameBase<Player>? GameMenu()
         {
             Dictionary<string, string> games = ImportGames();
+
+            games.Add(T("Menu.Back"), "__BACK__");
+
+            Console.Clear();
 
             (int, int) cursorPos = (Console.CursorLeft, Console.CursorTop);
             string[] options = [.. games.Keys];
             int selected = 0;
+            GameBase<Player>? game;
 
             while (!Console.KeyAvailable)
             {
+                Console.CursorVisible = false;
                 Console.SetCursorPosition(cursorPos.Item1, cursorPos.Item2);
                 for (int i = 0; i < games.Count; i++)
                 {
@@ -141,30 +170,48 @@ namespace cardgames.core
 
                 Util.ResetColor();
 
-                GameBase? game = (GameBase?)GetGameChoice(games, options, ref selected);
+                var choice = GetGameChoice(games, options, ref selected);
+
+                var temp = new object();
+
+                if (choice != null && choice.GetType() == temp.GetType())
+                {
+                    Console.Clear();
+                    Console.CursorVisible = true;
+                    return null;
+                }
+
+                game = (GameBase<Player>?)choice;
+
                 if (game != null)
                 {
                     Console.Clear();
+                    Console.CursorVisible = true;
                     return game;
                 }
             }
+
             return null;
         }
 
         private static object? GetGameChoice(Dictionary<string, string> games, string[] options, ref int selected)
         {
-
             ConsoleKeyInfo key = Console.ReadKey(true);
-            if (key.Key == ConsoleKey.UpArrow || key.Key == ConsoleKey.W)
+            if (Util.previousOptions.Contains(key.Key) || (key.Key == ConsoleKey.Tab && key.Modifiers.HasFlag(ConsoleModifiers.Shift)))
             {
                 selected = (selected - 1 + options.Length) % options.Length;
             }
-            else if (key.Key == ConsoleKey.DownArrow || key.Key == ConsoleKey.S)
+            else if (Util.nextOptions.Contains(key.Key))
             {
                 selected = (selected + 1) % options.Length;
             }
-            else if (key.Key == ConsoleKey.Enter)
+            else if (Util.affirmatives.Contains(key.Key))
             {
+                if (options[selected] == T("Menu.Back"))
+                {
+                    return new object();
+                }
+
                 return GetGame(games[options[selected]]);
             }
 

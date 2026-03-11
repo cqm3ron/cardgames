@@ -21,10 +21,11 @@ namespace cardgames.core
 
         public void AddCards(IEnumerable<Card> newCards)
         {
-            foreach (Card card in newCards)
+            foreach (Card card in newCards.ToList())
             {
                 cards.Push(card);
             }
+
         }
         public void Shuffle()
         {
@@ -74,9 +75,9 @@ namespace cardgames.core
         {
             cards = new Stack<Card>();
 
-            foreach (Suit suit in Enum.GetValues(typeof(Suit)))
+            foreach (Suits suit in Enum.GetValues(typeof(Suits)))
             {
-                foreach (Rank rank in Enum.GetValues(typeof(Rank)))
+                foreach (Ranks rank in Enum.GetValues(typeof(Ranks)))
                 {
                     cards.Push(new Card(suit, rank));
                 }
@@ -90,6 +91,16 @@ namespace cardgames.core
             {
                 AddCards(GenerateStandardDeck());
             }
+        }
+
+        public void RemoveCard(Card card)
+        {
+            cards.RemoveFirstOccurrence(card);
+        }
+
+        public Stack<Card> GetCards()
+        {
+            return cards;
         }
     }
 }

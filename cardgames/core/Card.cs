@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace cardgames.core
 {
-    public enum Suit
+    public enum Suits // TODO: add language support (sigh)
     {
         Hearts,
         Diamonds,
         Clubs,
         Spades
     }
-    public enum Rank
+    public enum Ranks
     {
         Two = 2,
         Three,
@@ -32,20 +32,29 @@ namespace cardgames.core
     }
     internal class Card
     {
-        public Suit suit { get; protected set; }
-        public Rank rank { get; protected set; }
-        public int Value => (int)rank;
+        public Suits Suit { get; private protected set; }
+        public Ranks Rank { get; private protected set; }
+        public bool IsFaceCard { get; private protected set; }
+        public int Value => (int)Rank;
 
         // Constructors
-        public Card(Suit suit, Rank rank)
+        public Card(Suits suit, Ranks rank)
         {
-            this.suit = suit;
-            this.rank = rank;
+            this.Suit = suit;
+            this.Rank = rank;
+            if (rank == Ranks.King || rank == Ranks.Queen || rank == Ranks.Jack)
+            {
+                IsFaceCard = true;
+            }
+            else
+            {
+                IsFaceCard = false;
+            }
         }
 
         public override string ToString()
         {
-            return $"{rank} of {suit}";
+            return $"{Rank} of {Suit}"; // and language support here too (double sigh)
         }
 
     }

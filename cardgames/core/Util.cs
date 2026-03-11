@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using static cardgames.core.Translator;
+using static cardgames.core.Language;
 
 namespace cardgames.core
 {
@@ -12,49 +12,15 @@ namespace cardgames.core
     {
         public static bool UserAgrees()
         {
-            int selected = 0;
             string[] options = [T("Util.Yes"), T("Util.No")];
 
-            (int, int) cursorPos = (Console.CursorLeft, Console.CursorTop);
-
-            while (!Console.KeyAvailable)
-            {
-                Console.SetCursorPosition(cursorPos.Item1, cursorPos.Item2);
-                for (int i = 0; i < options.Length; i++)
-                {
-                    if (i == selected)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Cyan;
-                    }
-                    else
-                    {
-                        Console.ForegroundColor = ConsoleColor.White;
-                    }
-                    Console.WriteLine($"> {options[i]}");
-                }
-
-                Util.ResetColor();
-
-                ConsoleKeyInfo key = Console.ReadKey(true);
-                if (key.Key == ConsoleKey.UpArrow || key.Key == ConsoleKey.W)
-                {
-                    selected = (selected - 1 + options.Length) % options.Length;
-                }
-                else if (key.Key == ConsoleKey.DownArrow || key.Key == ConsoleKey.S)
-                {
-                    selected = (selected + 1) % options.Length;
-                }
-                else if (key.Key == ConsoleKey.Enter)
-                {
-                    return selected == 0;
-                }
-            }
-
-            return false;
+            if (GetChoice(options) == 0) return true;
+            else return true;
         }
 
         public static int GetChoice(string[] options, int selected = 0)
         {
+            Console.CursorVisible = false;
             (int, int) cursorPos = (Console.CursorLeft, Console.CursorTop);
 
             while (!Console.KeyAvailable)
@@ -64,11 +30,11 @@ namespace cardgames.core
                 {
                     if (i == selected)
                     {
-                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.ForegroundColor = SELECTED_FOREGROUND;
                     }
                     else
                     {
-                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.ForegroundColor = DEFAULT_FOREGROUND;
                     }
                     Console.WriteLine($"> {options[i]}");
                 }
@@ -76,20 +42,21 @@ namespace cardgames.core
                 Util.ResetColor();
 
                 ConsoleKeyInfo key = Console.ReadKey(true);
-                if (key.Key == ConsoleKey.UpArrow || key.Key == ConsoleKey.W)
+                if (previousOptions.Contains(key.Key) || (key.Key == ConsoleKey.Tab && key.Modifiers.HasFlag(ConsoleModifiers.Shift)))
                 {
                     selected = (selected - 1 + options.Length) % options.Length;
                 }
-                else if (key.Key == ConsoleKey.DownArrow || key.Key == ConsoleKey.S)
+                else if (nextOptions.Contains(key.Key))
                 {
                     selected = (selected + 1) % options.Length;
                 }
-                else if (key.Key == ConsoleKey.Enter)
+                else if (affirmatives.Contains(key.Key))
                 {
+                    Console.CursorVisible = true;
                     return selected;
                 }
             }
-
+            Console.CursorVisible = true;
             return selected;
         }
 
@@ -126,13 +93,18 @@ namespace cardgames.core
 
 
 
-        private static readonly ConsoleColor DefaultForeground = ConsoleColor.White;
-        private static readonly ConsoleColor DefaultBackground = ConsoleColor.Black;
+        private static readonly ConsoleColor DEFAULT_FOREGROUND = ConsoleColor.White;
+        private static readonly ConsoleColor DEFAULT_BACKGROUND = ConsoleColor.Black;
+        private static readonly ConsoleColor SELECTED_FOREGROUND = ConsoleColor.Cyan;
+
+        public static ConsoleKey[] affirmatives = { ConsoleKey.Enter, ConsoleKey.Spacebar, ConsoleKey.Z };
+        public static ConsoleKey[] nextOptions = { ConsoleKey.DownArrow, ConsoleKey.PageDown, ConsoleKey.Tab, ConsoleKey.S };
+        public static ConsoleKey[] previousOptions = { ConsoleKey.UpArrow, ConsoleKey.PageUp, ConsoleKey.W };
 
         public static void ResetColor()
         {
-            Console.ForegroundColor = DefaultForeground;
-            Console.BackgroundColor = DefaultBackground;
+            Console.ForegroundColor = DEFAULT_FOREGROUND;
+            Console.BackgroundColor = DEFAULT_BACKGROUND;
         }
 
         public static void ResetColour()

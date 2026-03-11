@@ -1,4 +1,5 @@
-﻿using System;
+﻿using cardgames.core.extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,11 +8,12 @@ using System.Threading.Tasks;
 
 namespace cardgames.core
 {
-    public static class Translator
+    public static class Language
     {
         private static Dictionary<string, string> translations = [];
         private const string LANGUAGE_DIRECTORY_PATH = "..\\..\\..\\lang\\";
         private const string DEFAULT_LANGUAGE_CODE = "en-GB";
+        public static string CurrentLanguage { get; private set; }
 
         public static void SelectLanguage()
         {
@@ -38,9 +40,32 @@ namespace cardgames.core
 
         public static void Load(string languageCode = DEFAULT_LANGUAGE_CODE)
         {
+            CurrentLanguage = languageCode;
             string file = LANGUAGE_DIRECTORY_PATH + languageCode + ".json";
             string json = File.ReadAllText(file);
             translations = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+        }
+
+        public static void LoadGame(string gameName)
+        {
+            string locale = CurrentLanguage;
+            string gameLangDirectoryPath = $"..\\..\\..\\games\\{gameName.ToLower()}\\lang\\{locale}.json";
+
+            string json = File.ReadAllText(gameLangDirectoryPath);
+            Dictionary<string, string> importedTranslations = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+            translations.AddRange(importedTranslations);
+
+        }
+
+        public static void UnloadGame(string gameName)
+        {
+            string locale = CurrentLanguage;
+            string gameLangDirectoryPath = $"..\\..\\..\\games\\{gameName.ToLower()}\\lang\\{locale}.json";
+
+            string json = File.ReadAllText(gameLangDirectoryPath);
+            Dictionary<string, string> importedTranslations = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+            
+            translations.RemoveRange(importedTranslations);
         }
 
         public static string T(string key, Dictionary<string, string>? parameters = null)
