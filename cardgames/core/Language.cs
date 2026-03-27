@@ -1,10 +1,5 @@
-﻿using cardgames.core.extensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using cardgames.core.extension;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace cardgames.core
 {
@@ -13,7 +8,7 @@ namespace cardgames.core
         private static Dictionary<string, string> translations = [];
         private const string LANGUAGE_DIRECTORY_PATH = "..\\..\\..\\lang\\";
         private const string DEFAULT_LANGUAGE_CODE = "en-GB";
-        public static string CurrentLanguage { get; private set; }
+        public static string CurrentLanguage { get; private set; } = DEFAULT_LANGUAGE_CODE;
 
         public static void SelectLanguage()
         {
@@ -49,7 +44,7 @@ namespace cardgames.core
         public static void LoadGame(string gameName)
         {
             string locale = CurrentLanguage;
-            string gameLangDirectoryPath = $"..\\..\\..\\games\\{gameName.ToLower()}\\lang\\{locale}.json";
+            string gameLangDirectoryPath = $"..\\..\\..\\game\\{gameName.ToLower()}\\lang\\{locale}.json";
 
             string json = File.ReadAllText(gameLangDirectoryPath);
             Dictionary<string, string> importedTranslations = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
@@ -60,11 +55,11 @@ namespace cardgames.core
         public static void UnloadGame(string gameName)
         {
             string locale = CurrentLanguage;
-            string gameLangDirectoryPath = $"..\\..\\..\\games\\{gameName.ToLower()}\\lang\\{locale}.json";
+            string gameLangDirectoryPath = $"..\\..\\..\\game\\{gameName.ToLower()}\\lang\\{locale}.json";
 
             string json = File.ReadAllText(gameLangDirectoryPath);
             Dictionary<string, string> importedTranslations = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
-            
+
             translations.RemoveRange(importedTranslations);
         }
 

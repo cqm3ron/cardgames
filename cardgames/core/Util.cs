@@ -1,21 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.InteropServices;
 using static cardgames.core.Language;
 
 namespace cardgames.core
 {
     internal static class Util
     {
+        private static Thread? loading;
+        public static bool IsLoading = false;
         public static bool UserAgrees()
         {
             string[] options = [T("Util.Yes"), T("Util.No")];
 
-            if (GetChoice(options) == 0) return true;
-            else return true;
+            if (GetChoice(options) == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         public static int GetChoice(string[] options, int selected = 0)
@@ -91,8 +94,6 @@ namespace cardgames.core
             return password;
         }
 
-
-
         private static readonly ConsoleColor DEFAULT_FOREGROUND = ConsoleColor.White;
         private static readonly ConsoleColor DEFAULT_BACKGROUND = ConsoleColor.Black;
         private static readonly ConsoleColor SELECTED_FOREGROUND = ConsoleColor.Cyan;
@@ -129,6 +130,90 @@ namespace cardgames.core
             }
 
             Console.SetCursorPosition(0, initialCursorPos.Item2 + 1);
+        }
+
+        public static void StartLoading(string reason = "")
+        {
+            loading = new Thread(() => LoadingBar(reason))
+            {
+                IsBackground = true
+            };
+            IsLoading = true;
+            loading.Start();
+        }
+        public static void FinishLoading()
+        {
+            if (IsLoading)
+            {
+                IsLoading = false;
+                loading!.Join();
+            }
+            loading = null;
+        }
+        private static void LoadingBar(string reason = "")
+        {
+            const int SLEEP_DURATION = 250;
+
+            Queue<char> characters = new();
+
+            (int, int) cursorPos = Console.GetCursorPosition();
+            Console.Write(reason + new string(' ', Console.WindowWidth - reason.Length));
+            Thread.Sleep(SLEEP_DURATION / 2);
+            Console.SetCursorPosition(cursorPos.Item1, cursorPos.Item2);
+            Console.Write(new string(' ', Console.WindowWidth));
+            while (IsLoading)
+            {
+                if (characters.Count == 0)
+                {
+                    characters.Enqueue('-');
+                    characters.Enqueue('/');
+                    characters.Enqueue('-');
+                    characters.Enqueue('\\');
+                }
+
+                Console.SetCursorPosition(cursorPos.Item1, cursorPos.Item2);
+                Console.Write(characters.Dequeue());
+                Thread.Sleep(SLEEP_DURATION);
+            }
+            Console.SetCursorPosition(cursorPos.Item1, cursorPos.Item2);
+            Console.Write("Done!");
+            Thread.Sleep(SLEEP_DURATION);
+            Console.SetCursorPosition(cursorPos.Item1, cursorPos.Item2);
+            Console.Write(new string(' ', Console.WindowWidth));
+            Console.SetCursorPosition(cursorPos.Item1, cursorPos.Item2);
+        }
+
+        private struct Rect
+        {
+            public int Left;
+            public int Top;
+            public int Right;
+            public int Bottom;
+        }
+        public static void MaximiseWindow() // Code from https://learn.microsoft.com/en-us/answers/questions/1275773/how-to-resize-a-console-app-in-c-windows-terminal
+        {                                   // Only needed because Microsoft changed the default terminal app in W11 and school recently updated; Previously Console.SetWindowSize() would have worked.
+            // Import the necessary functions from user32.dll
+            [DllImport("user32.dll")]
+            static extern IntPtr GetForegroundWindow();
+            [DllImport("user32.dll")]
+            static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+            [DllImport("user32.dll")]
+            static extern bool GetWindowRect(IntPtr hWnd, out Rect lpRect);
+            [DllImport("user32.dll")]
+            static extern bool MoveWindow(IntPtr hWnd, int x, int y, int nWidth, int nHeight, bool bRepaint);
+            // Constants for the ShowWindow function
+            const int SW_MAXIMIZE = 3;
+            // Get the handle of the console window
+            IntPtr consoleWindowHandle = GetForegroundWindow();
+            // Maximize the console window
+            ShowWindow(consoleWindowHandle, SW_MAXIMIZE);
+            // Get the screen size
+            Rect screenRect;
+            GetWindowRect(consoleWindowHandle, out screenRect);
+            // Resize and reposition the console window to fill the screen
+            int width = screenRect.Right - screenRect.Left;
+            int height = screenRect.Bottom - screenRect.Top;
+            MoveWindow(consoleWindowHandle, screenRect.Left, screenRect.Top, width, height, true);
         }
     }
 }

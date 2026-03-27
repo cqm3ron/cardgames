@@ -1,19 +1,22 @@
-﻿using static cardgames.core.Language;
+﻿using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.VisualBasic;
+using static cardgames.core.Language;
 
 namespace cardgames.core
 {
     internal class Player
     {
-        private const string USER_FOLDER_PATH = "..\\..\\..\\users\\"; // In a real production environment, this data would be stored in %appdata% or similar location, in order to prevent people tampering with the user data or breaking things accidentally. However, for the purposes of this project, the data will be stored in a folder within the project directory, to make it easier to access and manage during development and testing.
-        private const int DEFAULT_BALANCE = 1500;
+        private const string USER_FOLDER_PATH = "..\\..\\..\\data\\user\\"; // In a real production environment, this data would be stored in %appdata% or similar location, in order to prevent people tampering with the user data or breaking things accidentally. However, for the purposes of this project, the data will be stored in a folder within the project directory, to make it easier to access and manage during development and testing.
+        private static readonly Money DEFAULT_BALANCE = 1500;
 
         private protected string name;
         private protected string uname;
-        private protected double balance;
-        public double Bet { get; private set; }
+        private protected Money balance;
+        private protected int rechargeCount;
+        public Money Bet { get; private set; }
         private protected List<Card> hand = [];
 
         #region GETTERS & SETTERS
@@ -21,7 +24,7 @@ namespace cardgames.core
         // Getters
         public string GetName() => name;
         public string GetUsername() => uname;
-        public double GetBalance() => balance;
+        public Money GetBalance() => balance;
 
         #endregion
 
@@ -45,19 +48,22 @@ namespace cardgames.core
             SetUsername();
             SetPassword();
             balance = DEFAULT_BALANCE;
+            rechargeCount = 0;
             SaveUserData();
         }
-        public Player(string _name, string _uname, double _balance) // for logging in
+        public Player(string _name, string _uname, decimal _balance, int _recharges) // for logging in
         {
             name = _name;
             uname = _uname;
             balance = _balance;
+            rechargeCount = _recharges;
         }
         private Player(string _name, string _uname)
         {
             name = _name;
             uname = _uname;
             balance = DEFAULT_BALANCE; // reset balance if failed to parse
+            rechargeCount = 0; // reset recharges with balance since this effectively purges user data. This shouldn't ever happen unless they tamper with the file and then that serves them right for trying to cheat.
         }
 
         #endregion
@@ -97,7 +103,7 @@ namespace cardgames.core
 
             if (!userNames.Contains(name.ToLower()))
             {
-                Console.WriteLine(T("Auth.Username.NotTaken", new Dictionary<string, string> { {"name", name.ToLower()} }));
+                Console.WriteLine(T("Auth.Username.NotTaken", new Dictionary<string, string> { { "name", name.ToLower() } }));
                 if (Util.UserAgrees())
                 {
                     uname = name.ToLower();
@@ -147,7 +153,7 @@ namespace cardgames.core
             string? input = "";
             while (input == "")
             {
-                Console.WriteLine(T("Auth.Password.Requirements", new Dictionary<string, string> { {"minChars", minChars.ToString() }, { "maxChars", maxChars.ToString() }, { "minUpperCase", minUppercase.ToString() }, { "minLowerCase", minLowercase.ToString() }, { "minDigits", minDigits.ToString() }, { "minSpecialChars", minSpecialChars.ToString() } }));
+                Console.WriteLine(T("Auth.Password.Requirements", new Dictionary<string, string> { { "minChars", minChars.ToString() }, { "maxChars", maxChars.ToString() }, { "minUpperCase", minUppercase.ToString() }, { "minLowerCase", minLowercase.ToString() }, { "minDigits", minDigits.ToString() }, { "minSpecialChars", minSpecialChars.ToString() } }));
                 //Console.WriteLine("Enter a secure password.");
                 //Console.WriteLine("The password should contain:");
                 //Console.WriteLine($"Between {minChars} & {maxChars} characters,");
@@ -210,7 +216,10 @@ namespace cardgames.core
 
             path = path + userName + ".userdata";
 
-            if (!File.Exists(path)) return null; // return null if the username does not exist.
+            if (!File.Exists(path))
+            {
+                return null; // return null if the username does not exist.
+            }
 
             string[] fileData = File.ReadAllLines(path);
 
@@ -218,23 +227,33 @@ namespace cardgames.core
             int iterations = int.Parse(passwordData[0]);
             byte[] saltBytes = Convert.FromBase64String(passwordData[1]);
             string storedHash = passwordData[2];
+            int playerRechargeCount;
 
             if (ComputeHash(password, saltBytes, iterations) == storedHash)
             {
                 string name = fileData[1];
                 string balanceFromFile = fileData[2];
-                if (double.TryParse(balanceFromFile, out double balance))
+                if (int.TryParse(fileData[3], out int temp))
                 {
-                    Console.WriteLine(T("Auth.Login.PlayerFound", new Dictionary<string, string> { {"name", name}, { "userName", userName }, { "balance", balance.ToString() } }));
-                    return new Player(name, userName, balance);
+                    playerRechargeCount = int.Parse(fileData[3]);
+                }
+                else
+                {
+                    playerRechargeCount = -1;
+                }
+
+                if (decimal.TryParse(balanceFromFile, out decimal balance) || playerRechargeCount == -1)
+                {
+                    Console.WriteLine(T("Auth.Login.PlayerFound", new Dictionary<string, string> { { "name", name }, { "userName", userName }, { "balance", balance.ToString() } }));
+                    return new Player(name, userName, balance, playerRechargeCount);
                 }
                 else
                 {
                     Console.WriteLine(T("Auth.Login.PlayerFoundNoBalance", new Dictionary<string, string> { { "name", name }, { "userName", userName } }));
-                    Console.WriteLine(T("Err.BalanceNotLoaded", new Dictionary<string, string> { { "DEFAULT_BALANCE", DEFAULT_BALANCE.ToString()} }));
+                    Console.WriteLine(T("Err.BalanceNotLoaded", new Dictionary<string, string> { { "DEFAULT_BALANCE", DEFAULT_BALANCE.ToString() } }));
                     return new Player(name, userName);
                 }
-                            
+
             }
             else
             {
@@ -249,11 +268,11 @@ namespace cardgames.core
             byte[] dataBytes = Encoding.UTF8.GetBytes(data); // Convert the input into bytes
             byte[] saltedData = new byte[saltBytes.Length + dataBytes.Length]; // Combine the salt and the data
 
-            for (int i = 0; i < saltBytes.Length; i++) 
+            for (int i = 0; i < saltBytes.Length; i++)
             {
                 saltedData[i] = saltBytes[i];
             }
-            for (int i = 0; i < dataBytes.Length; i++) 
+            for (int i = 0; i < dataBytes.Length; i++)
             {
                 saltedData[saltBytes.Length + i] = dataBytes[i];
             } // Merges the salt & data into one array of bytes
@@ -270,8 +289,46 @@ namespace cardgames.core
 
         #endregion
 
+        // Importing Players (For Leaderboard)
+
+        public static Dictionary<string, Money> GetLeaderboardPlayerData()
+        {
+            string[] userFiles = Directory.GetFiles(USER_FOLDER_PATH);
+            string[] userData; string name; Money balance; int recharges;
+
+            Dictionary<string, Money> leaderboardData = [];
+
+            foreach (string file in userFiles)
+            {
+                userData = null;
+                name = null;
+                balance = -1;
+                recharges = -1;
+                try
+                {
+                    userData = File.ReadAllLines(file);
+                    name = file.Replace(USER_FOLDER_PATH, "").Replace("userdata", "");
+                    balance = Convert.ToDecimal(userData[2]);
+                    recharges = Convert.ToInt32(userData[3]);
+                }
+                catch (Exception ex)
+                {
+                    // error in importing data; do not show this player on the leaderboard
+                }
+
+                balance -= DEFAULT_BALANCE * recharges;
+
+                leaderboardData.Add(name, balance);
+            }
+
+            var sortedLeaderboardData = leaderboardData.OrderByDescending(val => val.Value);
+
+            return sortedLeaderboardData.ToDictionary();
+        }
+
         // Player Data Saving
-        public void SaveUserData() 
+
+        public void SaveUserData()
         {
             string path = USER_FOLDER_PATH + uname + ".userdata";
             string[] newData;
@@ -279,7 +336,7 @@ namespace cardgames.core
             if (File.Exists(path))
             {
                 string[] data = [.. File.ReadAllLines(path)];
-                newData = [data[0], name, balance.ToString()];
+                newData = [data[0], name, balance.ToString(), rechargeCount.ToString()];
                 File.WriteAllText(path, string.Empty); // empty existing file
                 File.WriteAllLines(path, newData); // write new data
             }
@@ -291,26 +348,34 @@ namespace cardgames.core
 
         public static void SavePlayers(List<Player> players)
         {
-            if (players.Count == 0) return;
+            if (players.Count == 0)
+            {
+                return;
+            }
+
+            Util.StartLoading(T("Info.SavingData")); // TODO: LANG
+
             foreach (Player player in players)
             {
                 player.SaveUserData();
             }
+
+            Util.FinishLoading();
         }
 
         // Balance & Betting
 
-        public void PlaceBet(double amountToBet) 
+        public void PlaceBet(Money amountToBet)
         {
             Bet += amountToBet;
         }
 
         public void DoubleBet()
         {
-            Bet *= 2;
+            Bet = new Money(Bet.Value * 2);
         }
 
-        public void DeductFromBalance(double amountToDeduct)
+        public void DeductFromBalance(Money amountToDeduct)
         {
             if (amountToDeduct > 0)
             {
@@ -328,6 +393,12 @@ namespace cardgames.core
         {
             balance += Bet;
             Bet = 0;
+        }
+
+        public void RechargeBalance()
+        {
+            balance = 1500m;
+            rechargeCount++;
         }
 
         // Gameplay

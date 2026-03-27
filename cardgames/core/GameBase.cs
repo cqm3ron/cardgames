@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using static cardgames.core.Language;
+﻿using static cardgames.core.Language;
 
 namespace cardgames.core
 {
     internal abstract class GameBase<TPlayer> where TPlayer : Player
     {
+
         private protected GameBase()
         {
             //string stupidParsedString = this.GetType().ToString().Split('.')[^1].Replace("Game", "");
 
-            GameName = this.GetType().ToString().Split('.')[^1].Replace("Game", "");
+            GameName = GetType().ToString().Split('.')[^1].Replace("Game", "");
         }
 
         private protected string GameName;
@@ -25,8 +20,11 @@ namespace cardgames.core
         private protected abstract void EndGame();
         private protected void LoadGame()
         {
-            Console.WriteLine(T("Menu.Loading") + GameName);
+            Util.StartLoading(T("Menu.Loading") + GameName);
+            //Console.WriteLine(T("Menu.Loading") + GameName);
             Language.LoadGame(GameName);
+            Util.FinishLoading();
+
         }
     }
 }

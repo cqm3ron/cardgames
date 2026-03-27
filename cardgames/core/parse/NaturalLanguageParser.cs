@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using static cardgames.core.Card;
 
 
 namespace cardgames.core
@@ -41,7 +40,7 @@ namespace cardgames.core
 
             return map;
         } // import map
-        protected private void ExportMap<TEnum>(Dictionary<string, TEnum> map, string path) where TEnum : struct, Enum
+        private protected void ExportMap<TEnum>(Dictionary<string, TEnum> map, string path) where TEnum : struct, Enum
         {
             var grouped = map.GroupBy(kvp => kvp.Value).ToDictionary(g => g.Key.ToString()!, g => g.Select(x => x.Key).OrderBy(x => x).ToList());
 
@@ -61,9 +60,12 @@ namespace cardgames.core
         } // export map
 
         // Parsing - Generic
-        protected private bool TryFindMatch<T>(string token, Dictionary<string, T> map, out T value)
+        private protected bool TryFindMatch<T>(string token, Dictionary<string, T> map, out T value)
         {
-            if (map.TryGetValue(token, out value)) return true;
+            if (map.TryGetValue(token, out value))
+            {
+                return true;
+            }
 
             var prefixMatches = map.Keys.Where(k => k.StartsWith(token)).OrderByDescending(k => k.Length).ToList();
 
@@ -77,7 +79,7 @@ namespace cardgames.core
                 return TryFuzzyMatch(token, map, out value);
             }
         }
-        protected private bool TryFuzzyMatch<T>(string token, Dictionary<string, T> map, out T value)
+        private protected bool TryFuzzyMatch<T>(string token, Dictionary<string, T> map, out T value)
         {
             {
                 {
@@ -110,12 +112,12 @@ namespace cardgames.core
         }
 
         // Util
-        protected private string NormaliseInput(string input)
+        private protected string NormaliseInput(string input)
         {
             return input.ToLower().Replace("of", "").Replace(",", "").Replace(".", "").Trim();
         } // remove unnecessary characters & standardise formatting
 
-        protected private int Levenshtein(string string1, string string2)
+        private protected int Levenshtein(string string1, string string2)
         {
             // Store length of each string in variable; this will be used a lot.
             int length1 = string1.Length;
@@ -123,8 +125,15 @@ namespace cardgames.core
 
             int[,] distanceMatrix = new int[length1 + 1, length2 + 1];
 
-            if (length1 == 0) return length2;
-            if (length2 == 0) return length1;
+            if (length1 == 0)
+            {
+                return length2;
+            }
+
+            if (length2 == 0)
+            {
+                return length1;
+            }
 
             for (int i = 1; i <= length1; i++)
             {

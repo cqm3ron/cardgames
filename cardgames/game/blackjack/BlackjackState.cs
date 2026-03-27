@@ -1,11 +1,6 @@
 ﻿using cardgames.core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace cardgames.games.blackjack
+namespace cardgames.game.blackjack
 {
     internal class BlackjackState : GameState<BlackjackPlayer>
     {

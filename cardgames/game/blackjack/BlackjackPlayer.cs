@@ -1,12 +1,7 @@
 ﻿using cardgames.core;
 using static cardgames.core.Language;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace cardgames.games.blackjack
+namespace cardgames.game.blackjack
 {
     enum WinStates
     {
@@ -25,6 +20,7 @@ namespace cardgames.games.blackjack
         public WinStates WinState { get; private set; }
 
         public int HandValue => CalculateHandValue();
+        public int CardsInHand => hand.Count;
 
         #region CONVERSIONS
 
@@ -39,7 +35,7 @@ namespace cardgames.games.blackjack
 
             return blackjackPlayer;
         }
-        
+
         public static List<BlackjackPlayer> ConvertTo(List<Player> players)
         {
             List<BlackjackPlayer> bjplayers = [];
@@ -48,13 +44,13 @@ namespace cardgames.games.blackjack
             {
                 bjplayers.Add(ConvertTo(p));
             }
-            
+
             return bjplayers;
         }
 
         public static Player ConvertFrom(BlackjackPlayer blackjackPlayer)
         {
-            Player player = new Player(blackjackPlayer.name, blackjackPlayer.uname, blackjackPlayer.balance);
+            Player player = new(blackjackPlayer.name, blackjackPlayer.uname, blackjackPlayer.balance.Value, blackjackPlayer.rechargeCount);
             return player;
         }
 
@@ -127,7 +123,7 @@ namespace cardgames.games.blackjack
             return total;
         }
 
-        public double GetBustChance(BlackjackState state)
+        public double GetBustChance(BlackjackState state)           // COUNTED AS A COMPLEX CALCULATION (NEA)
         {
             int decksInShoe = BlackjackGame.DECKCOUNT;              // normally 6
             Deck possibleDeck = new();
@@ -148,13 +144,25 @@ namespace cardgames.games.blackjack
             {
                 int value;
 
-                if (rank is Ranks.King or Ranks.Queen or Ranks.Jack) value = 10;
+                if (rank is Ranks.King or Ranks.Queen or Ranks.Jack)
+                {
+                    value = 10;
+                }
                 else if (rank == Ranks.Ace)
                 {
-                    if (HandValue >= 11) value = 11;
-                    else value = 1;
+                    //if (HandValue >= 11)
+                    //{
+                    //    value = 11;
+                    //}
+                    //else
+                    {
+                        value = 1;
+                    }
                 }
-                else value = (int)rank;
+                else
+                {
+                    value = (int)rank;
+                }
 
                 if (value > maxSafeCardValue)
                 {
@@ -172,7 +180,7 @@ namespace cardgames.games.blackjack
                 }
             }
 
-            double bustProbability = (double)numberOfCardsThatWouldBust / (double)possibleDeck.GetCards().Count;
+            double bustProbability = numberOfCardsThatWouldBust / (double)possibleDeck.GetCards().Count;
 
             bustProbability *= 100;
 

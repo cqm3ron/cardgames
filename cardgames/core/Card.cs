@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Security;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace cardgames.core
+﻿namespace cardgames.core
 {
     public enum Suits // TODO: add language support (sigh)
     {
@@ -40,8 +33,8 @@ namespace cardgames.core
         // Constructors
         public Card(Suits suit, Ranks rank)
         {
-            this.Suit = suit;
-            this.Rank = rank;
+            Suit = suit;
+            Rank = rank;
             if (rank == Ranks.King || rank == Ranks.Queen || rank == Ranks.Jack)
             {
                 IsFaceCard = true;

@@ -4,9 +4,9 @@ namespace cardgames
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
-            Application.Load();
+            Application.Load(); // Delegate functionality to the application class for more flexibility
         }
     }
 }

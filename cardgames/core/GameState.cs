@@ -17,6 +17,8 @@
         {
             players = [.. _players];
             currentPlayer = 0;
+            gameDeck = new();
+            gamePhase = "";
         }
 
         public TPlayer GetCurrentPlayer()

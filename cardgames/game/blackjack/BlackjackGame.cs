@@ -1,51 +1,42 @@
 ﻿using cardgames.core;
-using System.Numerics;
 using static cardgames.core.Language;
 
-namespace cardgames.games.blackjack
+namespace cardgames.game.blackjack
 {
     internal class BlackjackGame : GameBase<Player>
     {
         public const int DECKCOUNT = 6;
+        private readonly decimal[] BETTING_AMOUNTS = [0.01m, 0.05m, 0.1m, 0.2m, 0.33m, 0.5m, 0.75m, 0.9m, 1m];
         public BlackjackState State { get; set; }
-        private BlackjackParser Parser { get; set; } // unused for now
-        
         public BlackjackGame() : base() { }
 
         public override List<Player> PlayGame(List<Player> players)
         {
             LoadGame();
 
-            // maybe add a totally rad loading bar here (but only once ive finished the actual programming LOL)
-
             List<BlackjackPlayer> blackjackPlayers = BlackjackPlayer.ConvertTo(players);
 
             State = new(blackjackPlayers);
-            Parser = new();
 
             foreach (BlackjackPlayer player in State.GetPlayerList())
             {
-                List<double> options = [];
-                double balance = player.GetBalance();
+                Console.Clear();
+                List<Money> options = [];
+                Money balance = player.GetBalance();
                 Console.WriteLine(T("User.Betting.Info") + player.GetName());
                 Console.WriteLine(T("User.Balance") + ": cr" + balance);
                 Console.WriteLine(T("User.Ask.Betting"));
 
-                options.Add(Math.Round(balance * 0.01, 2));
-                options.Add(Math.Round(balance * 0.05, 2));
-                options.Add(Math.Round(balance * 0.1, 2));
-                options.Add(Math.Round(balance * 0.2, 2));
-                options.Add(Math.Round(balance * 0.33, 2));
-                options.Add(Math.Round(balance * 0.5, 2));
-                options.Add(Math.Round(balance * 0.75, 2));
-                options.Add(Math.Round(balance * 0.9, 2));
-                options.Add(Math.Round(balance, 2));
+                foreach (Money amount in BETTING_AMOUNTS)
+                {
+                    options.Add(balance * amount);
+                }
 
                 List<string> optionsToDisplay = [];
-                
-                foreach (double option in options)
+
+                for (int opt = 0; opt < options.Count; opt++)
                 {
-                    optionsToDisplay.Add($"{Math.Round((option / balance) * 100, 0)}%: "+ option.ToString());
+                    optionsToDisplay.Add($"{(int)(BETTING_AMOUNTS[opt] * 100)}%: {options[opt].ToString()}");
                 }
 
                 int choice = Util.GetChoice([.. optionsToDisplay.ToArray()]);
@@ -79,7 +70,16 @@ namespace cardgames.games.blackjack
         {
             BlackjackPlayer player = State.GetCurrentPlayer();
 
-            string[] options = [T("Blackjack.Hit"), T("Blackjack.Stand"), T("Blackjack.Double")];
+            string[] options = [T("Blackjack.Hit"), T("Blackjack.Stand")];
+
+            Console.WriteLine(player.CardsInHand);
+            Console.WriteLine(player.GetBalance());
+            Console.WriteLine(player.Bet);
+            Console.WriteLine(player.GetBalance() - player.Bet);
+            if (player.CardsInHand <= 2 && player.GetBalance() >= player.Bet * 2)
+            {
+                options = [T("Blackjack.Hit"), T("Blackjack.Stand"), T("Blackjack.Double")];
+            }
 
             while (!player.Standing && !player.Bust)
             {
@@ -113,7 +113,6 @@ namespace cardgames.games.blackjack
             player.EndTurn();
 
         }
-
         private void DisplayBlackjackData(BlackjackPlayer player, BlackjackState state)
         {
             Console.Clear();
@@ -142,15 +141,18 @@ namespace cardgames.games.blackjack
                 Console.WriteLine($"/!\\ If you choose to hit, you have a {player.GetBustChance(State)}% chance of going bust!"); // TODO: lang
             }
         }
-        
+
         private protected override void EndGame()
         {
             CheckWinners();
-
+            Console.Clear();
             foreach (BlackjackPlayer player in State.GetPlayerList())
             {
                 Console.WriteLine(T("Blackjack.Player.WinSummary", new Dictionary<string, string> { { "player", player.GetName() }, { "bet", player.Bet.ToString() } }));
-                if (player.Doubled) Console.WriteLine("Blackjack.Player.WinSummary.Doubled");
+                if (player.Doubled)
+                {
+                    Console.WriteLine("Blackjack.Player.WinSummary.Doubled");
+                }
 
                 if (player.WinState == WinStates.Won)
                 {
