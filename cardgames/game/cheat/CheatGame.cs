@@ -1,6 +1,5 @@
 ﻿using cardgames.core;
-using cardgames.game.cheat;
-
+using static cardgames.core.Language;
 
 namespace cardgames.game.cheat
 {
@@ -12,7 +11,20 @@ namespace cardgames.game.cheat
         public CheatGame() : base() { }
         public override List<Player> PlayGame(List<Player> players)
         {
+            List<CheatPlayer> cheatPlayers = CheatPlayer.ConvertTo(players);
 
+            State = new(cheatPlayers);
+
+            // do good game 👍
+
+            EndGame();
+
+            Console.WriteLine(T("Util.PressKey"));
+            Console.ReadKey(true);
+
+            Language.UnloadGame(GameName);
+            players = CheatPlayer.ConvertFrom(State.GetPlayerList());
+            return players;
         }
         private protected override void PlayTurn()
         {

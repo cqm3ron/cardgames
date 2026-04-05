@@ -7,7 +7,7 @@ namespace cardgames.game.blackjack
     {
         public const int DECKCOUNT = 6;
         private readonly decimal[] BETTING_AMOUNTS = [0.01m, 0.05m, 0.1m, 0.2m, 0.33m, 0.5m, 0.75m, 0.9m, 1m];
-        public BlackjackState State { get; set; }
+        public BlackjackState State { get; set; } = null!;
         public BlackjackGame() : base() { }
         public override List<Player> PlayGame(List<Player> players)
         {
@@ -64,6 +64,7 @@ namespace cardgames.game.blackjack
             players = BlackjackPlayer.ConvertFrom(State.GetPlayerList());
             return players;
         }
+
         private protected override void PlayTurn()
         {
             BlackjackPlayer player = State.GetCurrentPlayer();
@@ -111,6 +112,7 @@ namespace cardgames.game.blackjack
             player.EndTurn();
 
         }
+
         private void DisplayBlackjackData(BlackjackPlayer player, BlackjackState state)
         {
             Console.Clear();
