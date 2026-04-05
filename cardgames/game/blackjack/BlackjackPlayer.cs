@@ -12,6 +12,7 @@ namespace cardgames.game.blackjack
 
     internal class BlackjackPlayer : Player
     {
+        #region PROPERTIES
         public bool Bust { get; private set; }
         public bool Standing { get; private set; }
         public bool Doubled { get; private set; }
@@ -21,6 +22,7 @@ namespace cardgames.game.blackjack
 
         public int HandValue => CalculateHandValue();
         public int CardsInHand => hand.Count;
+        #endregion
 
         #region CONVERSIONS
 
@@ -150,14 +152,7 @@ namespace cardgames.game.blackjack
                 }
                 else if (rank == Ranks.Ace)
                 {
-                    //if (HandValue >= 11)
-                    //{
-                    //    value = 11;
-                    //}
-                    //else
-                    {
-                        value = 1;
-                    }
+                    value = 1;
                 }
                 else
                 {

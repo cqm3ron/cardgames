@@ -9,7 +9,6 @@ namespace cardgames.game.blackjack
         private readonly decimal[] BETTING_AMOUNTS = [0.01m, 0.05m, 0.1m, 0.2m, 0.33m, 0.5m, 0.75m, 0.9m, 1m];
         public BlackjackState State { get; set; }
         public BlackjackGame() : base() { }
-
         public override List<Player> PlayGame(List<Player> players)
         {
             LoadGame();
@@ -65,7 +64,6 @@ namespace cardgames.game.blackjack
             players = BlackjackPlayer.ConvertFrom(State.GetPlayerList());
             return players;
         }
-
         private protected override void PlayTurn()
         {
             BlackjackPlayer player = State.GetCurrentPlayer();
@@ -127,21 +125,23 @@ namespace cardgames.game.blackjack
 
             Console.WriteLine();
 
-            Console.WriteLine($"Dealer's face-up card is: {state.dealer.PublicCard}"); // TODO: lang
+            Console.WriteLine(T("Blackjack.Dealer.FaceUpCard") + ": " + state.dealer.PublicCard);
+            //Console.WriteLine($"Dealer's face-up card is: {state.dealer.PublicCard}"); // TODO: lang
 
             if (player.Bust)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Uh-oh! You went bust."); // TODO: lang
+                Console.WriteLine(T("Blackjack.Player.WentBust"));
+                //Console.WriteLine("Uh-oh! You went bust."); // TODO: lang
                 Util.ResetColour();
             }
 
             if (!player.Bust)
             {
-                Console.WriteLine($"/!\\ If you choose to hit, you have a {player.GetBustChance(State)}% chance of going bust!"); // TODO: lang
+                Console.Write(T("Blackjack.Player.BustChance", new Dictionary<string, string> { { "playerBustChance", player.GetBustChance(State).ToString() } }));
+                //Console.WriteLine($"/!\\ If you choose to hit, you have a {player.GetBustChance(State)}% chance of going bust!"); // TODO: lang
             }
         }
-
         private protected override void EndGame()
         {
             CheckWinners();
@@ -151,7 +151,7 @@ namespace cardgames.game.blackjack
                 Console.WriteLine(T("Blackjack.Player.WinSummary", new Dictionary<string, string> { { "player", player.GetName() }, { "bet", player.Bet.ToString() } }));
                 if (player.Doubled)
                 {
-                    Console.WriteLine("Blackjack.Player.WinSummary.Doubled");
+                    Console.WriteLine(T("Blackjack.Player.WinSummary.Doubled"));
                 }
 
                 if (player.WinState == WinStates.Won)
@@ -187,7 +187,6 @@ namespace cardgames.game.blackjack
                 }
             }
         }
-
         private void CheckWinners()
         {
             if (State.dealer.Bust) // if dealer is bust, all non-bust players win

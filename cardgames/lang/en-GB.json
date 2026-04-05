@@ -7,6 +7,7 @@
   "Menu.CreateUser": "Create User",
   "Menu.LanguageSelect": "Select Language",
   "Menu.RechargeBalance": "Recharge Player Balance",
+  "Menu.ViewLeaderboard": "View Leaderboard",
   "Menu.GameSelection": "Proceed to Game Selection Screen",
   "Menu.Exit": "Save & Exit",
   "Menu.LoggedIn": "LOGGED IN USERS",
@@ -14,6 +15,7 @@
   "Menu.Input.Username": "Enter your username: ",
   "Menu.Input.Password": "Enter your password: ",
   "Menu.Loading": "Loading ",
+  "Leaderboard.Title": "=== LEADERBOARD ===",
   "Auth.Name.Preferred": "Enter your preferred name: ",
   "Auth.Username.NotTaken": "Your name, {name}, is not taken as a username. Use it as your username?",
   "Auth.Username.Input": "Input your username: ",
@@ -27,10 +29,12 @@
   "Err.PasswordNotSecure": "That didn't seem to meet the security requirements. Try another password.",
   "Err.UserDataNotFound": "User data file not found. This means your account was not created successfully. Please re-create your account.",
   "Err.BalanceNotLoaded": "Failed to load balance; reset to {DEFAULT_BALANCE}",
+  "Err.AlreadyLoggedIn": "That user is already logged in!",
   "Util.Yes": "YES",
   "Util.No": "NO",
   "Util.PressKey": "Press any key to continue",
   "User.Ask.Betting": "How much do you wish to bet?",
   "User.Betting.Info": "Player to place bet: ",
-  "User.Balance": "Balance"
+  "User.Balance": "Balance",
+  "Info.SavingData": "Your data is being saved. Please wait..."
 }

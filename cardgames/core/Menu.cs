@@ -162,7 +162,7 @@ namespace cardgames.core
             List<int> playerOptions = [];
 
             Console.Clear();
-            Console.WriteLine("Bankrupt Players:"); // TODO: LANG
+            Console.WriteLine(T("Menu.Players.Bankrupt")); // TODO: LANG
             foreach (Player player in players)
             {
                 if (player.GetBalance() <= 0)

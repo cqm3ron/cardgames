@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace cardgames.game.cheat
 {
-    //internal class CheatPlayer : Player
-    //{
+    internal class CheatPlayer : Player
+    {
 
-    //}
+    }
 }

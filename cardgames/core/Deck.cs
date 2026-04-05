@@ -5,13 +5,11 @@ namespace cardgames.core
     internal class Deck
     {
         private protected Stack<Card> cards;
-        private protected Stack<Card> discardPile;
         private protected static readonly Random rand = new();
 
         public Deck()
         {
             cards = new();
-            discardPile = new();
         }
 
         public void AddCards(IEnumerable<Card> newCards)
@@ -22,10 +20,12 @@ namespace cardgames.core
             }
 
         }
+
         public void Shuffle()
         {
             cards.Shuffle(); // Calls the fisher-yates shuffle extension method for stacks (extensions/StackExtensions.cs)
         }
+
         public Card Draw()
         {
             return cards.Pop();
@@ -50,19 +50,6 @@ namespace cardgames.core
 
             return hands;
 
-        }
-
-        public void AddToDiscard(Card card)
-        {
-            discardPile.Push(card);
-        }
-        public void RefillDeckFromDiscard()
-        {
-            while (discardPile.Count > 0)
-            {
-                cards.Push(discardPile.Pop());
-            }
-            Shuffle();
         }
 
         // Utility
