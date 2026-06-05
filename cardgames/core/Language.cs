@@ -80,6 +80,5 @@ namespace cardgames.core
 
             return value;
         }
-
     }
 }

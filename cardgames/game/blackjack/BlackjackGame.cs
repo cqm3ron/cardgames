@@ -60,7 +60,6 @@ namespace cardgames.game.blackjack
             Console.WriteLine(T("Util.PressKey"));
             Console.ReadKey(true);
 
-            Language.UnloadGame(GameName);
             players = BlackjackPlayer.ConvertFrom(State.GetPlayerList());
             return players;
         }

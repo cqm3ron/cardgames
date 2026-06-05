@@ -157,7 +157,7 @@ namespace cardgames.core
             Queue<char> characters = new();
 
             (int, int) cursorPos = Console.GetCursorPosition();
-            Console.Write(reason + new string(' ', Console.WindowWidth - reason.Length));
+            Console.Write(reason + new string(' ', Console.WindowWidth -  reason.Length)); // pad reason with spaces to clear any previous text
             Thread.Sleep(SLEEP_DURATION / 2);
             Console.SetCursorPosition(cursorPos.Item1, cursorPos.Item2);
             Console.Write(new string(' ', Console.WindowWidth));
@@ -191,7 +191,7 @@ namespace cardgames.core
             public int Bottom;
         }
         public static void MaximiseWindow() // Code from https://learn.microsoft.com/en-us/answers/questions/1275773/how-to-resize-a-console-app-in-c-windows-terminal
-        {                                   // Only needed because Microsoft changed the default terminal app in W11 and school recently updated; Previously Console.SetWindowSize() would have worked.
+        {                                   // Only needed because Microsoft changed the default terminal application in Win 11 and school recently updated; Previously Console.SetWindowSize() would have worked.
             // Import the necessary functions from user32.dll
             [DllImport("user32.dll")]
             static extern IntPtr GetForegroundWindow();

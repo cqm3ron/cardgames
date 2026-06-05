@@ -17,12 +17,17 @@ namespace cardgames.game.cheat
 
             // do good game 👍
 
+            /*
+             * PLAN
+             * 1. 
+             * 
+             */
+
             EndGame();
 
             Console.WriteLine(T("Util.PressKey"));
             Console.ReadKey(true);
 
-            Language.UnloadGame(GameName);
             players = CheatPlayer.ConvertFrom(State.GetPlayerList());
             return players;
         }

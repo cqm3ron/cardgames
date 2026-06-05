@@ -34,6 +34,7 @@ namespace cardgames.core
                     game = Menu.GameMenu();
                 }
                 players = game.PlayGame(players);
+                Language.UnloadGame(game.GameName);
                 Player.SavePlayers(players);
                 game = null;
             }

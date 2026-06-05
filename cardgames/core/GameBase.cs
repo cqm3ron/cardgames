@@ -12,7 +12,7 @@ namespace cardgames.core
             GameName = GetType().ToString().Split('.')[^1].Replace("Game", "");
         }
 
-        private protected string GameName;
+        public readonly string GameName;
         //public GameState<TPlayer> State { get; protected set; }
         //private protected RuleEngine<TPlayer> Rules { get; set; }
         public abstract List<Player> PlayGame(List<TPlayer> players);
@@ -21,7 +21,6 @@ namespace cardgames.core
         private protected void LoadGame()
         {
             Util.StartLoading(T("Menu.Loading") + GameName);
-            //Console.WriteLine(T("Menu.Loading") + GameName);
             Language.LoadGame(GameName);
             Util.FinishLoading();
 
