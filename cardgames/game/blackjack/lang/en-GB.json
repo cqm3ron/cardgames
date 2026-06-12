@@ -10,5 +10,8 @@
   "Blackjack.Player.WonDouble": "You won after choosing to double down! Your new balance is cr{balance}",
   "Blackjack.Player.Drew": "You drew! Your balance hasn't changed.",
   "Blackjack.Player.WinSummary": "Player {player} bet cr{bet}.",
-  "Blackjack.Player.WinSummary.Doubled": "They also chose to double down."
+  "Blackjack.Player.WinSummary.Doubled": "They also chose to double down.",
+  "Blackjack.Dealer.FaceUpCard": "Dealer's face-up card",
+  "Blackjack.Player.BustChance": "/!\\ If you choose to hit, you have a {playerBustChance}% chance of going bust!",
+  "Blackjack.Player.WentBust": "Uh-oh! You went bust."
 }

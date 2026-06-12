@@ -1,5 +1,6 @@
 ﻿using cardgames.core;
 using static cardgames.core.Language;
+using static cardgames.core.L10n;
 
 namespace cardgames.game.blackjack
 {
@@ -22,9 +23,9 @@ namespace cardgames.game.blackjack
                 Console.Clear();
                 List<Money> options = [];
                 Money balance = player.GetBalance();
-                Console.WriteLine(T("User.Betting.Info") + player.GetName());
-                Console.WriteLine(T("User.Balance") + ": cr" + balance);
-                Console.WriteLine(T("User.Ask.Betting"));
+                Console.WriteLine(T(User_Betting_Info, ("name", player.GetName())));
+                Console.WriteLine(T(User_Balance) + ": cr" + balance);
+                Console.WriteLine(T(User_Ask_Betting));
 
                 foreach (Money amount in BETTING_AMOUNTS)
                 {
@@ -57,7 +58,7 @@ namespace cardgames.game.blackjack
 
             EndGame();
 
-            Console.WriteLine(T("Util.PressKey"));
+            Console.WriteLine(T(Util_PressKey));
             Console.ReadKey(true);
 
             players = BlackjackPlayer.ConvertFrom(State.GetPlayerList());
@@ -68,7 +69,7 @@ namespace cardgames.game.blackjack
         {
             BlackjackPlayer player = State.GetCurrentPlayer();
 
-            string[] options = [T("Blackjack.Hit"), T("Blackjack.Stand")];
+            string[] options = [T(Blackjack_Hit), T(Blackjack_Stand)];
 
             Console.WriteLine(player.CardsInHand);
             Console.WriteLine(player.GetBalance());
@@ -76,7 +77,7 @@ namespace cardgames.game.blackjack
             Console.WriteLine(player.GetBalance() - player.Bet);
             if (player.CardsInHand <= 2 && player.GetBalance() >= player.Bet * 2)
             {
-                options = [T("Blackjack.Hit"), T("Blackjack.Stand"), T("Blackjack.Double")];
+                options = [T(Blackjack_Hit), T(Blackjack_Stand), T(Blackjack_Double)];
             }
 
             while (!player.Standing && !player.Bust)
@@ -115,32 +116,29 @@ namespace cardgames.game.blackjack
         private void DisplayBlackjackData(BlackjackPlayer player, BlackjackState state)
         {
             Console.Clear();
-            Console.WriteLine(T("Blackjack.PlayerHand", new Dictionary<string, string> { { "name" /* name is the param ident, doesn't need replacing w translation key */, player.GetName() } }));
+            Console.WriteLine(T(Blackjack_PlayerHand, ("name", player.GetName())));
 
             foreach (Card card in player.GetHand())
             {
                 Console.WriteLine(card);
             }
 
-            Console.WriteLine($"\n{T("Blackjack.HandValueInfo")}" + player.HandValue);
+            Console.WriteLine($"\n{T(Blackjack_HandValueInfo)}" + player.HandValue);
 
             Console.WriteLine();
 
-            Console.WriteLine(T("Blackjack.Dealer.FaceUpCard") + ": " + state.dealer.PublicCard);
-            //Console.WriteLine($"Dealer's face-up card is: {state.dealer.PublicCard}"); // TODO: lang
+            Console.WriteLine(T(Blackjack_Dealer_FaceUpCard) + ": " + state.dealer.PublicCard);
 
             if (player.Bust)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(T("Blackjack.Player.WentBust"));
-                //Console.WriteLine("Uh-oh! You went bust."); // TODO: lang
+                Console.WriteLine(T(Blackjack_Player_WentBust));
                 Util.ResetColour();
             }
 
             if (!player.Bust)
             {
-                Console.Write(T("Blackjack.Player.BustChance", new Dictionary<string, string> { { "playerBustChance", player.GetBustChance(State).ToString() } }));
-                //Console.WriteLine($"/!\\ If you choose to hit, you have a {player.GetBustChance(State)}% chance of going bust!"); // TODO: lang
+                Console.WriteLine(T(Blackjack_Player_BustChance, ("playerBustChance", player.GetBustChance(state).ToString())));
             }
         }
         private protected override void EndGame()
@@ -149,10 +147,10 @@ namespace cardgames.game.blackjack
             Console.Clear();
             foreach (BlackjackPlayer player in State.GetPlayerList())
             {
-                Console.WriteLine(T("Blackjack.Player.WinSummary", new Dictionary<string, string> { { "player", player.GetName() }, { "bet", player.Bet.ToString() } }));
+                Console.WriteLine(T(Blackjack_Player_WinSummary, ("player", player.GetName()), ("bet", player.Bet.ToString())));
                 if (player.Doubled)
                 {
-                    Console.WriteLine(T("Blackjack.Player.WinSummary.Doubled"));
+                    Console.WriteLine(T(Blackjack_Player_WinSummary_Doubled));
                 }
 
                 if (player.WinState == WinStates.Won)
@@ -161,11 +159,11 @@ namespace cardgames.game.blackjack
 
                     if (player.Doubled)
                     {
-                        Console.WriteLine(T("Blackjack.Player.Won.Double", new Dictionary<string, string> { { "balance", player.GetBalance().ToString() } }));
+                        Console.WriteLine(T(Blackjack_Player_WonDouble, ("balance", player.GetBalance().ToString())));
                     }
                     else
                     {
-                        Console.WriteLine(T("Blackjack.Player.Won", new Dictionary<string, string> { { "balance", player.GetBalance().ToString() } }));
+                        Console.WriteLine(T(Blackjack_Player_Won, ("balance", player.GetBalance().ToString())));
                     }
 
                 }
@@ -175,16 +173,16 @@ namespace cardgames.game.blackjack
 
                     if (player.Doubled)
                     {
-                        Console.WriteLine(T("Blackjack.Player.Lost.Double", new Dictionary<string, string> { { "balance", player.GetBalance().ToString() } }));
+                        Console.WriteLine(T(Blackjack_Player_LostDouble, ("balance", player.GetBalance().ToString())));
                     }
                     else
                     {
-                        Console.WriteLine(T("Blackjack.Player.Lost", new Dictionary<string, string> { { "balance", player.GetBalance().ToString() } }));
+                        Console.WriteLine(T(Blackjack_Player_Lost, ("balance", player.GetBalance().ToString())));
                     }
                 }
                 else
                 {
-                    Console.WriteLine(T("Blackjack.Player.Drew"));
+                    Console.WriteLine(T(Blackjack_Player_Drew));
                 }
             }
         }

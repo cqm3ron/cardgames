@@ -1,6 +1,9 @@
-﻿namespace cardgames.core
+﻿using static cardgames.core.Language;
+using static cardgames.core.L10n;
+
+namespace cardgames.core
 {
-    public enum Suits // TODO: add language support (sigh)
+    public enum Suits
     {
         Hearts,
         Diamonds,
@@ -47,7 +50,7 @@
 
         public override string ToString()
         {
-            return $"{Rank} of {Suit}"; // and language support here too (double sigh)
+            return $"{T($"Rank.{Rank}")} {T(Card_Of)} {T($"Suit.{Suit}")}";
         }
 
     }

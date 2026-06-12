@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using static cardgames.core.Language;
+using static cardgames.core.L10n;
 
 namespace cardgames.core
 {
@@ -103,7 +104,7 @@ namespace cardgames.core
 
             if (!userNames.Contains(name.ToLower()))
             {
-                Console.WriteLine(T("Auth.Username.NotTaken", new Dictionary<string, string> { { "name", name.ToLower() } }));
+                Console.WriteLine(T(Auth_Username_NotTaken, ("name", name.ToLower())));
                 if (Util.UserAgrees())
                 {
                     uname = name.ToLower();
@@ -121,7 +122,7 @@ namespace cardgames.core
                 {
                     if (userNames.Contains(input))
                     {
-                        Console.WriteLine(T("Auth.Username.Taken", new Dictionary<string, string> { { "username", input } }));
+                        Console.WriteLine(T(Auth_Username_Taken, ("username", input)));
                         input = "";
                     }
                     else
@@ -153,14 +154,7 @@ namespace cardgames.core
             string? input = "";
             while (input == "")
             {
-                Console.WriteLine(T("Auth.Password.Requirements", new Dictionary<string, string> { { "minChars", minChars.ToString() }, { "maxChars", maxChars.ToString() }, { "minUpperCase", minUppercase.ToString() }, { "minLowerCase", minLowercase.ToString() }, { "minDigits", minDigits.ToString() }, { "minSpecialChars", minSpecialChars.ToString() } }));
-                //Console.WriteLine("Enter a secure password.");
-                //Console.WriteLine("The password should contain:");
-                //Console.WriteLine($"Between {minChars} & {maxChars} characters,");
-                //Console.WriteLine($"At least {minUppercase} uppercase character,");
-                //Console.WriteLine($"At least {minLowercase} lowercase character,");
-                //Console.WriteLine($"At least {minDigits} digits,");
-                //Console.WriteLine($"And at least {minSpecialChars} special characters.");
+                Console.WriteLine(T(Auth_Password_Requirements, ("minChars", minChars.ToString()), ("maxChars", maxChars.ToString()), ("minUpperCase", minUppercase.ToString()), ("minLowerCase", minLowercase.ToString()), ("minDigits", minDigits.ToString()), ("minSpecialChars", minSpecialChars.ToString())));
 
                 Console.Write(T("Auth.Password.Enter") + " >>> ");
                 input = Util.GetPassword();
@@ -172,8 +166,8 @@ namespace cardgames.core
                     int digitCount = input.Count(char.IsDigit);
                     int specialCharCount = input.Count(ch => !char.IsLetterOrDigit(ch));
 
-                    if (length >= 8 && length <= 64 && uppercaseCount >= minUppercase && lowercaseCount >= minLowercase && digitCount >= minDigits && specialCharCount >= minSpecialChars)
-                    {
+                    if (length >= minChars && length <= maxChars && uppercaseCount >= minUppercase && lowercaseCount >= minLowercase && digitCount >= minDigits && specialCharCount >= minSpecialChars)
+                    { // that line was fun to write
                         SavePassword(input);
                     }
                     else
@@ -184,7 +178,7 @@ namespace cardgames.core
                 }
             }
         }
-        private void SavePassword(string password) // TODO: adjust so that this doesn't delete userdata files when changing password
+        private void SavePassword(string password)
         {
             string path = USER_FOLDER_PATH;
             path = path + uname + ".userdata";
@@ -244,20 +238,20 @@ namespace cardgames.core
 
                 if (decimal.TryParse(balanceFromFile, out decimal balance) || playerRechargeCount == -1)
                 {
-                    Console.WriteLine(T("Auth.Login.PlayerFound", new Dictionary<string, string> { { "name", name }, { "userName", userName }, { "balance", balance.ToString() } }));
+                    Console.WriteLine(T(Auth_Login_PlayerFound, ("name", name), ("userName", userName), ("balance", balance.ToString())));
                     return new Player(name, userName, balance, playerRechargeCount);
                 }
                 else
                 {
-                    Console.WriteLine(T("Auth.Login.PlayerFoundNoBalance", new Dictionary<string, string> { { "name", name }, { "userName", userName } }));
-                    Console.WriteLine(T("Err.BalanceNotLoaded", new Dictionary<string, string> { { "DEFAULT_BALANCE", DEFAULT_BALANCE.ToString() } }));
+                    Console.WriteLine(T(Auth_Login_PlayerFoundNoBalance, ("name", name), ("userName", userName)));
+                    Console.WriteLine(T(Err_BalanceNotLoaded, ("DEFAULT_BALANCE", DEFAULT_BALANCE.ToString())));
                     return new Player(name, userName);
                 }
 
             }
             else
             {
-                Console.WriteLine(T("Err.PlayerNotFound"));
+                Console.WriteLine(Err_PlayerNotFound);
                 return null;
             }
         }

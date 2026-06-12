@@ -1,4 +1,5 @@
-﻿using System.Reflection.Metadata;
+﻿using cardgames.core.language;
+using System.Reflection.Metadata;
 using System.Text;
 
 namespace cardgames.core
@@ -9,6 +10,7 @@ namespace cardgames.core
 
         public static void Load()
         {
+            LanGen.GenerateLocalisations(); // gen or update l10n files
             LoadDefaultSettings(); // Load the default settings; some can be changed later.
 
             players.Add(Player.LogIn("cam", "Potato123!")!); // remove after testing
@@ -46,6 +48,7 @@ namespace cardgames.core
             Console.CancelKeyPress += OnCancelKeyPress;
             Util.MaximiseWindow();
             Language.Load("en-GB");
+            LanGen.GenerateLocalisations();
             Util.ResetColor();
             Console.OutputEncoding = Encoding.UTF8;
         }

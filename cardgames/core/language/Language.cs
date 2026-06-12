@@ -1,5 +1,6 @@
 ﻿using cardgames.core.extension;
 using System.Text.Json;
+using static cardgames.core.L10n;
 
 namespace cardgames.core
 {
@@ -12,11 +13,11 @@ namespace cardgames.core
 
         public static void SelectLanguage()
         {
-            Console.WriteLine($"=== {T("Lang.Select")} ===");
+            Console.WriteLine($"=== {T(Lang_Select)} ===");
             string[] languages = DetectLanguages();
             int choice = Util.GetChoice(languages);
             Load(languages[choice]);
-            Console.WriteLine(T("Lang.NowUsing"));
+            Console.WriteLine(T(Lang_NowUsing));
         }
 
         private static string[] DetectLanguages()
@@ -63,7 +64,7 @@ namespace cardgames.core
             translations.RemoveRange(importedTranslations);
         }
 
-        public static string T(string key, Dictionary<string, string>? parameters = null)
+        private static string T(string key, Dictionary<string, string>? parameters = null) // internal parameter system
         {
             if (!translations.TryGetValue(key, out string? value))
             {
@@ -79,6 +80,12 @@ namespace cardgames.core
             }
 
             return value;
+        }
+
+        public static string T(string key, params (string Key, string Value)[] parameters) // public parameter system
+        {
+            Dictionary<string, string> paramDict = parameters.ToDictionary(p => p.Key, p => p.Value);
+            return T(key, paramDict);
         }
     }
 }
