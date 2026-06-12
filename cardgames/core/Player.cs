@@ -407,6 +407,8 @@ namespace cardgames.core
             return hand;
         }
 
+        public void AddToHand(Card card) => hand.Add(card);
+        
 
     }
 }

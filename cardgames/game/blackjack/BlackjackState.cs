@@ -11,16 +11,11 @@ namespace cardgames.game.blackjack
             dealer = new();
         }
 
-        public void SetupDeck(int deckCount)
+        public override void Deal(int cardsToDrawEach)
         {
-            gameDeck = new(); gameDeck.AddStandardDecks(deckCount); gameDeck.Shuffle(); // Create, populate & shuffle the play deck
-        }
-
-        public void Deal(int cardsToDraw)
-        {
-            for (int i = 0; i < cardsToDraw; i++)
+            for (int i = 0; i < cardsToDrawEach; i++)
             {
-                foreach (BlackjackPlayer player in GetPlayerList())
+                foreach (Player player in GetPlayerList())
                 {
                     player.AddToHand(DrawCard());
                 }

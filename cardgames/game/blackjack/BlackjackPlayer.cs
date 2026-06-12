@@ -68,11 +68,6 @@ namespace cardgames.game.blackjack
 
         #endregion
 
-        public void AddToHand(Card card)
-        {
-            hand.Add(card);
-        }
-
         public void GoBust()
         {
             Bust = true;
@@ -175,7 +170,7 @@ namespace cardgames.game.blackjack
                 }
             }
 
-            double bustProbability = numberOfCardsThatWouldBust / (double)possibleDeck.GetCards().Count;
+            double bustProbability = numberOfCardsThatWouldBust / (double)possibleDeck.Count;
 
             bustProbability *= 100;
 

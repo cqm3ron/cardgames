@@ -1,8 +1,4 @@
-﻿using System.Collections.Specialized;
-using System.ComponentModel.Design;
-using System.IO;
-using System.Reflection;
-using System.Runtime.CompilerServices;
+﻿using System.Reflection;
 using static cardgames.core.Language;
 
 namespace cardgames.core
@@ -41,7 +37,7 @@ namespace cardgames.core
                 {
                     options = [T("Menu.Login"), T("Menu.CreateUser"), T("Menu.LanguageSelect"), T("Menu.Exit")];
                     int choice = Util.GetChoice(options);
-                    switch (choice)
+                    switch (choice) // fix this please for the love of god its awful
                     {
                         case 0:
                             Console.WriteLine();
@@ -81,7 +77,7 @@ namespace cardgames.core
                 {
                     options = [T("Menu.AddPlayer"), T("Menu.CreateUser"), T("Menu.GameSelection"), T("Menu.ViewLeaderboard"), T("Menu.RechargeBalance"), T("Menu.LanguageSelect"), T("Menu.Exit")];
                     int choice = Util.GetChoice(options);
-                    switch (choice)
+                    switch (choice) // please also fix this oh god its horrible
                     {
                         case 0:
                             Console.WriteLine();

@@ -84,5 +84,7 @@ namespace cardgames.core
         {
             return cards;
         }
+
+        public int Count => cards.Count;
     }
 }
