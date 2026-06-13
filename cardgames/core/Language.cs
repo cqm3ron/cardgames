@@ -1,10 +1,9 @@
 ﻿using cardgames.core.extension;
 using System.Text.Json;
-using static cardgames.core.L10n;
 
 namespace cardgames.core
 {
-    public static class Language
+    internal static class Language
     {
         private static Dictionary<string, string> translations = [];
         private const string LANGUAGE_DIRECTORY_PATH = "..\\..\\..\\lang\\";
@@ -13,11 +12,11 @@ namespace cardgames.core
 
         public static void SelectLanguage()
         {
-            Console.WriteLine($"=== {T(Lang_Select)} ===");
+            Console.WriteLine($"=== {T("Lang.Select")} ===");
             string[] languages = DetectLanguages();
             int choice = Util.GetChoice(languages);
             Load(languages[choice]);
-            Console.WriteLine(T(Lang_NowUsing));
+            Console.WriteLine(T("Lang.NowUsing"));
         }
 
         private static string[] DetectLanguages()

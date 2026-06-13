@@ -9,7 +9,7 @@ namespace cardgames.core
 
         public Deck()
         {
-            cards = new();
+            cards = []; // generates an empty deck
         }
 
         public void AddCards(IEnumerable<Card> newCards)
@@ -55,17 +55,17 @@ namespace cardgames.core
         // Utility
         private Stack<Card> GenerateStandardDeck()
         {
-            cards = new Stack<Card>();
+            Stack<Card> newDeck = new Stack<Card>();
 
-            foreach (Suits suit in Enum.GetValues(typeof(Suits)))
+            foreach (Suits suit in Enum.GetValues<Suits>())
             {
-                foreach (Ranks rank in Enum.GetValues(typeof(Ranks)))
+                foreach (Ranks rank in Enum.GetValues<Ranks>())
                 {
-                    cards.Push(new Card(suit, rank));
+                    newDeck.Push(new Card(suit, rank));
                 }
             }
 
-            return cards;
+            return newDeck;
         }
         public void AddStandardDecks(int count = 1)
         {

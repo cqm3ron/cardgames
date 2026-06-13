@@ -1,0 +1,26 @@
+{
+  "heart": [
+    "\u2665",
+    "h",
+    "heart",
+    "hearts"
+  ],
+  "diamond": [
+    "\u2666",
+    "d",
+    "diamond",
+    "diamonds"
+  ],
+  "spade": [
+    "\u2660",
+    "s",
+    "spade",
+    "spades"
+  ],
+  "club": [
+    "\u2663",
+    "c",
+    "club",
+    "clubs"
+  ]
+}

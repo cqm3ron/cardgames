@@ -1,6 +1,5 @@
 ﻿using cardgames.core;
 using static cardgames.core.Language;
-using static cardgames.core.L10n;
 
 namespace cardgames.game.blackjack
 {
@@ -12,7 +11,7 @@ namespace cardgames.game.blackjack
         public BlackjackGame() : base() { }
         public override List<Player> PlayGame(List<Player> players)
         {
-            LoadGame();
+            // LoadGame(); // moved to application.cs
 
             List<BlackjackPlayer> blackjackPlayers = BlackjackPlayer.ConvertTo(players);
 
@@ -23,9 +22,9 @@ namespace cardgames.game.blackjack
                 Console.Clear();
                 List<Money> options = [];
                 Money balance = player.GetBalance();
-                Console.WriteLine(T(User_Betting_Info, ("name", player.GetName())));
-                Console.WriteLine(T(User_Balance) + ": cr" + balance);
-                Console.WriteLine(T(User_Ask_Betting));
+                Console.WriteLine(T("User.Betting.Info", ("name", player.GetName())));
+                Console.WriteLine(T("User.Balance") + ": cr" + balance);
+                Console.WriteLine(T("User.Ask.Betting"));
 
                 foreach (Money amount in BETTING_AMOUNTS)
                 {
@@ -58,7 +57,7 @@ namespace cardgames.game.blackjack
 
             EndGame();
 
-            Console.WriteLine(T(Util_PressKey));
+            Console.WriteLine(T("Util.PressKey"));
             Console.ReadKey(true);
 
             players = BlackjackPlayer.ConvertFrom(State.GetPlayerList());
@@ -69,7 +68,7 @@ namespace cardgames.game.blackjack
         {
             BlackjackPlayer player = State.GetCurrentPlayer();
 
-            string[] options = [T(Blackjack_Hit), T(Blackjack_Stand)];
+            string[] options = [T("Blackjack.Hit"), T("Blackjack.Stand")];
 
             Console.WriteLine(player.CardsInHand);
             Console.WriteLine(player.GetBalance());
@@ -77,7 +76,7 @@ namespace cardgames.game.blackjack
             Console.WriteLine(player.GetBalance() - player.Bet);
             if (player.CardsInHand <= 2 && player.GetBalance() >= player.Bet * 2)
             {
-                options = [T(Blackjack_Hit), T(Blackjack_Stand), T(Blackjack_Double)];
+                options = [T("Blackjack.Hit"), T("Blackjack.Stand"), T("Blackjack.Double")];
             }
 
             while (!player.Standing && !player.Bust)
@@ -116,29 +115,28 @@ namespace cardgames.game.blackjack
         private void DisplayBlackjackData(BlackjackPlayer player, BlackjackState state)
         {
             Console.Clear();
-            Console.WriteLine(T(Blackjack_PlayerHand, ("name", player.GetName())));
+            Console.WriteLine(T("Blackjack.PlayerHand", ("name", player.GetName())));
 
             foreach (Card card in player.GetHand())
             {
                 Console.WriteLine(card);
             }
 
-            Console.WriteLine($"\n{T(Blackjack_HandValueInfo)}" + player.HandValue);
+            Console.WriteLine($"\n{T("Blackjack.HandValueInfo")}" + player.HandValue);
 
             Console.WriteLine();
 
-            Console.WriteLine(T(Blackjack_Dealer_FaceUpCard) + ": " + state.dealer.PublicCard);
-
+            Console.WriteLine(T("Blackjack.Dealer.FaceUpCard") + ": " + state.dealer.PublicCard);
             if (player.Bust)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(T(Blackjack_Player_WentBust));
+                Console.WriteLine(T("Blackjack.Player.WentBust"));
                 Util.ResetColour();
             }
 
             if (!player.Bust)
             {
-                Console.WriteLine(T(Blackjack_Player_BustChance, ("playerBustChance", player.GetBustChance(state).ToString())));
+                Console.WriteLine(T("Blackjack.Player.BustChance", ("playerBustChance", player.GetBustChance(state).ToString())));
             }
         }
         private protected override void EndGame()
@@ -147,10 +145,10 @@ namespace cardgames.game.blackjack
             Console.Clear();
             foreach (BlackjackPlayer player in State.GetPlayerList())
             {
-                Console.WriteLine(T(Blackjack_Player_WinSummary, ("player", player.GetName()), ("bet", player.Bet.ToString())));
+                Console.WriteLine(T("Blackjack.Player.WinSummary", ("player", player.GetName()), ("bet", player.Bet.ToString())));
                 if (player.Doubled)
                 {
-                    Console.WriteLine(T(Blackjack_Player_WinSummary_Doubled));
+                    Console.WriteLine(T("Blackjack.Player.WinSummary.Doubled"));
                 }
 
                 if (player.WinState == WinStates.Won)
@@ -159,11 +157,11 @@ namespace cardgames.game.blackjack
 
                     if (player.Doubled)
                     {
-                        Console.WriteLine(T(Blackjack_Player_WonDouble, ("balance", player.GetBalance().ToString())));
+                        Console.WriteLine(T("Blackjack.Player.WonDouble", ("balance", player.GetBalance().ToString())));
                     }
                     else
                     {
-                        Console.WriteLine(T(Blackjack_Player_Won, ("balance", player.GetBalance().ToString())));
+                        Console.WriteLine(T("Blackjack.Player.Won", ("balance", player.GetBalance().ToString())));
                     }
 
                 }
@@ -173,16 +171,16 @@ namespace cardgames.game.blackjack
 
                     if (player.Doubled)
                     {
-                        Console.WriteLine(T(Blackjack_Player_LostDouble, ("balance", player.GetBalance().ToString())));
+                        Console.WriteLine(T("Blackjack.Player.LostDouble", ("balance", player.GetBalance().ToString())));
                     }
                     else
                     {
-                        Console.WriteLine(T(Blackjack_Player_Lost, ("balance", player.GetBalance().ToString())));
+                        Console.WriteLine(T("Blackjack.Player.Lost", ("balance", player.GetBalance().ToString())));
                     }
                 }
                 else
                 {
-                    Console.WriteLine(T(Blackjack_Player_Drew));
+                    Console.WriteLine(T("Blackjack.Player.Drew"));
                 }
             }
         }

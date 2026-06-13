@@ -4,7 +4,6 @@ using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using static cardgames.core.Language;
-using static cardgames.core.L10n;
 
 namespace cardgames.core
 {
@@ -104,7 +103,7 @@ namespace cardgames.core
 
             if (!userNames.Contains(name.ToLower()))
             {
-                Console.WriteLine(T(Auth_Username_NotTaken, ("name", name.ToLower())));
+                Console.WriteLine(T("Auth.Username.NotTaken", ("name", name.ToLower())));
                 if (Util.UserAgrees())
                 {
                     uname = name.ToLower();
@@ -117,12 +116,12 @@ namespace cardgames.core
 
             while (input == "")
             {
-                input = Console.ReadLine().ToLower();
+                input = Console.ReadLine()!.ToLower();
                 if (!string.IsNullOrEmpty(input))
                 {
                     if (userNames.Contains(input))
                     {
-                        Console.WriteLine(T(Auth_Username_Taken, ("username", input)));
+                        Console.WriteLine(T("Auth.Username.Taken", ("username", input)));
                         input = "";
                     }
                     else
@@ -154,7 +153,7 @@ namespace cardgames.core
             string? input = "";
             while (input == "")
             {
-                Console.WriteLine(T(Auth_Password_Requirements, ("minChars", minChars.ToString()), ("maxChars", maxChars.ToString()), ("minUpperCase", minUppercase.ToString()), ("minLowerCase", minLowercase.ToString()), ("minDigits", minDigits.ToString()), ("minSpecialChars", minSpecialChars.ToString())));
+                Console.WriteLine(T("Auth.Password.Requirements", ("minChars", minChars.ToString()), ("maxChars", maxChars.ToString()), ("minUpperCase", minUppercase.ToString()), ("minLowerCase", minLowercase.ToString()), ("minDigits", minDigits.ToString()), ("minSpecialChars", minSpecialChars.ToString())));
 
                 Console.Write(T("Auth.Password.Enter") + " >>> ");
                 input = Util.GetPassword();
@@ -238,20 +237,20 @@ namespace cardgames.core
 
                 if (decimal.TryParse(balanceFromFile, out decimal balance) || playerRechargeCount == -1)
                 {
-                    Console.WriteLine(T(Auth_Login_PlayerFound, ("name", name), ("userName", userName), ("balance", balance.ToString())));
+                    Console.WriteLine(T("Auth.Login.PlayerFound", ("name", name), ("userName", userName), ("balance", balance.ToString())));
                     return new Player(name, userName, balance, playerRechargeCount);
                 }
                 else
                 {
-                    Console.WriteLine(T(Auth_Login_PlayerFoundNoBalance, ("name", name), ("userName", userName)));
-                    Console.WriteLine(T(Err_BalanceNotLoaded, ("DEFAULT_BALANCE", DEFAULT_BALANCE.ToString())));
+                    Console.WriteLine(T("Auth.Login.PlayerFoundNoBalance", ("name", name), ("userName", userName)));
+                    Console.WriteLine(T("Auth.Login.BalanceNotLoaded", ("DEFAULT_BALANCE", DEFAULT_BALANCE.ToString())));
                     return new Player(name, userName);
                 }
 
             }
             else
             {
-                Console.WriteLine(Err_PlayerNotFound);
+                Console.WriteLine(T("Auth.Login.PlayerNotFound"));
                 return null;
             }
         }
@@ -402,7 +401,19 @@ namespace cardgames.core
         }
 
         public void AddToHand(Card card) => hand.Add(card);
-        
 
+        // Static methods for sorting hands
+        public void SortHandBySuit() {
+            hand = [..hand.OrderBy(c => c.Suit).ThenBy(c => c.Rank)] ;
+        }
+        public void SortHandByRank() {
+            hand = [..hand.OrderBy(c => c.Rank).ThenBy(c => c.Suit)] ;
+        }
+
+        // Selection Logic
+        public void DeselectAllCards()
+        {
+            foreach (Card card in hand) card.Deselect();
+        }
     }
 }

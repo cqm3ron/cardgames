@@ -18,12 +18,11 @@ namespace cardgames.core
         public abstract List<Player> PlayGame(List<TPlayer> players);
         private protected abstract void PlayTurn();
         private protected abstract void EndGame();
-        private protected void LoadGame()
+        public void LoadGame()
         {
             Util.StartLoading(T("Menu.Loading") + GameName);
             Language.LoadGame(GameName);
             Util.FinishLoading();
-
         }
     }
 }

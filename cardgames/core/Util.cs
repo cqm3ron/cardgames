@@ -101,6 +101,9 @@ namespace cardgames.core
         public static ConsoleKey[] affirmatives = { ConsoleKey.Enter, ConsoleKey.Spacebar, ConsoleKey.Z };
         public static ConsoleKey[] nextOptions = { ConsoleKey.DownArrow, ConsoleKey.PageDown, ConsoleKey.Tab, ConsoleKey.S };
         public static ConsoleKey[] previousOptions = { ConsoleKey.UpArrow, ConsoleKey.PageUp, ConsoleKey.W };
+        public static ConsoleKey[] scrollLeft = { ConsoleKey.LeftArrow, ConsoleKey.A };
+        public static ConsoleKey[] scrollRight = { ConsoleKey.RightArrow, ConsoleKey.D };
+
 
         public static void ResetColor()
         {
@@ -113,14 +116,12 @@ namespace cardgames.core
             ResetColor();
         }
 
-        public static void WriteLineBackwards(string input)
+        public static void WriteLineBackwards(string input) // error handling non-existent?
         {
             Console.SetCursorPosition(Console.WindowWidth - 1, Console.GetCursorPosition().Top);
             char[] characters = input.ToCharArray();
 
             (int, int) initialCursorPos = Console.GetCursorPosition();
-
-            //if (characters.Length > (Console.WindowWidth - Console.GetCursorPosition().Left)) throw new IndexOutOfRangeException("Not enough space to write!");
 
             for (int c = characters.Length - 1; c >= 0; c--)
             {

@@ -17,7 +17,7 @@
         {
             players = [.. _players];
             currentPlayer = 0;
-            gameDeck = new();
+            gameDeck = new(); // generates an empty deck
             gamePhase = "";
         }
 
@@ -97,11 +97,11 @@
             gameDeck = new(); gameDeck.AddStandardDecks(deckCount); gameDeck.Shuffle(); // Create, populate & shuffle the play deck
         }
 
-        public int ChooseStartingPlayer()
+        public int ChooseRandomStartingPlayer()
         {
             Random rnd = new Random();
-            return rnd.Next(0, players.Count - 1);
+            currentPlayer = rnd.Next(0, players.Count);
+            return currentPlayer;
         }
-
     }
 }
