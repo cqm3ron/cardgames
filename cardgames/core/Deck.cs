@@ -12,24 +12,19 @@ namespace cardgames.core
             cards = []; // generates an empty deck
         }
 
+        public void AddCard(Card newCard) => cards.Push(newCard);
+
         public void AddCards(IEnumerable<Card> newCards)
         {
             foreach (Card card in newCards.ToList())
             {
                 cards.Push(card);
             }
-
         }
 
-        public void Shuffle()
-        {
-            cards.Shuffle(); // Calls the fisher-yates shuffle extension method for stacks (extensions/StackExtensions.cs)
-        }
+        public void Shuffle() => cards.Shuffle(); // Calls the fisher-yates shuffle extension method for stacks (extensions/StackExtensions.cs)
 
-        public Card Draw()
-        {
-            return cards.Pop();
-        }
+        public Card Draw() => cards.Pop();
 
         public Card[,] Deal(int playerCount, int cardsPerPlayer = -1)
         {

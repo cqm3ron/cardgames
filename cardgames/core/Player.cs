@@ -402,6 +402,29 @@ namespace cardgames.core
 
         public void AddToHand(Card card) => hand.Add(card);
 
+        public Card PlayCard(Card card)
+        {
+            if (hand.Remove(card)) return card;
+            throw new InvalidOperationException("Card not found in hand");
+        }
+
+        public List<Card> PlayCards(List<Card> cards)
+        {
+            List<Card> playedCards = [];
+            foreach (Card card in cards)
+            {
+                if (hand.Remove(card))
+                {
+                    playedCards.Add(card);
+                }
+            }
+            if (playedCards.Count > 0)
+            {
+                return playedCards;
+            }
+            throw new InvalidOperationException("None of the specified cards were found in hand");
+        }
+
         // Static methods for sorting hands
         public void SortHandBySuit() {
             hand = [..hand.OrderBy(c => c.Suit).ThenBy(c => c.Rank)] ;

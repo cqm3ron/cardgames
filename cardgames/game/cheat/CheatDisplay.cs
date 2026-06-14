@@ -12,17 +12,22 @@ namespace cardgames.game.cheat
         public static void DisplayScrollMenu(List<Card> cards, int currentCardIndex)
         {
             Console.Clear();
+            Console.WriteLine(T("Cheat.Menu.Instructions"));
+            Console.WriteLine(T("Cheat.Player.YourHand"));
             int x = Console.GetCursorPosition().Left;
             int y = Console.GetCursorPosition().Top;
             DisplayThreeCardView(cards, currentCardIndex);
             Console.SetCursorPosition(x + (2 * CARD_WIDTH) + 2 , y);
             SelectedCards(cards);
-            Console.SetCursorPosition(x, CARD_HEIGHT + 2);
+            Console.SetCursorPosition(x, y + CARD_HEIGHT + 1);
             OwnedCards(cards);
         }
 
         private static void DisplayThreeCardView(List<Card> cards, int currentCardIndex)
         {
+            if (currentCardIndex < 0) currentCardIndex = 0; // ensure the index is within bounds
+            else if (currentCardIndex >= cards.Count) currentCardIndex = cards.Count - 1; // ensure the index is within bounds
+
             Card middleCard = cards[currentCardIndex]; // get the card to display proud and centre
             Card? lastCard = null, nextCard = null;
             if (currentCardIndex > 0) lastCard = cards[currentCardIndex - 1]; // get the previous card to show a preview
@@ -185,7 +190,7 @@ namespace cardgames.game.cheat
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                 }
                 Console.WriteLine($"{(Ranks)(i + 2)}: {cardCounter[i]}");
-                Console.ResetColor();
+                Util.ResetColor();
             }
         }
     }

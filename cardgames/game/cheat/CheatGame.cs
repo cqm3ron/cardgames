@@ -1,4 +1,5 @@
 ﻿using cardgames.core;
+using cardgames.games.cheat;
 using System.Numerics;
 using System.Xml;
 using static cardgames.core.Language;
@@ -36,10 +37,62 @@ namespace cardgames.game.cheat
                 // (true) is temporary; end condition needed. 
             {
                 Player current = State.GetCurrentPlayer();
+                Console.WriteLine(T("Cheat.Player.Current", ("name", current.GetName()))); // Current Player
+                Console.WriteLine(T("Cheat.Player.LookAway")); // Prompt for other players to look away
+                Console.WriteLine(T("Util.PressKey"));
+                Console.ReadKey(true);
                 current.SortHandByRank();
-                ScrollMenu(current.GetHand());
-                List<Card> selectedCards = Card.GetSelectedCards(current.GetHand());
                 current.DeselectAllCards();
+                ScrollMenu(current.GetHand());
+                List<Card> playedCards = current.PlayCards(Card.GetSelectedCards(current.GetHand())); // play selected cards; return them to be added to discard deck
+                State.Discard(playedCards); // add the played cards onto the top of the discard deck
+
+                CheatParser nlp = new();
+                nlp.ImportMaps("..\\..\\..\\game\\cheat\\map\\rankmap.json", "..\\..\\..\\game\\cheat\\map\\suitmap.json");
+                Ranks? rank = null;
+                bool invalidClaim = false, moveOn = false;
+
+                while (!moveOn)
+                {
+                    while (rank == null)
+                    {
+                        Console.Clear();
+                        Console.Write(T("Cheat.Player.PlayedCards") + ": ");
+                        for (int i = 0; i < playedCards.Count; i++)
+                        {
+                            Console.Write(playedCards[i]);
+                            if (i < playedCards.Count - 1) Console.Write(", ");
+                        }
+                        Console.WriteLine();
+                        Console.WriteLine(T("Cheat.Player.RankClaimPrompt"));
+
+                        if (invalidClaim) Console.WriteLine(T("Cheat.Player.InvalidClaim"));
+                        invalidClaim = false;
+                        Console.CursorVisible = true;
+                        string claim = Console.ReadLine()!;
+                        nlp.TryParseRank(claim, out rank);
+                        if (rank == null) invalidClaim = true;
+                    }
+
+                    Console.WriteLine(T("Cheat.Player.RankConfirmation", ("rank", rank.ToString()!)));
+                    if (Util.UserAgrees()) moveOn = true;
+                }
+
+                Console.WriteLine(T("Util.PressKey"));
+                Console.ReadKey(true);
+                
+                Console.Clear();
+
+                Console.WriteLine(T("Cheat.Player.OpenEyes"));
+                Console.Beep(1000, 250);
+                Console.WriteLine();
+                Console.WriteLine(T("Cheat.Player.ClaimDisplay", ("player", current.GetName()), ("count", playedCards.Count.ToString()), ("rank", rank.ToString()!)));
+
+                // TODO: allow players to call cheat
+
+                Console.WriteLine(T("Util.PressKey"));
+                Console.ReadKey(true);
+
 
                 State.NextPlayer();
             }
@@ -48,12 +101,11 @@ namespace cardgames.game.cheat
              * PLAN
              * 1. give out hands [x]
              * 2. determine play order [x]
-             * 3. play starter card [ ] ??
-             * 4. first player look; everyone else look away [ ]
-             * 5. first player do they thang [ ]
-             * 5a. nlp [ ]
-             * 6. first player finish turn CLEAR SCREEN [ ]
-             * 7. option to call cheat at any point? [ ]
+             * 4. first player look; everyone else look away [x]
+             * 5. first player do they thang [x]
+             * 5a. nlp [x]
+             * 6. first player finish turn CLEAR SCREEN [x]
+             * 7. option to call cheat at any point? [ ] ==> Choosing option B; more similar to official rules.
              *     a. each player gets their own key to press to call cheat perhaps?
              *     b. or just a slower-paced game; display a timed window in which any player can call cheat
              *  8. handle cheat [ ] 

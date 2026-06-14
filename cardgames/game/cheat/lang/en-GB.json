@@ -1,4 +1,13 @@
 {
   "Cheat.Cards.Selected": "Selected Cards",
-  "Cheat.Cards.Owned": "Owned Cards"
+  "Cheat.Cards.Owned": "Owned Cards",
+  "Cheat.Player.Current": "Player {name}'s turn!",
+  "Cheat.Player.LookAway": "All other players should now look away. Open your eyes again when you hear the beep.",
+  "Cheat.Player.OpenEyes": "All players can now open their eyes again.",
+  "Cheat.Player.YourHand": "Your Hand:",
+  "Cheat.Menu.Instructions": "Use the arrow keys to navigate & [SPACE] to select cards. Select 1-4 cards and press [ENTER] when finished.\n",
+  "Cheat.Player.RankClaimPrompt": "Now, enter the rank that you want to clam the cards are, 2-10, Jack, Queen, King or Ace.\nPress [ENTER] to submit your claim & move on.",
+  "Cheat.Player.InvalidClaim": "That input didn't look quite right. Please try again.",
+  "Cheat.Player.RankConfirmation": "You claimed that the cards you played are of rank {rank}. Is this what you intended?",
+  "Cheat.Player.ClaimDisplay": "Player {player} has played {count} {rank}s."
 }

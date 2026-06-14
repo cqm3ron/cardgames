@@ -13,11 +13,12 @@ namespace cardgames.games.cheat
         private Dictionary<string, Ranks> rankMap;
         private Dictionary<string, Suits> suitMap;
 
-        CheatParser()
+        public CheatParser()
         {
             rankMap = [];
             suitMap = [];
         }
+
         public void ImportMaps(string rankMapPath, string suitMapPath)
         {
             rankMap = ImportMap<Ranks>(rankMapPath);
@@ -63,6 +64,21 @@ namespace cardgames.games.cheat
             card = new Card(suit.Value, rank.Value);
 
             return true;
+        }
+
+        public bool TryParseRank(string input, out Ranks? rank)
+        {
+            rank = null;
+            var tokens = NormaliseInput(input).Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            foreach (var token in tokens)
+            {
+                if (TryFindMatch(token, rankMap, out Ranks foundRank))
+                {
+                    rank = foundRank;
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
