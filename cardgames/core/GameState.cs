@@ -99,7 +99,7 @@
 
         public int ChooseRandomStartingPlayer()
         {
-            Random rnd = new Random();
+            Random rnd = new();
             currentPlayer = rnd.Next(0, players.Count);
             return currentPlayer;
         }

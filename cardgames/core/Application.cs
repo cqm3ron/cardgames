@@ -1,5 +1,6 @@
 ﻿using cardgames.game.cheat;
 using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace cardgames.core
@@ -7,7 +8,10 @@ namespace cardgames.core
     internal static class Application
     {
         private static List<Player> players = [];
-
+        public const int MAX_PLAYERS = 8;
+        // TODO: utilise this const. Prevent logins when MAX_PLAYERS already logged in (remove option from menu)
+        // TODO: logout option
+        // TODO: resend display when windowsize changes (thread?)
         public static void Load()
         {
             //LanGen.GenerateLocalisations(); // gen or update l10n files

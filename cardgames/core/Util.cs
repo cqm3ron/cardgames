@@ -17,7 +17,7 @@ namespace cardgames.core
             }
             else
             {
-                return true;
+                return false;
             }
         }
 

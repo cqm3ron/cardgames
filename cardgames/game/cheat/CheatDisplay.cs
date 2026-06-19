@@ -38,7 +38,7 @@ namespace cardgames.game.cheat
             Console.SetCursorPosition(Console.GetCursorPosition().Left + (CARD_WIDTH / 2) - (CARD_WIDTH / 2), Console.GetCursorPosition().Top + 1); // re-align the cursor
             ShortCard(true, nextCard); // display a preview of the next card on the right
         }
-        private static void BigCard(Card card)
+        public static void BigCard(Card card)
         {
             string rightRank, leftRank;
             string rank = card.GetRankSymbol();

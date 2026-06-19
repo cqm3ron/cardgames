@@ -3,7 +3,7 @@ using static cardgames.core.Language;
 
 namespace cardgames.game.blackjack
 {
-    internal class BlackjackGame : GameBase<Player>
+    internal class BlackjackGame : GameBase<Player> // TODO: show dealer's total when game ends so users know they aren't being scammed lolol
     {
         public const int DECKCOUNT = 6;
         private readonly decimal[] BETTING_AMOUNTS = [0.01m, 0.05m, 0.1m, 0.2m, 0.33m, 0.5m, 0.75m, 0.9m, 1m];

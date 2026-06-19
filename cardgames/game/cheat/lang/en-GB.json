@@ -9,5 +9,9 @@
   "Cheat.Player.RankClaimPrompt": "Now, enter the rank that you want to clam the cards are, 2-10, Jack, Queen, King or Ace.\nPress [ENTER] to submit your claim & move on.",
   "Cheat.Player.InvalidClaim": "That input didn't look quite right. Please try again.",
   "Cheat.Player.RankConfirmation": "You claimed that the cards you played are of rank {rank}. Is this what you intended?",
-  "Cheat.Player.ClaimDisplay": "Player {player} has played {count} {rank}s."
+  "Cheat.Player.ClaimDisplaySingular": "Player {player} has played {count} {rank}.",
+  "Cheat.Player.ClaimDisplayMultiple": "Player {player} has played {count} {rank}s.",
+  "Cheat.Player.CheatPrompt": "Any player who believes that {player} cheated should now press any key, then select their name.\nOtherwise, allow the timer to finish and continue.",
+  "Cheat.Player.CallCheat": "Who is calling cheat?",
+  "Cheat.CheatCalled.LookAway": "{accuser} has accused {accused} of cheating!\nAll players except those two should please close their eyes and only re-open them when they hear the beep."
 }

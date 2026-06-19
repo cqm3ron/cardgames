@@ -9,13 +9,9 @@ using System.Threading.Tasks;
 
 namespace cardgames.game.cheat
 {
-    internal class CheatState : GameState<CheatPlayer>
+    internal class CheatState(List<CheatPlayer> _players) : GameState<CheatPlayer>(_players)
     {
         Deck discard = new();
-
-        public CheatState(List<CheatPlayer> _players) : base(_players)
-        {
-        }
 
         public void Discard(Card card)
         {
@@ -25,6 +21,10 @@ namespace cardgames.game.cheat
         {
             discard.AddCards(cards);
             return cards.Count;
+        }
+        public static void Beep()
+        {
+            Console.Beep(1000, 250);
         }
     }
 }
