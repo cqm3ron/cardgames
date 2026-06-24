@@ -61,5 +61,16 @@
                 stack.Push(temp.Pop());
             }
         }
+
+        public static Stack<T> Empty<T>(this Stack<T> collection) // define alias for Clear() that also returns the removed items.
+        {
+            Stack<T> collectionBeforeClear = [];
+            foreach (T item in collection)
+            {
+                collectionBeforeClear.Push(item);
+            }
+            collection.Clear();
+            return collectionBeforeClear;
+        }
     }
 }

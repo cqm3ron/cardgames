@@ -114,6 +114,10 @@ namespace cardgames.core
         // Util
         private protected string NormaliseInput(string input)
         {
+            if (input == null)
+            {
+                return "";
+            }
             return input.ToLower().Replace("of", "").Replace(",", "").Replace(".", "").Trim();
         } // remove unnecessary characters & standardise formatting
 

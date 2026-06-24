@@ -1,11 +1,14 @@
 ﻿using cardgames.core;
+using cardgames.core.extension;
 using cardgames.games.cheat;
+using System.Numerics;
+using System.Runtime.CompilerServices;
 using static cardgames.core.Language;
 
 namespace cardgames.game.cheat
 {
     internal class CheatGame : GameBase<Player>
-    {
+    {   
         private bool CANCEL_COUNTDOWN = false;
         public const int DECKCOUNT = 1;
         private readonly decimal[] BETTING_AMOUNTS = [0.01m, 0.05m, 0.1m, 0.2m, 0.33m, 0.5m, 0.75m, 0.9m, 1m];
@@ -15,12 +18,13 @@ namespace cardgames.game.cheat
         {
             const int CHEAT_DISPLAY_DURATION_SECONDS = 5;
 
-        List<CheatPlayer> cheatPlayers = CheatPlayer.ConvertTo(players);
-
+            List<CheatPlayer> cheatPlayers = CheatPlayer.ConvertTo(players);
+            
             State = new(cheatPlayers);
 
             // 1 deck default, 1 deck for every 4 players over 4.
-            State.SetupDeck(DECKCOUNT + (int)Math.Ceiling((players.Count - 4.0) / 4.0f)); // floats specified to ensure float division not integer division
+            // TODO: link to number of selectable cards. Should this be higher with more decks? not sure.
+            State.SetupDeck(DECKCOUNT + (int)Math.Ceiling((cheatPlayers.Count - 4.0) / 4.0f)); // floats specified to ensure float division not integer division
             State.Deal(-1); // deal ALL cards out, not worrying about it being even between players
 
 
@@ -29,7 +33,8 @@ namespace cardgames.game.cheat
             while (true) // game loop 
                 // (true) is temporary; end condition needed. 
             {
-                Player current = State.GetCurrentPlayer();
+                State.PrepareDeck();
+                CheatPlayer current = State.GetCurrentPlayer();
                 Console.WriteLine(T("Cheat.Player.Current", ("name", current.GetName()))); // Current Player
                 Console.WriteLine(T("Cheat.Player.LookAway")); // Prompt for other players to look away
                 Console.WriteLine(T("Util.PressKey"));
@@ -93,34 +98,50 @@ namespace cardgames.game.cheat
                 else Console.WriteLine(T("Cheat.Player.ClaimDisplayMultiple", ("player", current.GetName()), ("count", playedCards.Count.ToString()), ("rank", rank.ToString()!)));
 
                 Console.WriteLine(T("Cheat.Player.CheatPrompt", ("player", current.GetName())));
-                Console.WriteLine(); // Otherwise, allow the timer to finish.
 
-
+                Card.DeselectCards(playedCards);
 
                 Thread? awaitingCheatCall = new(() => DisplayCallCheatMenu(CHEAT_DISPLAY_DURATION_SECONDS))
                 {
                     IsBackground = true
                 };
 
+                // TODO: Fix nothing happening when timer expires
+                // THIS SEEMS LIKE AN ANNOYING ONE. IT SHOULD BE EASY. IT ISN'T.
+
                 awaitingCheatCall.Start();
                 while (awaitingCheatCall.ThreadState == ThreadState.Background)
                 {
-                    Console.ReadKey(true);
+                    while (awaitingCheatCall.ThreadState == ThreadState.Background)
+                    {
+                        if (Console.KeyAvailable)
+                        {
+                            ConsoleKeyInfo key = Console.ReadKey(true);
+                        }
+                        else
+                        {
+                            Thread.Sleep(100);
+                        }
+                    }
+
+                    if (awaitingCheatCall.ThreadState == ThreadState.Background) break;
+
                     CANCEL_COUNTDOWN = true;
                     awaitingCheatCall.Join();
                     List<string> options = [];
-                    List<Player?> playerOptions = [];
-                    for (int i = 0; i < players.Count; i++) 
+                    List<CheatPlayer?> playerOptions = [];
+                    for (int i = 0; i < cheatPlayers.Count; i++) 
                     {
-                        if (players[i].GetUsername() == current.GetUsername()) continue;
-                        options.Add(players[i].GetName());
-                        playerOptions.Add(players[i]);
+                        if (cheatPlayers[i].GetUsername() == current.GetUsername()) continue;
+                        options.Add(cheatPlayers[i].GetName());
+                        playerOptions.Add(cheatPlayers[i]);
                     }
                     options.Add(T("Util.Cancel"));
                     playerOptions.Add(null);
                     Console.Clear();
                     Console.WriteLine(T("Cheat.Player.CallCheat"));
-                    Player? playerCalledCheat = playerOptions[Util.GetChoice([.. options])];
+
+                    CheatPlayer? playerCalledCheat = playerOptions[Util.GetChoice([.. options])];
                     if (playerCalledCheat != null) CheatCalled(current, playerCalledCheat, playedCards, rank);
                 }
                 Console.Clear();
@@ -147,7 +168,7 @@ namespace cardgames.game.cheat
              * 7. option to call cheat at any point? [x] ==> Choosing option B; more similar to official rules.
              *     a. each player gets their own key to press to call cheat perhaps?
              *     b. or just a slower-paced game; display a timed window in which any player can call cheat
-             *  8. handle cheat [ ] 
+             *  8. handle cheat [x] (done ish)
              *  9. next turn [ ]
              *  10. some kinda base case idk what [ ]
              */
@@ -164,7 +185,7 @@ namespace cardgames.game.cheat
         private void DisplayCallCheatMenu(int displayDurationSeconds)
         {
             const int msStepDuration = 100;
-            for (int t = displayDurationSeconds * 1000; t > 0; t -= msStepDuration) // convert time in seconds to ms; step by -10ms 
+            for (int t = displayDurationSeconds * 1000; t > 0; t -= msStepDuration) // convert time in seconds to ms; step by -100ms 
             {
                 if (CANCEL_COUNTDOWN) break;
                 if (t % 1000 == 0) Console.WriteLine(t / 1000);
@@ -173,7 +194,7 @@ namespace cardgames.game.cheat
 
         }
 
-        private void CheatCalled(Player accused, Player accuser, List<Card> playedCards, Ranks? rankClaimed)
+        private void CheatCalled(CheatPlayer accused, CheatPlayer accuser, List<Card> playedCards, Ranks? rankClaimed)
         {
             Console.Clear();
             Console.WriteLine(T("Cheat.CheatCalled.LookAway", ("accused", accused.GetName()), ("accuser", accuser.GetName())));
@@ -182,16 +203,24 @@ namespace cardgames.game.cheat
             Console.ReadKey(true);
             Console.Clear();
 
+
+            Console.WriteLine(T("Cheat.Player.PlayedCards", ("player", accused.GetName())));
             foreach (Card card in playedCards)
             {
                 CheatDisplay.BigCard(card);
             }
-
+            Console.SetCursorPosition(0, CheatDisplay.CARD_HEIGHT + Console.GetCursorPosition().Top);
             if (DidCheat(playedCards, rankClaimed))
             {
-
+                Console.WriteLine(T("Cheat.Player.Cheated", ("player", accused.GetName())));
+                State.PlayerPicksUpPile(accused); // doesn't work currently
             }
-            
+            else
+            {
+                Console.WriteLine(T("Cheat.Player.Truthful", ("player", accused.GetName())));
+                State.PlayerPicksUpPile(accuser); // doesn't work currently
+            }
+
 
             Console.WriteLine(T("Util.PressKey"));
             Console.ReadKey(true);

@@ -22,9 +22,21 @@ namespace cardgames.game.cheat
             discard.AddCards(cards);
             return cards.Count;
         }
+        
         public static void Beep()
         {
             Console.Beep(1000, 250);
+        }
+
+        public void PrepareDeck()
+        {
+            Card.DeselectCards(gameDeck);
+            Card.DeselectCards(discard);
+        }
+
+        public void PlayerPicksUpPile(Player playerToPickUp)
+        {
+            playerToPickUp.AddToHand(discard.Empty().ToList());
         }
     }
 }

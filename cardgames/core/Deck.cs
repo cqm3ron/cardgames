@@ -81,5 +81,10 @@ namespace cardgames.core
         }
 
         public int Count => cards.Count;
+
+        public Stack<Card> Empty()
+        {
+            return cards.Empty();
+        }
     }
 }

@@ -132,5 +132,21 @@ namespace cardgames.core
         {
             return [.. cards.Where(c => c.IsSelected)];
         }
+        public static List<Card> DeselectCards(List<Card> cards)
+        {
+            foreach (Card card in cards)
+            {
+                card.Deselect();
+            }
+            return cards;
+        }
+        public static Deck DeselectCards(Deck deck)
+        {
+            foreach (Card card in deck.GetCards())
+            {
+                card.Deselect();
+            }
+            return deck;
+        }
     }
 }

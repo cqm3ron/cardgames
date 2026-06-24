@@ -184,6 +184,8 @@ namespace cardgames.core
             Console.SetCursorPosition(cursorPos.Item1, cursorPos.Item2);
         }
 
+
+
         private struct Rect
         {
             public int Left;

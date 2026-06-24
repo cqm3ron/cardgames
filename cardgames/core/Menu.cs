@@ -12,10 +12,7 @@ namespace cardgames.core
         {
             bool goToGames = false;
 
-            if (players == null)
-            {
-                players = [];
-            }
+            players ??= []; // if players is null, set players to the empty list
 
             while (!goToGames)
             {

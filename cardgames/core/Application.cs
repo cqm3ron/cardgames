@@ -12,6 +12,11 @@ namespace cardgames.core
         // TODO: utilise this const. Prevent logins when MAX_PLAYERS already logged in (remove option from menu)
         // TODO: logout option
         // TODO: resend display when windowsize changes (thread?)
+        // TODO: improve authentication input validation to handle empty inputs and CTRL+C / unexpected inputs
+        // TODO: user data file deleted itself somehow
+        // TODO: complex algorithms - find card game additions to support this?
+        // TODO: finish cheat
+        // TODO: refactor menu
         public static void Load()
         {
             //LanGen.GenerateLocalisations(); // gen or update l10n files

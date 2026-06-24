@@ -116,7 +116,7 @@ namespace cardgames.core
 
             while (input == "")
             {
-                input = Console.ReadLine()!.ToLower();
+                input = Console.ReadLine().ToLower();
                 if (!string.IsNullOrEmpty(input))
                 {
                     if (userNames.Contains(input))
@@ -401,6 +401,20 @@ namespace cardgames.core
         }
 
         public void AddToHand(Card card) => hand.Add(card);
+        public void AddToHand(List<Card> cards)
+        {
+            foreach (Card card in cards)
+            {
+                hand.Add(card);
+            }
+        }
+        public void AddToHand(Deck deck)
+        {
+            foreach (Card card in deck.GetCards())
+            {
+                hand.Add(card);
+            }
+        }
 
         public Card PlayCard(Card card)
         {
