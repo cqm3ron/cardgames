@@ -15,9 +15,9 @@ namespace cardgames.core
         // TODO: improve authentication input validation to handle empty inputs and CTRL+C / unexpected inputs
         // TODO: user data file deleted itself somehow
         // TODO: complex algorithms - find card game additions to support this?
-        // TODO: finish cheat
         // TODO: refactor menu
         // TODO: add guest users
+        // TODO: add solitaire
         public static void Load()
         {
             //LanGen.GenerateLocalisations(); // gen or update l10n files
