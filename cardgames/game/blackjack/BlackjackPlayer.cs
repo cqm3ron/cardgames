@@ -71,7 +71,6 @@ namespace cardgames.game.blackjack
         public void GoBust()
         {
             Bust = true;
-
         }
 
         public void Stand()

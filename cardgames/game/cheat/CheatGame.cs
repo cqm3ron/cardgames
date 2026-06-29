@@ -16,10 +16,8 @@ namespace cardgames.game.cheat
         public CheatGame() : base() { }
         public override List<Player> PlayGame(List<Player> players)
         {
-            const int CHEAT_DISPLAY_DURATION_SECONDS = 5;
-
             List<CheatPlayer> cheatPlayers = CheatPlayer.ConvertTo(players);
-            
+
             State = new(cheatPlayers);
 
             // 1 deck default, 1 deck for every 4 players over 4.
@@ -27,151 +25,18 @@ namespace cardgames.game.cheat
             State.SetupDeck(DECKCOUNT + (int)Math.Ceiling((cheatPlayers.Count - 4.0) / 4.0f)); // floats specified to ensure float division not integer division
             State.Deal(-1); // deal ALL cards out, not worrying about it being even between players
 
+            Betting.BettingMenu(State.GetPlayerList());
 
             State.ChooseRandomStartingPlayer();
 
-            while (true) // game loop 
-                // (true) is temporary; end condition needed. 
+            while (!State.IsGameOver()) // game loop 
             {
-                State.PrepareDeck();
-                CheatPlayer current = State.GetCurrentPlayer();
-                Console.WriteLine(T("Cheat.Player.Current", ("name", current.GetName()))); // Current Player
-                Console.WriteLine(T("Cheat.Player.LookAway")); // Prompt for other players to look away
-                Console.WriteLine(T("Util.PressKey"));
-                Console.ReadKey(true);
-                current.SortHandByRank();
-                current.DeselectAllCards();
-                ScrollMenu(current.GetHand());
-                List<Card> playedCards = current.PlayCards(Card.GetSelectedCards(current.GetHand())); // play selected cards; return them to be added to discard deck
-                State.Discard(playedCards); // add the played cards onto the top of the discard deck
+                PlayTurn();
 
-                CheatParser nlp = new();
-                nlp.ImportMaps("..\\..\\..\\game\\cheat\\map\\rankmap.json", "..\\..\\..\\game\\cheat\\map\\suitmap.json");
-                Ranks? rank = null;
-                bool invalidClaim = false, moveOn = false;
+                CheckWinners();
 
-                while (moveOn == false)
-                {
-                    CANCEL_COUNTDOWN = false;
-                    while (rank == null)
-                    {
-                        Console.Clear();
-                        Console.Write(T("Cheat.Player.PlayedCards") + ": ");
-                        for (int i = 0; i < playedCards.Count; i++)
-                        {
-                            Console.Write(playedCards[i]);
-                            if (i < playedCards.Count - 1) Console.Write(", ");
-                        }
-                        Console.WriteLine();
-                        Console.WriteLine(T("Cheat.Player.RankClaimPrompt"));
-
-                        if (invalidClaim) Console.WriteLine(T("Cheat.Player.InvalidClaim"));
-                        invalidClaim = false;
-                        Console.CursorVisible = true;
-                        string claim = Console.ReadLine()!;
-                        nlp.TryParseRank(claim, out rank);
-                        if (rank == null) invalidClaim = true;
-                    }
-
-                    Console.WriteLine(T("Cheat.Player.RankConfirmation", ("rank", rank.ToString()!)));
-                    if (Util.UserAgrees())
-                    {
-                        moveOn = true;
-                    }
-                    else
-                    {
-                        rank = null;
-                        moveOn = false;
-                    }
-                }
-
-                Console.WriteLine(T("Util.PressKey"));
-                Console.ReadKey(true);
-                
-                Console.Clear();
-
-                Console.WriteLine(T("Cheat.Player.OpenEyes"));
-                CheatState.Beep();
-                Console.WriteLine();
-
-                if (playedCards.Count == 1) Console.WriteLine(T("Cheat.Player.ClaimDisplaySingular", ("player", current.GetName()), ("count", playedCards.Count.ToString()), ("rank", rank.ToString()!)));
-                else Console.WriteLine(T("Cheat.Player.ClaimDisplayMultiple", ("player", current.GetName()), ("count", playedCards.Count.ToString()), ("rank", rank.ToString()!)));
-
-                Console.WriteLine(T("Cheat.Player.CheatPrompt", ("player", current.GetName())));
-
-                Card.DeselectCards(playedCards);
-
-                Thread? awaitingCheatCall = new(() => DisplayCallCheatMenu(CHEAT_DISPLAY_DURATION_SECONDS))
-                {
-                    IsBackground = true
-                };
-
-                // TODO: Fix nothing happening when timer expires
-                // THIS SEEMS LIKE AN ANNOYING ONE. IT SHOULD BE EASY. IT ISN'T.
-
-                awaitingCheatCall.Start();
-                while (awaitingCheatCall.ThreadState == ThreadState.Background)
-                {
-                    while (awaitingCheatCall.ThreadState == ThreadState.Background)
-                    {
-                        if (Console.KeyAvailable)
-                        {
-                            ConsoleKeyInfo key = Console.ReadKey(true);
-                        }
-                        else
-                        {
-                            Thread.Sleep(100);
-                        }
-                    }
-
-                    if (awaitingCheatCall.ThreadState == ThreadState.Background) break;
-
-                    CANCEL_COUNTDOWN = true;
-                    awaitingCheatCall.Join();
-                    List<string> options = [];
-                    List<CheatPlayer?> playerOptions = [];
-                    for (int i = 0; i < cheatPlayers.Count; i++) 
-                    {
-                        if (cheatPlayers[i].GetUsername() == current.GetUsername()) continue;
-                        options.Add(cheatPlayers[i].GetName());
-                        playerOptions.Add(cheatPlayers[i]);
-                    }
-                    options.Add(T("Util.Cancel"));
-                    playerOptions.Add(null);
-                    Console.Clear();
-                    Console.WriteLine(T("Cheat.Player.CallCheat"));
-
-                    CheatPlayer? playerCalledCheat = playerOptions[Util.GetChoice([.. options])];
-                    if (playerCalledCheat != null) CheatCalled(current, playerCalledCheat, playedCards, rank);
-                }
-                Console.Clear();
-
-                // Cheat window closed. Moving on to the next player's turn.
-
-
-
-                Console.WriteLine(T("Util.PressKey"));
-                Console.ReadKey(true);
-
-
-                State.NextPlayer();
+                if (!State.IsGameOver()) State.NextPlayer();
             }
-
-            /*
-             * PLAN
-             * 1. give out hands [x]
-             * 2. determine play order [x]
-             * 4. first player look; everyone else look away [x]
-             * 5. first player do they thang [x]
-             * 5a. nlp [x]
-             * 6. first player finish turn CLEAR SCREEN [x]
-             * 7. option to call cheat at any point? [x] ==> Choosing option B; more similar to official rules.
-             *     a. each player gets their own key to press to call cheat perhaps?
-             *     b. or just a slower-paced game; display a timed window in which any player can call cheat
-             *  8. handle cheat [x] (done ish)
-             *  9. next turn [ ]
-             *  10. some kinda base case idk what [ ]
-             */
 
             EndGame();
 
@@ -182,12 +47,25 @@ namespace cardgames.game.cheat
             return players;
         }
 
+        private void CheckWinners()
+        {
+            foreach (CheatPlayer player in State.GetPlayerList())
+            {
+                if (player.GetHand().Count == 0)
+                {
+                    player.Win();
+                    State.GameOver();
+                    return;
+                }
+            }
+        }
+
         private void DisplayCallCheatMenu(int displayDurationSeconds)
         {
             const int msStepDuration = 100;
             for (int t = displayDurationSeconds * 1000; t > 0; t -= msStepDuration) // convert time in seconds to ms; step by -100ms 
             {
-                if (CANCEL_COUNTDOWN) break;
+                if (CANCEL_COUNTDOWN) return;
                 if (t % 1000 == 0) Console.WriteLine(t / 1000);
                 Thread.Sleep(msStepDuration);
             }
@@ -213,12 +91,12 @@ namespace cardgames.game.cheat
             if (DidCheat(playedCards, rankClaimed))
             {
                 Console.WriteLine(T("Cheat.Player.Cheated", ("player", accused.GetName())));
-                State.PlayerPicksUpPile(accused); // doesn't work currently
+                State.PlayerPicksUpPile(accused);
             }
             else
             {
                 Console.WriteLine(T("Cheat.Player.Truthful", ("player", accused.GetName())));
-                State.PlayerPicksUpPile(accuser); // doesn't work currently
+                State.PlayerPicksUpPile(accuser); 
             }
 
 
@@ -241,11 +119,146 @@ namespace cardgames.game.cheat
 
         private protected override void PlayTurn()
         {
+            Console.Clear();
+            const int CHEAT_DISPLAY_DURATION_SECONDS = 5;
 
+            State.PrepareDeck();
+            CheatPlayer current = State.GetCurrentPlayer();
+            Console.WriteLine(T("Cheat.Player.Current", ("name", current.GetName()))); // Current Player
+            Console.WriteLine(T("Cheat.Player.LookAway")); // Prompt for other players to look away
+            Console.WriteLine(T("Util.PressKey"));
+            Console.ReadKey(true);
+            current.SortHandByRank();
+            current.DeselectAllCards();
+            ScrollMenu(current.GetHand());
+            List<Card> playedCards = current.PlayCards(Card.GetSelectedCards(current.GetHand())); // play selected cards; return them to be added to discard deck
+            State.Discard(playedCards); // add the played cards onto the top of the discard deck
+
+            CheatParser nlp = new();
+            nlp.ImportMaps("..\\..\\..\\game\\cheat\\map\\rankmap.json", "..\\..\\..\\game\\cheat\\map\\suitmap.json");
+            Ranks? rank = null;
+            bool invalidClaim = false, moveOn = false;
+
+            while (moveOn == false)
+            {
+                CANCEL_COUNTDOWN = false;
+                while (rank == null)
+                {
+                    Console.Clear();
+                    Console.Write(T("Cheat.Player.PlayedCards", ("player", current.GetName())) + ": ");
+                    for (int i = 0; i < playedCards.Count; i++)
+                    {
+                        Console.Write(playedCards[i]);
+                        if (i < playedCards.Count - 1) Console.Write(", ");
+                    }
+                    Console.WriteLine();
+                    Console.WriteLine(T("Cheat.Player.RankClaimPrompt"));
+
+                    if (invalidClaim) Console.WriteLine(T("Cheat.Player.InvalidClaim"));
+                    invalidClaim = false;
+                    Console.CursorVisible = true;
+                    string claim = Console.ReadLine()!;
+                    nlp.TryParseRank(claim, out rank);
+                    if (rank == null) invalidClaim = true;
+                }
+
+                Console.WriteLine(T("Cheat.Player.RankConfirmation", ("rank", rank.ToString()!)));
+                if (Util.UserAgrees())
+                {
+                    moveOn = true;
+                }
+                else
+                {
+                    rank = null;
+                    moveOn = false;
+                }
+            }
+
+            Console.WriteLine(T("Util.PressKey"));
+            Console.ReadKey(true);
+
+            Console.Clear();
+
+            Console.WriteLine(T("Cheat.Player.OpenEyes"));
+            CheatState.Beep();
+            Console.WriteLine();
+
+            if (playedCards.Count == 1) Console.WriteLine(T("Cheat.Player.ClaimDisplaySingular", ("player", current.GetName()), ("count", playedCards.Count.ToString()), ("rank", rank.ToString()!)));
+            else Console.WriteLine(T("Cheat.Player.ClaimDisplayMultiple", ("player", current.GetName()), ("count", playedCards.Count.ToString()), ("rank", rank.ToString()!)));
+
+            Console.WriteLine(T("Cheat.Player.CheatPrompt", ("player", current.GetName())));
+
+            Card.DeselectCards(playedCards);
+
+            Thread? awaitingCheatCall = new(() => DisplayCallCheatMenu(CHEAT_DISPLAY_DURATION_SECONDS))
+            {
+                IsBackground = true
+            };
+
+            awaitingCheatCall.Start();
+
+            while (awaitingCheatCall.IsAlive)
+            {
+                if (!Console.KeyAvailable)
+                {
+                    Thread.Sleep(50);
+                    continue;
+                }
+
+                Console.ReadKey(true);
+                CANCEL_COUNTDOWN = true;
+                awaitingCheatCall.Join();
+
+                List<string> options = [];
+                List<CheatPlayer?> playerOptions = [];
+                for (int i = 0; i < State.GetPlayerList().Count; i++)
+                {
+                    if (State.GetPlayerList()[i].GetUsername() == current.GetUsername()) continue;
+                    options.Add(State.GetPlayerList()[i].GetName());
+                    playerOptions.Add(State.GetPlayerList()[i]);
+                }
+                options.Add(T("Util.Cancel"));
+                playerOptions.Add(null);
+
+                Console.Clear();
+                Console.WriteLine(T("Cheat.Player.CallCheat"));
+                CheatPlayer? playerCalledCheat = playerOptions[Util.GetChoice([.. options])];
+                if (playerCalledCheat != null) CheatCalled(current, playerCalledCheat, playedCards, rank);
+                Console.Clear();
+
+                break;
+            }
+
+            Console.WriteLine(T("Util.PressKey"));
+            Console.ReadKey(true);
         }
+
         private protected override void EndGame()
         {
-
+            Money pool = 0;
+            Player? won = null;
+            foreach (CheatPlayer player in State.GetPlayerList())
+            {
+                pool += player.DeductBetFromBalance();
+            }
+            foreach (CheatPlayer player in State.GetPlayerList())
+            {
+                if (player.HasWon())
+                {
+                    won = player;
+                    player.AddToBalance(pool);
+                }
+            }
+            Console.Clear();
+            Console.WriteLine(T("Cheat.Player.Won", ("player", won?.GetName() ?? "Unknown"), ("amount", pool.ToString())));
+            
+            Console.WriteLine(T("Cheat.Player.FinalHands"));
+            foreach (CheatPlayer player in State.GetPlayerList())
+            {
+                Console.Write(player.GetName() + ": ");
+                if (!player.HasWon()) Console.WriteLine(string.Join(", ", player.GetHand().Select(card => $"{card.GetRankSymbol()}{card.GetSuitSymbol()}")));
+                else Console.WriteLine(T("Cheat.Player.EmptyHand"));
+            }
         }
 
         private static void ScrollMenu(List<Card> cards)

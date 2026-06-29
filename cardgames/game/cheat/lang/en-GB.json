@@ -14,7 +14,10 @@
   "Cheat.Player.CheatPrompt": "Any player who believes that {player} cheated should now press any key, then select their name.\nOtherwise, allow the timer to finish and continue.",
   "Cheat.Player.CallCheat": "Who is calling cheat?",
   "Cheat.CheatCalled.LookAway": "{accuser} has accused {accused} of cheating!\nAll players except those two should please close their eyes and only re-open them when they hear the beep.",
-  "Cheat.Player.PlayedCards": "{player} played the following card(s):",
+  "Cheat.Player.PlayedCards": "{player} played the following card(s)",
   "Cheat.Player.Cheated": "{player} cheated! They pick up the pile.",
-  "Cheat.Player.Truthful": "{player} did not cheat! You pick up the pile."
+  "Cheat.Player.Truthful": "{player} did not cheat! You pick up the pile.",
+  "Cheat.Player.Won": "{player} has won the game! They win cr{amount}!",
+  "Cheat.Player.EmptyHand": "Winner (empty hand)!",
+  "Cheat.Player.FinalHands": "The final hands are:"
 }

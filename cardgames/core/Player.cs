@@ -368,6 +368,11 @@ namespace cardgames.core
             Bet = new Money(Bet.Value * 2);
         }
 
+        public void AddToBalance(Money amountToAdd)
+        {
+            balance += amountToAdd;
+        }
+
         public void DeductFromBalance(Money amountToDeduct)
         {
             if (amountToDeduct > 0)
@@ -376,16 +381,20 @@ namespace cardgames.core
             }
         }
 
-        public void DeductBetFromBalance()
+        public Money DeductBetFromBalance()
         {
+            Money bet = Bet;
             balance -= Bet;
             Bet = 0;
+            return bet;
         }
 
-        public void AddBetToBalance()
+        public Money AddBetToBalance()
         {
+            Money bet = Bet;
             balance += Bet;
             Bet = 0;
+            return bet;
         }
 
         public void RechargeBalance()

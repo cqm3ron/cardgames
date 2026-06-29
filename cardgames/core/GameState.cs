@@ -10,7 +10,6 @@
         private protected Deck gameDeck;
         private protected List<TPlayer> players;
         private protected int currentPlayer;
-        private protected string gamePhase;
         private protected Direction direction;
 
         public GameState(IEnumerable<TPlayer> _players)
@@ -18,7 +17,6 @@
             players = [.. _players];
             currentPlayer = 0;
             gameDeck = new(); // generates an empty deck
-            gamePhase = "";
         }
 
         public TPlayer GetCurrentPlayer()

@@ -10,6 +10,16 @@ namespace cardgames.game.cheat
 {
     internal class CheatPlayer : Player
     {
+        private bool won = false;
+        public bool HasWon()
+        {
+            return won;
+        }
+        public void Win()
+        {
+            won = true;
+        }
+
         #region CONVERSIONS
 
         public static CheatPlayer ConvertTo(Player player)

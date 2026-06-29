@@ -6,42 +6,15 @@ namespace cardgames.game.blackjack
     internal class BlackjackGame : GameBase<Player> // TODO: show dealer's total when game ends so users know they aren't being scammed lolol
     {
         public const int DECKCOUNT = 6;
-        private readonly decimal[] BETTING_AMOUNTS = [0.01m, 0.05m, 0.1m, 0.2m, 0.33m, 0.5m, 0.75m, 0.9m, 1m];
         public BlackjackState State { get; set; } = null!;
         public BlackjackGame() : base() { }
         public override List<Player> PlayGame(List<Player> players)
         {
-            // LoadGame(); // moved to application.cs
-
             List<BlackjackPlayer> blackjackPlayers = BlackjackPlayer.ConvertTo(players);
 
             State = new(blackjackPlayers);
 
-            foreach (BlackjackPlayer player in State.GetPlayerList())
-            {
-                Console.Clear();
-                List<Money> options = [];
-                Money balance = player.GetBalance();
-                Console.WriteLine(T("User.Betting.Info", ("name", player.GetName())));
-                Console.WriteLine(T("User.Balance") + ": cr" + balance);
-                Console.WriteLine(T("User.Ask.Betting"));
-
-                foreach (Money amount in BETTING_AMOUNTS)
-                {
-                    options.Add(balance * amount);
-                }
-
-                List<string> optionsToDisplay = [];
-
-                for (int opt = 0; opt < options.Count; opt++)
-                {
-                    optionsToDisplay.Add($"{(int)(BETTING_AMOUNTS[opt] * 100)}%: {options[opt].ToString()}");
-                }
-
-                int choice = Util.GetChoice([.. optionsToDisplay.ToArray()]);
-
-                player.PlaceBet(options[choice]);
-            }
+            Betting.BettingMenu(players);
 
             const int CARDS_TO_DRAW = 2;
             State.SetupDeck(DECKCOUNT);
@@ -211,9 +184,9 @@ namespace cardgames.game.blackjack
                             player.Win();
                             continue;
                         }
-                        if (player.GetHand().Count == 2 && player.HandValue == 21)
+                        if (player.GetHand().Count == 2 && player.HandValue == 21) // blackjack!
                         {
-                            player.Win(); // blackjack!
+                            player.Win();
                             continue;
                         }
 

@@ -11,7 +11,11 @@ namespace cardgames.game.cheat
 {
     internal class CheatState(List<CheatPlayer> _players) : GameState<CheatPlayer>(_players)
     {
-        Deck discard = new();
+        private Deck discard = new();
+        private bool gameOver = false;
+
+        public bool IsGameOver() => gameOver;
+        public void GameOver() => gameOver = true;
 
         public void Discard(Card card)
         {
