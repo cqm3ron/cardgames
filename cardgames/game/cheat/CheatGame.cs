@@ -183,6 +183,11 @@ namespace cardgames.game.cheat
             CheatState.Beep();
             Console.WriteLine();
 
+            Console.WriteLine(T("Cheat.Player.EyesOpenContinue"));
+            Console.WriteLine(T("Util.PressKey"));
+            Console.ReadKey(true);
+            Console.Clear();
+
             if (playedCards.Count == 1) Console.WriteLine(T("Cheat.Player.ClaimDisplaySingular", ("player", current.GetName()), ("count", playedCards.Count.ToString()), ("rank", rank.ToString()!)));
             else Console.WriteLine(T("Cheat.Player.ClaimDisplayMultiple", ("player", current.GetName()), ("count", playedCards.Count.ToString()), ("rank", rank.ToString()!)));
 

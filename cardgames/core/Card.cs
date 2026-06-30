@@ -30,8 +30,10 @@ namespace cardgames.core
         public Suits Suit { get; private protected set; }
         public Ranks Rank { get; private protected set; }
         public bool IsFaceCard { get; private protected set; }
+        public bool IsFaceUp { get; private protected set; }
         public int Value => (int)Rank;
         public bool IsSelected = false; // some games need users to "select" cards, such as cheat. This can be used for such games.
+        public bool IsHovered = false; // some games need to display the card the user is hovering over, such as Solitaire. This can be used for such games.
 
         // Constructors
         public Card(Suits suit, Ranks rank)
@@ -108,7 +110,7 @@ namespace cardgames.core
         }
 
 
-        // Methods for games implementing selection mechanics
+        // Methods for games implementing selection and/or hover mechanics
 
         public void Select()
         {
@@ -121,6 +123,19 @@ namespace cardgames.core
         public void ToggleSelect()
         {
             IsSelected = !IsSelected;
+        }
+
+        public void Hover()
+        {
+            IsHovered = true;
+        }
+        public void Unhover()
+        {
+            IsHovered = false;
+        }
+        public void ToggleHover()
+        {
+            IsHovered = !IsHovered;
         }
 
         // Static methods for games implementing selection mechanics
@@ -148,5 +163,10 @@ namespace cardgames.core
             }
             return deck;
         }
+
+        // Methods for games implementing face-up / face-down cards
+        public void TurnOver() => IsFaceUp = !IsFaceUp;
+        public void TurnFaceUp() => IsFaceUp = true;
+        public void TurnFaceDown() => IsFaceUp = false;
     }
 }

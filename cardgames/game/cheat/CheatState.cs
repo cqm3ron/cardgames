@@ -11,7 +11,7 @@ namespace cardgames.game.cheat
 {
     internal class CheatState(List<CheatPlayer> _players) : GameState<CheatPlayer>(_players)
     {
-        private Deck discard = new();
+        private readonly Deck discard = new();
         private bool gameOver = false;
 
         public bool IsGameOver() => gameOver;

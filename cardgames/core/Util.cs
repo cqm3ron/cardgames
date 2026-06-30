@@ -103,6 +103,8 @@ namespace cardgames.core
         public static ConsoleKey[] previousOptions = { ConsoleKey.UpArrow, ConsoleKey.PageUp, ConsoleKey.W };
         public static ConsoleKey[] scrollLeft = { ConsoleKey.LeftArrow, ConsoleKey.A };
         public static ConsoleKey[] scrollRight = { ConsoleKey.RightArrow, ConsoleKey.D };
+        public static ConsoleKey[] scrollUp = { ConsoleKey.UpArrow, ConsoleKey.W };
+        public static ConsoleKey[] scrollDown = { ConsoleKey.DownArrow, ConsoleKey.S };
 
 
         public static void ResetColor()

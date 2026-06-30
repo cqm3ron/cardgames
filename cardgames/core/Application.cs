@@ -18,13 +18,15 @@ namespace cardgames.core
         // TODO: refactor menu
         // TODO: add guest users
         // TODO: add solitaire
+        // TODO: solitaire should be greyed out in menu if more than one player is logged in.
+        // TODO: minimum and maximum player counts; only allow loading into a game if between min-max player counts. Defined in base class and constructor?
         public static void Load()
         {
             //LanGen.GenerateLocalisations(); // gen or update l10n files
             LoadDefaultSettings(); // Load the default settings; some can be changed later.
 
             players.Add(Player.LogIn("cam", "Potato123!")!); // remove after testing
-            players.Add(Player.LogIn("zaineb", "Zaineb!1sthebest!")!); // remove after testing
+            //players.Add(Player.LogIn("zaineb", "Zaineb!1sthebest!")!); // remove after testing
 
             Menu.UpdateLeaderboard();
 
@@ -55,10 +57,10 @@ namespace cardgames.core
 
         private static void LoadDefaultSettings()
         {
-            AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit);
-            Console.CancelKeyPress += OnCancelKeyPress;
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit); // save the game on exit
+            Console.CancelKeyPress += OnCancelKeyPress; // save the game when ctrl+c is performed
             Util.MaximiseWindow();
-            Language.Load("en-GB");
+            Language.Load("en-GB"); // load default language
             Util.ResetColor();
             Console.OutputEncoding = Encoding.UTF8;
         }

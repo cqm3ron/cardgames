@@ -80,6 +80,11 @@ namespace cardgames.core
             return cards;
         }
 
+        public Card GetTopCard()
+        {
+            return cards.Peek();
+        }
+
         public int Count => cards.Count;
 
         public Stack<Card> Empty()

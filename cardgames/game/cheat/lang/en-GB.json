@@ -19,5 +19,6 @@
   "Cheat.Player.Truthful": "{player} did not cheat! You pick up the pile.",
   "Cheat.Player.Won": "{player} has won the game! They win cr{amount}!",
   "Cheat.Player.EmptyHand": "Winner (empty hand)!",
-  "Cheat.Player.FinalHands": "The final hands are:"
+  "Cheat.Player.FinalHands": "The final hands are:",
+  "Cheat.Player.EyesOpenContinue": "When all players have opened their eyes, press any key."
 }

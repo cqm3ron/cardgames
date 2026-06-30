@@ -24,40 +24,40 @@ namespace cardgames.game.cheat
 
         public static CheatPlayer ConvertTo(Player player)
         {
-            CheatPlayer blackjackPlayer = new()
+            CheatPlayer cheatPlayer = new()
             {
                 name = player.GetName(),
                 uname = player.GetUsername(),
                 balance = player.GetBalance()
             };
 
-            return blackjackPlayer;
+            return cheatPlayer;
         }
 
         public static List<CheatPlayer> ConvertTo(List<Player> players)
         {
-            List<CheatPlayer> bjplayers = [];
+            List<CheatPlayer> cheatPlayers = [];
 
             foreach (Player p in players.ToList())
             {
-                bjplayers.Add(ConvertTo(p));
+                cheatPlayers.Add(ConvertTo(p));
             }
 
-            return bjplayers;
+            return cheatPlayers;
         }
 
-        public static Player ConvertFrom(CheatPlayer blackjackPlayer)
+        public static Player ConvertFrom(CheatPlayer cheatPlayer)
         {
-            Player player = new(blackjackPlayer.name, blackjackPlayer.uname, blackjackPlayer.balance.Value, blackjackPlayer.rechargeCount);
+            Player player = new(cheatPlayer.name, cheatPlayer.uname, cheatPlayer.balance.Value, cheatPlayer.rechargeCount);
             return player;
         }
 
-        public static List<Player> ConvertFrom(List<CheatPlayer> blackjackPlayers)
+        public static List<Player> ConvertFrom(List<CheatPlayer> cheatPlayers)
         {
             List<Player> players = [];
-            foreach (CheatPlayer bjp in blackjackPlayers)
+            foreach (CheatPlayer cheatPlayer in cheatPlayers)
             {
-                players.Add(ConvertFrom(bjp));
+                players.Add(ConvertFrom(cheatPlayer));
             }
             return players;
         }
