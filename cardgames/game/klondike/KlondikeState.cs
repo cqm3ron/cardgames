@@ -48,16 +48,13 @@ namespace cardgames.game.klondike
             }
 
             foreach (Card card in gameDeck.GetCards())
-            {
+            {                
                 card.TurnFaceDown();
             }
 
             foreach (Stack<Card> cardStack in cardStacks)
             {
-                foreach (Card card in cardStack)
-                {
-                    card.TurnFaceUp();
-                }
+                cardStack.Peek().TurnFaceUp();
             }
 
             cardStacks[0].Peek().Hover(); // hover the first card by default
@@ -85,15 +82,23 @@ namespace cardgames.game.klondike
             if (index > cardStacks.Length - 1) index = cardStacks.Length - 1;
             if (index < 0) index = 0;
 
-            return cardStacks[index].ElementAt(cardStacks.Length - 1 - n);
+            return cardStacks[index].ElementAt(cardStacks[index].Count - n - 1);
         }
         public void HoverTopCardFromStack(int index) // zero-based
         {
             GetTopCardFromStack(index).Hover();
         }
+        public void HoverCardFromStack(int stackIndex, int cardIndex)
+        {
+            GetNthCardFromStack(stackIndex, cardIndex).Hover();
+        }
         public void UnhoverTopCardFromStack(int index) // zero-based
         {
             GetTopCardFromStack(index).Unhover();
+        }
+        public void UnhoverCardFromStack(int stackIndex, int cardIndex)
+        {
+            GetNthCardFromStack(stackIndex, cardIndex).Unhover();
         }
         public void SelectTopCardFromStack(int index) // zero-based
         {
@@ -106,6 +111,29 @@ namespace cardgames.game.klondike
         public void ToggleSelectionOfTopCardFromStack(int index) // zero-based
         {
             GetTopCardFromStack(index).ToggleSelect();
+        }
+        public void ToggleSelectionOfNthCardFromStack(int currentStack, int currentCardInStack) // zero-based
+        {
+            Card card = GetNthCardFromStack(currentStack, currentCardInStack);
+            //if (card.IsFaceUp) // this should NOT be commented; only for testing purposes
+                GetNthCardFromStack(currentStack, currentCardInStack).ToggleSelect();
+
+            if (GetNthCardFromStack(currentStack, currentCardInStack) != GetCardStack(currentStack).ElementAt(GetCardStack(currentStack).Count - 1)) // if card is not the top card in the stack (i.e there are cards above it)
+            {
+                // select those cards too
+                for (int i = GetCardStack(currentStack).Count - 1; i > currentCardInStack; i--)
+                {
+                    GetNthCardFromStack(currentStack, i).ToggleSelect();
+                }
+            }
+
+            /* TODO
+             * if the current card is selected
+             * and if any card below it is selected
+             * deselect all the below cards + the current card
+             */
+
+
         }
         public void AddCardToDrawnCards(Card card)
         {

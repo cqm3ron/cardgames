@@ -88,18 +88,31 @@ namespace cardgames.game.klondike
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
             }
 
-            if (justDisplayTopLine)
+            if (justDisplayTopLine && faceUp)
             {
                 cardLines =
                 [
                     "┌─────────┐",
-                    "",
+                    $"│{leftRank}  {suit}  {rightRank}│",
                     "",
                     "",
                     "",
                     "",
                     ""
                 ];
+            }
+            else if (justDisplayTopLine &!faceUp)
+            {
+                cardLines =
+                [
+                    "┌─────────┐",
+                    "│ ~~~~~~~ │",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+];
             }
             else
             {
@@ -115,7 +128,7 @@ namespace cardgames.game.klondike
 ];
             }
 
-            if (!faceUp)
+            if (!faceUp &! justDisplayTopLine)
             {
                 cardLines =
                 [
@@ -140,45 +153,61 @@ namespace cardgames.game.klondike
             }
             Console.SetCursorPosition(x + CARD_WIDTH, y - CARD_HEIGHT);
             Util.ResetColor();
-        }
-
-        
+        } 
         public static void DisplayKlondikeMenu(KlondikeState state)
         {
             bool drawSection = false;
             bool drawSectionLeft = true;
             Console.CursorVisible = false;
-            int currentStack = 0;
+            int currentStack = 0; // 0 leftmost stack; higher = further right.
+            int currentCardInStack = 0; // 0 top; higher = deeper into stack.
             ConsoleKeyInfo inputKey;
             bool changesMade = true;
             Stack<Card>[] cardStacks = state.GetCardStacks();
 
             while (true)
             {
-                state.HoverTopCardFromStack(currentStack);
+                state.HoverCardFromStack(currentStack, currentCardInStack);
 
                 if (changesMade)
                 {
                     Console.SetCursorPosition(0, 0);
-                    if (drawSection) state.UnhoverTopCardFromStack(currentStack);
+                    if (drawSection) state.UnhoverCardFromStack(currentStack, currentCardInStack);
                     DisplayCardStacks(cardStacks, state.GetDeck(), drawSection, state.GetDrawnCards(), drawSectionLeft);
                     changesMade = false;
                 }
                 inputKey = Console.ReadKey(true);
 
-                state.UnhoverTopCardFromStack(currentStack);
+                state.UnhoverCardFromStack(currentStack, currentCardInStack);
                 if (!drawSection)
                 {
                     if (Util.scrollRight.Contains(inputKey.Key) && currentStack < cardStacks.Length - 1)
                     {
                         currentStack++;
+                        currentCardInStack = cardStacks[currentStack].Count - 1;
                         changesMade = true;
                     }
                     else if (Util.scrollLeft.Contains(inputKey.Key) && currentStack > 0)
                     {
                         currentStack--;
+                        currentCardInStack = cardStacks[currentStack].Count - 1;
                         changesMade = true;
                     }
+                    else if (inputKey.Key == ConsoleKey.UpArrow || inputKey.Key == ConsoleKey.W)
+                    {
+                        currentCardInStack = (currentCardInStack - 1);
+                        if (currentCardInStack < 0) currentCardInStack = 0;
+                        changesMade = true;
+                    }
+                    else if (inputKey.Key == ConsoleKey.DownArrow || inputKey.Key == ConsoleKey.S)
+                    {
+                        currentCardInStack = (currentCardInStack + 1);
+                        if (currentCardInStack > cardStacks[currentStack].Count - 1) currentCardInStack = cardStacks[currentStack].Count - 1;
+                        changesMade = true;
+                    }
+                    if (currentCardInStack > cardStacks[currentStack].Count - 1) currentCardInStack = cardStacks[currentStack].Count - 1;
+                    else if (currentCardInStack < 0) currentCardInStack = 0;
+
                 }
                 else
                 {
@@ -204,11 +233,14 @@ namespace cardgames.game.klondike
                     drawSection = false;
                     changesMade = true;
                 }
-                else if (Util.affirmatives.Contains(inputKey.Key))
+
+
+
+                if (Util.affirmatives.Contains(inputKey.Key))
                 {
                     if (!drawSection)
                     {
-                        state.ToggleSelectionOfTopCardFromStack(currentStack);
+                        state.ToggleSelectionOfNthCardFromStack(currentStack, currentCardInStack);
                     }
                     else
                     {
@@ -297,7 +329,7 @@ namespace cardgames.game.klondike
                     Util.ResetColor();
                 }
 
-                yCoord++;
+                yCoord+=2;
             }
         }
 
