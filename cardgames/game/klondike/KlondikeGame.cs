@@ -21,7 +21,7 @@ namespace cardgames.game.klondike
 
             State.SetupDeck(1); // Solitaire always uses one deck of cards.
 
-            State.SetupCardPilesFromDeck();
+            State.SetupCards();
 
             while (true)
             {
@@ -43,6 +43,7 @@ namespace cardgames.game.klondike
                 // TODO: NUMBER KEYS 1-4 TO SELECT THE DECKS UP TOP
                 // TODO: PROPERLY IMPLEMENT THE SUIT STACKS
                 // TODO: AUTO SOLVER
+                // TODO: SELECTION LIMIT
                 
             }
 

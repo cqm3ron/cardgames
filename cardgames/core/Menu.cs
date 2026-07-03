@@ -205,9 +205,9 @@ namespace cardgames.core
 
                 Util.ResetColor();
 
-                var choice = GetGameChoice(games, options, ref selected);
+                object choice = GetGameChoice(games, options, ref selected);
 
-                var temp = new object();
+                object temp = new();
 
                 if (choice != null && choice.GetType() == temp.GetType())
                 {

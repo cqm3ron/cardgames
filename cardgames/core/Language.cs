@@ -1,4 +1,5 @@
 ﻿using cardgames.core.extension;
+using System.Net.Http.Headers;
 using System.Text.Json;
 
 namespace cardgames.core
@@ -72,7 +73,7 @@ namespace cardgames.core
 
             if (parameters != null)
             {
-                foreach (var p in parameters)
+                foreach (KeyValuePair<string, string> p in parameters)
                 {
                     value = value.Replace($"{{{p.Key}}}", p.Value);
                 }

@@ -29,11 +29,11 @@ namespace cardgames.games.cheat
         public bool TryParseCard(string input, out Card? card)
         {
             card = null;
-            var tokens = NormaliseInput(input).Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            string[] tokens = NormaliseInput(input).Split(' ', StringSplitOptions.RemoveEmptyEntries);
             Ranks? rank = null;
             Suits? suit = null;
 
-            foreach (var token in tokens)
+            foreach (string token in tokens)
             {
                 if (token.Length == 1 && !rankMap.ContainsKey(token) && !suitMap.ContainsKey(token))
                 {
@@ -69,7 +69,7 @@ namespace cardgames.games.cheat
         public bool TryParseRank(string input, out Ranks? rank)
         {
             rank = null;
-            var tokens = NormaliseInput(input).Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            string[] tokens = NormaliseInput(input).Split(' ', StringSplitOptions.RemoveEmptyEntries);
             foreach (var token in tokens)
             {
                 if (TryFindMatch(token, rankMap, out Ranks foundRank))

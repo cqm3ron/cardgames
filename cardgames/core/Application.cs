@@ -20,6 +20,7 @@ namespace cardgames.core
         // TODO: add solitaire
         // TODO: solitaire should be greyed out in menu if more than one player is logged in.
         // TODO: minimum and maximum player counts; only allow loading into a game if between min-max player counts. Defined in base class and constructor?
+        // TODO: remove all instances of "var"; use strongly-typed variables instead.
         public static void Load()
         {
             //LanGen.GenerateLocalisations(); // gen or update l10n files
