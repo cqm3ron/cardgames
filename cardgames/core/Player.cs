@@ -300,13 +300,14 @@ namespace cardgames.core
                 try
                 {
                     userData = File.ReadAllLines(file);
-                    name = file.Replace(USER_FOLDER_PATH, "").Replace("userdata", "");
+                    name = file.Replace(USER_FOLDER_PATH, "").Replace(".userdata", "");
                     balance = Convert.ToDecimal(userData[2]);
                     recharges = Convert.ToInt32(userData[3]);
                 }
                 catch (Exception ex)
                 {
                     // error in importing data; do not show this player on the leaderboard
+                    // TODO: display an error message
                 }
 
                 balance -= DEFAULT_BALANCE * recharges;

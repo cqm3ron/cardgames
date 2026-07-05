@@ -1,6 +1,5 @@
 ﻿using cardgames.core;
 using cardgames.core.extension;
-using System.Reflection.Metadata.Ecma335;
 
 namespace cardgames.game.klondike
 {
@@ -9,7 +8,13 @@ namespace cardgames.game.klondike
         private readonly Stack<Card>[] cardStacks = new Stack<Card>[7];
         private readonly Stack<Card>[] suitStacks = new Stack<Card>[4]; // hearts, diamonds, clubs, spades
         private readonly Stack<Card> drawnCards = [];
+        public enum MoveType
+        {
+            ToSuitStack,
+            ToCardStack
+        }
         private Queue<Card>[] orderToAddToSuitStacks = [];
+        private readonly Queue<Card>[] orderToAddToCardStacks = [];
 
         public void SetupCards()
         {
@@ -52,7 +57,7 @@ namespace cardgames.game.klondike
             }
 
             foreach (Card card in gameDeck.GetCards())
-            {                
+            {
                 card.TurnFaceDown();
             }
 
@@ -71,8 +76,15 @@ namespace cardgames.game.klondike
         }
         public Stack<Card> GetCardStack(int index) // zero-based
         {
-            if (index < 0) index = 0;
-            else if (index > 7) index = 6;
+            if (index < 0)
+            {
+                index = 0;
+            }
+            else if (index > 7)
+            {
+                index = 6;
+            }
+
             return cardStacks[index];
         }
         public Stack<Card>[] GetCardStacks()
@@ -81,36 +93,100 @@ namespace cardgames.game.klondike
         }
 
         public Card GetTopCardFromStack(int index) // zero-based
-        {
-            if (index > cardStacks.Length - 1) index = cardStacks.Length - 1;
-            if (index < 0) index = 0;
+        { 
+            if (index > cardStacks.Length - 1)
+            {
+                index = cardStacks.Length - 1;
+            }
+
+            if (index < 0)
+            {
+                index = 0;
+            }
+
+            if (cardStacks[index].Count == 0)
+            {
+                return null;
+            }
 
             return cardStacks[index].Peek();
         }
         public Card GetNthCardFromStack(int index, int n) // zero-based
         {
-            if (index > cardStacks.Length - 1) index = cardStacks.Length - 1;
-            if (index < 0) index = 0;
-            
-            if (n >= cardStacks[index].Count) n = cardStacks[index].Count - 1;
-            if (n < 0) n = 0;
+            if (index > cardStacks.Length - 1)
+            {
+                index = cardStacks.Length - 1;
+            }
+
+            if (index < 0)
+            {
+                index = 0;
+            }
+
+            // Return null if stack is empty to prevent IndexOutOfRange
+            if (cardStacks[index].Count == 0)
+            {
+                return null;
+            }
+
+            if (n >= cardStacks[index].Count)
+            {
+                n = cardStacks[index].Count - 1;
+            }
+
+            if (n < 0)
+            {
+                n = 0;
+            }
 
             return cardStacks[index].ElementAt(cardStacks[index].Count - n - 1);
         }
         public void RemoveNthCardFromStack(int index, int n) // zero-based
         {
-            if (index > cardStacks.Length - 1) index = cardStacks.Length - 1;
-            if (index < 0) index = 0;
+            if (index > cardStacks.Length - 1)
+            {
+                index = cardStacks.Length - 1;
+            }
+
+            if (index < 0)
+            {
+                index = 0;
+            }
 
             cardStacks[index].RemoveFirstOccurrence(cardStacks[index].ElementAt(cardStacks[index].Count - n - 1));
         }
+
+        public Card GetHoveredCard()
+        {
+            foreach (Stack<Card> cardStack in cardStacks)
+            {
+                foreach (Card card in cardStack)
+                {
+                    if (card.IsHovered)
+                    {
+                        return card;
+                    }
+                }
+            }
+            if (drawnCards.Count > 0 && drawnCards.Peek().IsHovered)
+            {
+                return drawnCards.Peek();
+            }
+
+            return null;
+        }
+
         public void HoverTopCardFromStack(int index) // zero-based
         {
             GetTopCardFromStack(index).Hover();
         }
         public void HoverCardFromStack(int stackIndex, int cardIndex)
         {
-            GetNthCardFromStack(stackIndex, cardIndex).Hover();
+            Card card = GetNthCardFromStack(stackIndex, cardIndex);
+            if (card != null) 
+            {
+                card.Hover();
+            }
         }
         public void UnhoverTopCardFromStack(int index) // zero-based
         {
@@ -118,7 +194,11 @@ namespace cardgames.game.klondike
         }
         public void UnhoverCardFromStack(int stackIndex, int cardIndex)
         {
-            GetNthCardFromStack(stackIndex, cardIndex).Unhover();
+            Card card = GetNthCardFromStack(stackIndex, cardIndex);
+            if (card != null)
+            {
+                card.Unhover();
+            }
         }
         public void SelectTopCardFromStack(int index) // zero-based
         {
@@ -132,11 +212,32 @@ namespace cardgames.game.klondike
         {
             GetTopCardFromStack(index).ToggleSelect();
         }
+
+        public List<Card> GetNthCardAndAboveFromStack(int currentStack, int currentCardInStack)
+        {
+            List<Card> cards = [];
+            Card card = GetNthCardFromStack(currentStack, currentCardInStack);
+            if (card == null || !card.IsFaceUp)
+                return [];
+
+            for (int i = currentCardInStack; i <= GetCardStack(currentStack).Count - 1; i++)
+            {
+                Card checkingCard = GetNthCardFromStack(currentStack, i);
+                cards.Add(checkingCard);  // Add, don't Push
+            }
+
+            return cards;
+        }
+
         public void ToggleSelectionOfNthCardFromStack(int currentStack, int currentCardInStack) // zero-based
         {
+            // TODO: UTILISE FUNCTIONALITY FROM GetNthcardAndAboveFromStack() TO SIMPLIFY FUNCTION & AVOID CODE DUPLICATION
             Card card = GetNthCardFromStack(currentStack, currentCardInStack);
 
-            if (!card.IsFaceUp) return;
+            if (!card.IsFaceUp)
+            {
+                return;
+            }
 
             if (card.IsSelected)
             {
@@ -158,15 +259,6 @@ namespace cardgames.game.klondike
                         checkingCard.Select();
                     }
                 }
-
-                /* TODO
-                 * if the current card is selected
-                 * and if any card below it is selected
-                 * deselect all the below cards + the current card
-                 * 
-                 */
-
-
             }
         }
         public void AddCardToDrawnCards(Card card)
@@ -190,7 +282,8 @@ namespace cardgames.game.klondike
                 }
             }
         }
-        public Ranks GetNextRankForGivenSuit(Suits suit)
+
+        public Ranks GetNextRankForSuitStack(Suits suit)
         {
             switch (suit)
             {
@@ -222,39 +315,128 @@ namespace cardgames.game.klondike
                     throw new ArgumentOutOfRangeException($"Invalid suit: {suit}"); // this should never happen but the compiler demands a default case so I added it
             }
         }
-        public void MoveCardToSuitStack(Card card, bool cameFromCardStacks)
+
+
+        /* Menu Traversal:
+         *  if a card cannot be moved anywhere, selection does nothing
+         *  if a card can be moved, it is selected and available moves are highlighted in a colour (magenta?)
+         *  if a card is selected, the user can select a destination and the card will be moved there incl. any cards on top of it (same logic as KlondikeState.SelectNthCardFromStack() func)
+         */
+        public List<(MoveType, int)> GetPermissableMoves(Card card, bool isFromDrawPile, int stackIndex = -1, int cardIndex = -1)
         {
-            Suits suit = card.Suit;
-            switch (suit)
+            // TODO: FIX BEING ABLE TO MOVE KING ON TOP OF ACE
+            
+            if (card == null || !card.IsFaceUp)
             {
-                case Suits.Hearts:
-                    suitStacks[0].Push(card);
-                    orderToAddToSuitStacks[0].Dequeue();
-                    break;
-                case Suits.Diamonds: 
-                    suitStacks[1].Push(card);
-                    orderToAddToSuitStacks[1].Dequeue();
-                    break;
-                case Suits.Clubs:
-                    suitStacks[2].Push(card);
-                    orderToAddToSuitStacks[2].Dequeue();
-                    break;
-                case Suits.Spades:
-                    suitStacks[3].Push(card);
-                    orderToAddToSuitStacks[3].Dequeue();
-                    break;
+                return [];
             }
 
-            if (cameFromCardStacks)
+            Suits[] suitStackOrder = [Suits.Hearts, Suits.Diamonds, Suits.Clubs, Suits.Spades];
+            List<(MoveType, int)> permissableMoves = [];
+
+            Suits suit = card.Suit;
+            Ranks nextRankForSuitStack = GetNextRankForSuitStack(suit);
+
+            for (int i = 0; i < cardStacks.Length; i++) // check each card stack to see if the card can be moved there
             {
-                foreach (Stack<Card> cardStack in cardStacks)
+                if (i == stackIndex)
                 {
-                    cardStack.RemoveFirstOccurrence(card); // remove the card from the card stack it came from
+                    continue;
+                }
+
+                Stack<Card> cardStack = cardStacks[i];
+                if (cardStack.Count == 0 && card.Rank == Ranks.King)
+                {
+                    permissableMoves.Add((MoveType.ToCardStack, i));
+                }
+                else if (cardStack.Count > 0)
+                {
+                    Card topCard = cardStack.Peek();
+                    if (topCard.IsFaceUp && topCard.IsRed != card.IsRed && (int)topCard.Rank == (int)card.Rank + 1)
+                    {
+                        permissableMoves.Add((MoveType.ToCardStack, i));
+                    }
+                }
+            }
+
+            if (isFromDrawPile)
+            {
+                if (card.Rank == nextRankForSuitStack)
+                {
+                    permissableMoves.Add((MoveType.ToSuitStack, Array.IndexOf(suitStackOrder, suit)));
                 }
             }
             else
             {
-                drawnCards.RemoveFirstOccurrence(card); // remove the card from the drawn cards stack 
+                if (stackIndex < 0 || stackIndex >= cardStacks.Length)
+                {
+                    return permissableMoves; // if the stack index is not in range, return
+                }
+
+                if (cardIndex == cardStacks[stackIndex].Count - 1 && card.Rank == nextRankForSuitStack)
+                {
+                    permissableMoves.Add((MoveType.ToSuitStack, Array.IndexOf(suitStackOrder, suit)));
+                }
+            }
+
+
+            return permissableMoves;
+        }
+
+        public void MakeMove(MoveType type, Card card, int targetIndex, bool isFromDrawPile, int sourceStackIndex = -1, int sourceCardIndex = -1)
+        {
+            Suits[] suitStackOrder = [Suits.Hearts, Suits.Diamonds, Suits.Clubs, Suits.Spades];
+            List<Card> movedCards = [];
+
+            if (type == MoveType.ToSuitStack)
+            {
+                int suitIndex = Array.IndexOf(suitStackOrder, card.Suit);
+
+                if (orderToAddToSuitStacks[suitIndex].Count > 0)
+                {
+                    Card expectedCard = orderToAddToSuitStacks[suitIndex].Peek();
+                    if (card.Suit != expectedCard.Suit || card.Rank != expectedCard.Rank)
+                    {
+                        return;
+                    }
+                    orderToAddToSuitStacks[suitIndex].Dequeue();
+                    suitStacks[suitIndex].Push(card);
+                }
+            }
+            else
+            {
+                if (!isFromDrawPile)
+                {
+                    List<Card> cardsToAdd = GetNthCardAndAboveFromStack(sourceStackIndex, sourceCardIndex);
+                    if (cardsToAdd != null && cardsToAdd.Count > 0)
+                    {
+                        movedCards = cardsToAdd;
+                        foreach (Card cardToAdd in cardsToAdd)
+                        {
+                            cardStacks[targetIndex].Push(cardToAdd);
+                        }
+                    }
+                }
+                if (isFromDrawPile)
+                {
+                    cardStacks[targetIndex].Push(card);
+                }
+            }
+
+            if (isFromDrawPile)
+            {
+                drawnCards.RemoveFirstOccurrence(card);
+            }
+            else
+            {
+                if (movedCards.Count == 0) cardStacks[sourceStackIndex].RemoveFirstOccurrence(card);
+                else
+                {
+                    foreach (Card currentCard in movedCards)
+                    {
+                        cardStacks[sourceStackIndex].RemoveFirstOccurrence(currentCard);
+                    }
+                }
             }
         }
     }

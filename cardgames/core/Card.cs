@@ -25,12 +25,14 @@ namespace cardgames.core
         King,
         Ace
     }
+
     internal class Card
     {
         public Suits Suit { get; private protected set; }
         public Ranks Rank { get; private protected set; }
         public bool IsFaceCard { get; private protected set; }
         public bool IsFaceUp { get; private protected set; }
+        public bool IsRed => Suit == Suits.Hearts || Suit == Suits.Diamonds;
         public int Value => (int)Rank;
         public bool IsSelected = false; // some games need users to "select" cards, such as cheat. This can be used for such games.
         public bool IsHovered = false; // some games need to display the card the user is hovering over, such as Solitaire. This can be used for such games.

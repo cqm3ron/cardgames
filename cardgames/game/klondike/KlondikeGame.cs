@@ -26,6 +26,8 @@ namespace cardgames.game.klondike
             while (true)
             {
                 KlondikeDisplay.DisplayKlondikeMenu(State);
+
+
                 /* GAME PLAN:
                  * 1. allow user to traverse menu
                  * 2. if they select a card, the game should move the card to the most sensible place
@@ -44,7 +46,7 @@ namespace cardgames.game.klondike
                 // TODO: PROPERLY IMPLEMENT THE SUIT STACKS
                 // TODO: AUTO SOLVER
                 // TODO: SELECTION LIMIT
-                
+
             }
 
 
