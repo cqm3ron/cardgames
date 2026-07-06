@@ -300,7 +300,7 @@ namespace cardgames.game.klondike
                             }
                             else
                             {
-                                state.ToggleSelectionOfNthCardFromStack(currentStack, currentCardInStack);
+                                state.ToggleSelectionOfNthCardAndAboveFromStack(currentStack, currentCardInStack);
                             }
                         }
                         else if (currentCard == state.GetTopCardFromStack(currentStack))

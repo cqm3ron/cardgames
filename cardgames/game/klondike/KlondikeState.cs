@@ -229,7 +229,7 @@ namespace cardgames.game.klondike
             return cards;
         }
 
-        public void ToggleSelectionOfNthCardFromStack(int currentStack, int currentCardInStack) // zero-based
+        public void ToggleSelectionOfNthCardAndAboveFromStack(int currentStack, int currentCardInStack) // zero-based
         {
             // TODO: UTILISE FUNCTIONALITY FROM GetNthcardAndAboveFromStack() TO SIMPLIFY FUNCTION & AVOID CODE DUPLICATION
             Card card = GetNthCardFromStack(currentStack, currentCardInStack);
@@ -379,6 +379,7 @@ namespace cardgames.game.klondike
                 }
             }
 
+            permissableMoves = permissableMoves.OrderBy(move => move.Item1).ToList(); 
 
             return permissableMoves;
         }
