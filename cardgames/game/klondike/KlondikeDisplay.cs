@@ -171,6 +171,7 @@ namespace cardgames.game.klondike
             bool totallyRedrawScreen = true;
             Stack<Card>[] cardStacks = state.GetCardStacks();
             List<(KlondikeState.MoveType, int)> moves;
+            int selectedMoveIndex = 0;
 
             while (true)
             {
@@ -189,19 +190,18 @@ namespace cardgames.game.klondike
                 {
                     Console.SetCursorPosition(0, 0);
                     if (drawSection) state.UnhoverCardFromStack(currentStack, currentCardInStack);
-                    DisplayCardStacks(cardStacks, state.GetDeck(), drawSection, state.GetDrawnCards(), drawSectionLeft, state, currentStack, moves);
+                    DisplayCardStacks(cardStacks, state.GetDeck(), drawSection, state.GetDrawnCards(), drawSectionLeft, state, currentStack, moves, selectedMoveIndex);
                     changesMade = false;
                 }
                 if (totallyRedrawScreen)
                 {
                     Console.Clear();
                     if (drawSection) state.UnhoverCardFromStack(currentStack, currentCardInStack);
-                    DisplayCardStacks(cardStacks, state.GetDeck(), drawSection, state.GetDrawnCards(), drawSectionLeft, state, currentStack, moves);
+                    DisplayCardStacks(cardStacks, state.GetDeck(), drawSection, state.GetDrawnCards(), drawSectionLeft, state, currentStack, moves, selectedMoveIndex);
                     totallyRedrawScreen = false;
                     changesMade = false;
                 }
-                inputKey = Console.ReadKey(true);
-                
+
                 // TODO: REMOVE TESTING BLOCK BELOW
 
                 if (!drawSection)
@@ -218,11 +218,13 @@ namespace cardgames.game.klondike
                         Console.WriteLine(x.Item1 + ", " + x.Item2);
                     }
                 }
-                
+
 
                 if (state.GetPermissableMoves(state.GetHoveredCard(), false, currentStack, currentCardInStack).Count == 0 && state.GetPermissableMoves(state.GetHoveredCard(), true).Count == 0) Console.WriteLine("                                             ");
 
                 // END OF TESTING BLOCK
+
+                inputKey = Console.ReadKey(true);
 
                 state.UnhoverCardFromStack(currentStack, currentCardInStack);
                 if (!drawSection)
@@ -282,6 +284,27 @@ namespace cardgames.game.klondike
 
 
 
+                // TODO: INFORM USER HOW MANY OPTIONS AND TELL THEM HOW TO SELECT (E.G. "OPTION 1 OF 2; PRESS TAB TO CYCLE FORWARDS OR SHIFT-TAB TO CYCLE BACKWARDS.")
+                if (inputKey.Key == ConsoleKey.Tab) // allow selecting which move you want to perform if multiple options
+                {
+                    if (moves.Count > 0)
+                    {
+                        selectedMoveIndex++;
+                        if (selectedMoveIndex >= moves.Count) selectedMoveIndex = 0;
+                        changesMade = true;
+                    }
+                }
+                else if (inputKey.Modifiers.HasFlag(ConsoleModifiers.Shift) && inputKey.Key == ConsoleKey.Tab)
+                {
+                    if (moves.Count > 0)
+                    {
+                        selectedMoveIndex--;
+                        if (selectedMoveIndex < 0) selectedMoveIndex = moves.Count - 1;
+                        changesMade = true;
+                    }
+                }
+
+
                 if (Util.affirmatives.Contains(inputKey.Key))
                 {
                     if (!drawSection)
@@ -294,7 +317,7 @@ namespace cardgames.game.klondike
                         {
                             if (moves.Count > 0)
                             {
-                                state.MakeMove(moves[0].Item1, currentCard, moves[0].Item2, false, currentStack, currentCardInStack);
+                                state.MakeMove(moves[selectedMoveIndex].Item1, currentCard, moves[selectedMoveIndex].Item2, false, currentStack, currentCardInStack);
                                 currentCard.Unhover();
                                 totallyRedrawScreen = true;
                             }
@@ -338,7 +361,7 @@ namespace cardgames.game.klondike
 
                                 if (moves.Count > 0)
                                 {
-                                    state.MakeMove(moves[0].Item1, currentCard, moves[0].Item2, true);
+                                    state.MakeMove(moves[selectedMoveIndex].Item1, currentCard, moves[selectedMoveIndex].Item2, true);
                                     currentCard.Unhover();
                                     totallyRedrawScreen = true;
                                 }
@@ -353,7 +376,7 @@ namespace cardgames.game.klondike
 
         }
 
-        public static void DisplayCardStacks(Stack<Card>[] cardStacks, Deck gameDeck, bool inDrawSection, Stack<Card> drawnCards, bool drawSectionLeft, KlondikeState state, int currentStack, List<(KlondikeState.MoveType, int)> moves)
+        public static void DisplayCardStacks(Stack<Card>[] cardStacks, Deck gameDeck, bool inDrawSection, Stack<Card> drawnCards, bool drawSectionLeft, KlondikeState state, int currentStack, List<(KlondikeState.MoveType, int)> moves, int selectedMoveIndex)
         {
             int x = Console.GetCursorPosition().Left;
             int y = Console.GetCursorPosition().Top;
@@ -401,10 +424,13 @@ namespace cardgames.game.klondike
                 Console.SetCursorPosition(x, y);
 
                 bool isStackSelected = false;
+                bool displayTopCardAsTarget = false;
 
                 if (i == currentStack &! inDrawSection) isStackSelected = true;
+                
+                if (moves.Count > 0 && moves[selectedMoveIndex].Item2 == i && moves[selectedMoveIndex].Item1 == KlondikeState.MoveType.ToCardStack) displayTopCardAsTarget = true;
 
-                DisplayIndividualCardStack(cardStacks[i], isStackSelected, (moves.Count > 0 && moves[0].Item2 == i && moves[0].Item1 == KlondikeState.MoveType.ToCardStack));
+                DisplayIndividualCardStack(cardStacks[i], isStackSelected, displayTopCardAsTarget);
 
                 x = Console.GetCursorPosition().Left;
             }
@@ -420,7 +446,7 @@ namespace cardgames.game.klondike
                 if (state.GetNextRankForSuitStack(suit) == Ranks.Ace)
                 {
                     Console.ForegroundColor = ConsoleColor.DarkGray;
-                    if (moves.Count > 0 && moves[0].Item1 == KlondikeState.MoveType.ToSuitStack && moves[0].Item2 == i)
+                    if (moves.Count > 0 && moves[selectedMoveIndex].Item1 == KlondikeState.MoveType.ToSuitStack && moves[selectedMoveIndex].Item2 == i)
                     {
                         Console.ForegroundColor = ConsoleColor.Magenta;
                     }
@@ -454,8 +480,7 @@ namespace cardgames.game.klondike
 
                 if (cardIndex == 0) // if its the top card (index 0)
                 {
-                    if (displayTopCardAsTarget) BigCard(cardStack.ElementAt(cardIndex), highlightAsTarget:displayTopCardAsTarget); // display it big & magenta
-                    else BigCard(cardStack.ElementAt(cardIndex)); // display it big =
+                    BigCard(cardStack.ElementAt(cardIndex), highlightAsTarget:displayTopCardAsTarget); // display it big & magenta
                 }
                 else
                 {

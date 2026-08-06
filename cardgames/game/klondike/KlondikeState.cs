@@ -337,36 +337,14 @@ namespace cardgames.game.klondike
             Suits suit = card.Suit;
             Ranks nextRankForSuitStack = GetNextRankForSuitStack(suit);
 
-            for (int i = 0; i < cardStacks.Length; i++) // check each card stack to see if the card can be moved there
-            {
-                if (i == stackIndex)
-                {
-                    continue;
-                }
-
-                Stack<Card> cardStack = cardStacks[i];
-                if (cardStack.Count == 0 && card.Rank == Ranks.King)
-                {
-                    permissableMoves.Add((MoveType.ToCardStack, i));
-                }
-                else if (cardStack.Count > 0)
-                {
-                    Card topCard = cardStack.Peek();
-                    if (topCard.IsFaceUp && topCard.IsRed != card.IsRed && (int)topCard.Rank == (int)card.Rank + 1)
-                    {
-                        permissableMoves.Add((MoveType.ToCardStack, i));
-                    }
-                }
-            }
-
-            if (isFromDrawPile)
+            if (isFromDrawPile) // if the card is from the draw pile, check if it can be moved to a suit stack
             {
                 if (card.Rank == nextRankForSuitStack)
                 {
                     permissableMoves.Add((MoveType.ToSuitStack, Array.IndexOf(suitStackOrder, suit)));
                 }
             }
-            else
+            else // if the card is from a card stack, check if it can be moved to a suit stack
             {
                 if (stackIndex < 0 || stackIndex >= cardStacks.Length)
                 {
@@ -379,6 +357,30 @@ namespace cardgames.game.klondike
                 }
             }
 
+
+            for (int i = 0; i < cardStacks.Length; i++) // check each card stack to see if the card can be moved there
+            {
+                if (i == stackIndex)
+                {
+                    continue;
+                }
+
+                Stack<Card> cardStack = cardStacks[i];
+
+                if (cardStack.Count == 0 && card.Rank == Ranks.King) // if king, prioritise moving to empty stack
+                {
+                    permissableMoves.Add((MoveType.ToCardStack, i));
+                }
+
+                else if (cardStack.Count > 0) // otherwise, check if the card can be moved to any other stack
+                {
+                    Card topCard = cardStack.Peek();
+                    if (topCard.IsFaceUp && topCard.IsRed != card.IsRed && (int)topCard.Rank == (int)card.Rank + 1)
+                    {
+                        permissableMoves.Add((MoveType.ToCardStack, i));
+                    }
+                }
+            }
 
             return permissableMoves;
         }
