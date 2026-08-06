@@ -1,8 +1,12 @@
 {
   "version": 2,
+<<<<<<< HEAD
   "dgSpecHash": "ec50kJxkgZI=",
+=======
+  "dgSpecHash": "sdfYZy9eup8=",
+>>>>>>> bc88ec0eac2b7d268ec83d092407f2d76dc9f297
   "success": true,
-  "projectFilePath": "D:\\Documents\\Visual Studio 2022\\Programs\\cardgames-NEA\\cardgames\\cardgames.csproj",
+  "projectFilePath": "U:\\Visual Studio 2022\\cardgames-master\\cardgames\\cardgames.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }
