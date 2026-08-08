@@ -51,8 +51,9 @@ namespace cardgames.game.klondike
 
                 // 2 - NON-FUNCTIONAL
 
-                
-                
+                // TODO: MOVE INPUT HANDLING LOGIC OUT OF DISPLAY CLASS - THE DISPLAY CLASS SHOULD ONLY BE RESPONSIBLE FOR DISPLAYING INFORMATION, NOT HANDLING INPUT. MOVE TO GAME CLASS.
+
+
                 // 3 - BUG FIXES
 
                 // TODO: display keybinding tooltips as it is not immediately obvious how to navigate menu (esp. to the draw pile)
