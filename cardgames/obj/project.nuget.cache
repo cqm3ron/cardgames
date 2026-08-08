@@ -1,12 +1,18 @@
 {
   "version": 2,
-<<<<<<< HEAD
   "dgSpecHash": "ec50kJxkgZI=",
-=======
-  "dgSpecHash": "sdfYZy9eup8=",
->>>>>>> bc88ec0eac2b7d268ec83d092407f2d76dc9f297
   "success": true,
-  "projectFilePath": "U:\\Visual Studio 2022\\cardgames-master\\cardgames\\cardgames.csproj",
+  "projectFilePath": "D:\\Documents\\Visual Studio 2022\\Programs\\cardgames-NEA\\cardgames\\cardgames.csproj",
   "expectedPackageFiles": [],
-  "logs": []
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "message": "Problem reading the cache file D:\\Documents\\Visual Studio 2022\\Programs\\cardgames-NEA\\cardgames\\obj\\project.nuget.cache : '<' is an invalid start of a property name. Expected a '\"'. Path: $ | LineNumber: 2 | BytePositionInLine: 0.",
+      "projectPath": "D:\\Documents\\Visual Studio 2022\\Programs\\cardgames-NEA\\cardgames\\cardgames.csproj",
+      "warningLevel": 1,
+      "filePath": "D:\\Documents\\Visual Studio 2022\\Programs\\cardgames-NEA\\cardgames\\cardgames.csproj",
+      "targetGraphs": []
+    }
+  ]
 }

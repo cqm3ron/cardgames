@@ -1,12 +1,19 @@
 ﻿using cardgames.core;
+using static cardgames.game.klondike.KlondikeState;
 using System.Transactions;
+using System.Resources;
 
 namespace cardgames.game.klondike
 {
-    internal class KlondikeDisplay
+    internal static class KlondikeDisplay
     {
         public const int CARD_WIDTH = 11; // public as it could be useful to know how much space to leave
         public const int CARD_HEIGHT = 7; // as above
+
+        private static int x;
+        private static int y;
+        private static bool changesMade = true;
+        private static bool totallyRedrawScreen = true;
 
         private static void BigCardOutline(Suits? suit = null)
         {
@@ -53,7 +60,6 @@ namespace cardgames.game.klondike
             string rightRank, leftRank;
             string rank = card.GetRankSymbol();
             char suit = card.GetSuitSymbol();
-            bool selected = card.IsSelected;
             bool hovered = card.IsHovered;
             bool faceUp = card.IsFaceUp;
             string[] cardLines;
@@ -75,19 +81,11 @@ namespace cardgames.game.klondike
                 Console.ForegroundColor = ConsoleColor.Red;
             }
 
-            if (hovered && selected)
-            {
-                Console.ForegroundColor = ConsoleColor.DarkCyan;
-            }
-            else if (selected)
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-            }
-            else if (hovered)
+            if (hovered)
             {
                 Console.ForegroundColor = ConsoleColor.DarkBlue;
             }
-            
+
             if (highlightAsTarget)
             {
                 Console.ForegroundColor = ConsoleColor.Magenta;
@@ -159,236 +157,74 @@ namespace cardgames.game.klondike
             Console.SetCursorPosition(x + CARD_WIDTH, y - CARD_HEIGHT);
             Util.ResetColor();
         }
+
         public static void DisplayKlondikeMenu(KlondikeState state)
         {
-            bool drawSection = false;
-            bool drawSectionLeft = true;
             Console.CursorVisible = false;
-            int currentStack = 0; // 0 leftmost stack; higher = further right.
-            int currentCardInStack = 0; // 0 top; higher = deeper into stack.
-            ConsoleKeyInfo inputKey;
-            bool changesMade = true;
-            bool totallyRedrawScreen = true;
-            Stack<Card>[] cardStacks = state.GetCardStacks();
-            List<(KlondikeState.MoveType, int)> moves;
-            int selectedMoveIndex = 0;
 
             while (true)
             {
-                state.HoverCardFromStack(currentStack, currentCardInStack);
 
-                if (state.GetDrawnCards().Count > 0 && drawSection &! drawSectionLeft)
+                if (changesMade || totallyRedrawScreen)
                 {
-                    moves = state.GetPermissableMoves(state.GetDrawnCards().Peek(), true);
-                }
-                else
-                {
-                    moves = state.GetPermissableMoves(state.GetNthCardFromStack(currentStack, currentCardInStack), false, currentStack, currentCardInStack);
-                }
-
-                if (changesMade)
-                {
-                    Console.SetCursorPosition(0, 0);
-                    if (drawSection) state.UnhoverCardFromStack(currentStack, currentCardInStack);
-                    DisplayCardStacks(cardStacks, state.GetDeck(), drawSection, state.GetDrawnCards(), drawSectionLeft, state, currentStack, moves, selectedMoveIndex);
-                    changesMade = false;
-                }
-                if (totallyRedrawScreen)
-                {
-                    Console.Clear();
-                    if (drawSection) state.UnhoverCardFromStack(currentStack, currentCardInStack);
-                    DisplayCardStacks(cardStacks, state.GetDeck(), drawSection, state.GetDrawnCards(), drawSectionLeft, state, currentStack, moves, selectedMoveIndex);
-                    totallyRedrawScreen = false;
+                    if (totallyRedrawScreen)
+                    {
+                        Console.Clear();
+                        totallyRedrawScreen = false;
+                    }
+                    else
+                    {
+                        Console.SetCursorPosition(0, 0);
+                    }
+                    state.UpdateMoves();
+                    DisplayGameScreen(state);
                     changesMade = false;
                 }
 
-                // TODO: REMOVE TESTING BLOCK BELOW
+                // === TODO: REMOVE TESTING BLOCK BELOW ===
 
-                if (!drawSection)
+                int tempx = Console.GetCursorPosition().Left, tempy = Console.GetCursorPosition().Top;
+                foreach (var x in state.GetMoves())
                 {
-                    foreach (var x in state.GetPermissableMoves(state.GetHoveredCard(), false, currentStack, currentCardInStack))
-                    {
-                        Console.WriteLine(x.Item1 + ", " + x.Item2);
-                    }
-                }
-                else
-                {
-                    foreach (var x in state.GetPermissableMoves(state.GetHoveredCard(), true))
-                    {
-                        Console.WriteLine(x.Item1 + ", " + x.Item2);
-                    }
+                    Console.SetCursorPosition(tempx, tempy);
+                    Console.WriteLine(x.Item1 + ", " + x.Item2);
+                    tempy++;
                 }
 
+                if (state.GetMoves().Count == 0) Console.WriteLine("                                             ");
 
-                if (state.GetPermissableMoves(state.GetHoveredCard(), false, currentStack, currentCardInStack).Count == 0 && state.GetPermissableMoves(state.GetHoveredCard(), true).Count == 0) Console.WriteLine("                                             ");
+                // === END OF TESTING BLOCK ===
 
-                // END OF TESTING BLOCK
-
-                inputKey = Console.ReadKey(true);
-
-                state.UnhoverCardFromStack(currentStack, currentCardInStack);
-                if (!drawSection)
-                {
-                    if (Util.scrollRight.Contains(inputKey.Key) && currentStack < cardStacks.Length - 1)
-                    {
-                        currentStack++;
-                        currentCardInStack = cardStacks[currentStack].Count - 1;
-                        changesMade = true;
-                    }
-                    else if (Util.scrollLeft.Contains(inputKey.Key) && currentStack > 0)
-                    {
-                        currentStack--;
-                        currentCardInStack = cardStacks[currentStack].Count - 1;
-                        changesMade = true;
-                    }
-                    else if (inputKey.Key == ConsoleKey.UpArrow || inputKey.Key == ConsoleKey.W)
-                    {
-                        currentCardInStack = currentCardInStack - 1;
-                        if (currentCardInStack < 0) currentCardInStack = 0;
-                        changesMade = true;
-                    }
-                    else if (inputKey.Key == ConsoleKey.DownArrow || inputKey.Key == ConsoleKey.S)
-                    {
-                        currentCardInStack = currentCardInStack + 1;
-                        if (currentCardInStack > cardStacks[currentStack].Count - 1) currentCardInStack = cardStacks[currentStack].Count - 1;
-                        changesMade = true;
-                    }
-                    if (currentCardInStack > cardStacks[currentStack].Count - 1) currentCardInStack = cardStacks[currentStack].Count - 1;
-                    else if (currentCardInStack < 0) currentCardInStack = 0;
-
-                }
-                else
-                {
-                    if (Util.scrollRight.Contains(inputKey.Key))
-                    {
-                        drawSectionLeft = false;
-                        changesMade = true;
-                    }
-                    else if (Util.scrollLeft.Contains(inputKey.Key))
-                    {
-                        drawSectionLeft = true;
-                        changesMade = true;
-                    }
-                }
-
-                if (inputKey.Key == ConsoleKey.PageUp)
-                {
-                    drawSection = true;
-                    changesMade = true;
-                }
-                else if (inputKey.Key == ConsoleKey.PageDown)
-                {
-                    drawSection = false;
-                    changesMade = true;
-                }
-
-
-
-                // TODO: INFORM USER HOW MANY OPTIONS AND TELL THEM HOW TO SELECT (E.G. "OPTION 1 OF 2; PRESS TAB TO CYCLE FORWARDS OR SHIFT-TAB TO CYCLE BACKWARDS.")
-                if (inputKey.Key == ConsoleKey.Tab) // allow selecting which move you want to perform if multiple options
-                {
-                    if (moves.Count > 0)
-                    {
-                        selectedMoveIndex++;
-                        if (selectedMoveIndex >= moves.Count) selectedMoveIndex = 0;
-                        changesMade = true;
-                    }
-                }
-                else if (inputKey.Modifiers.HasFlag(ConsoleModifiers.Shift) && inputKey.Key == ConsoleKey.Tab)
-                {
-                    if (moves.Count > 0)
-                    {
-                        selectedMoveIndex--;
-                        if (selectedMoveIndex < 0) selectedMoveIndex = moves.Count - 1;
-                        changesMade = true;
-                    }
-                }
-
-
-                if (Util.affirmatives.Contains(inputKey.Key))
-                {
-                    if (!drawSection)
-                    {
-                        Card currentCard = state.GetNthCardFromStack(currentStack, currentCardInStack);
-
-                        if (currentCard == null) continue;
-
-                        if (currentCard.IsFaceUp)
-                        {
-                            if (moves.Count > 0)
-                            {
-                                state.MakeMove(moves[selectedMoveIndex].Item1, currentCard, moves[selectedMoveIndex].Item2, false, currentStack, currentCardInStack);
-                                currentCard.Unhover();
-                                totallyRedrawScreen = true;
-                            }
-                            else
-                            {
-                                state.ToggleSelectionOfNthCardAndAboveFromStack(currentStack, currentCardInStack);
-                            }
-                        }
-                        else if (currentCard == state.GetTopCardFromStack(currentStack))
-                        {
-                            currentCard.TurnFaceUp();
-                        }
-                    }
-                    else // TODO: permissable moves from draw section
-                    {
-                        Deck deck = state.GetDeck();
-                        Stack<Card> drawnCards = state.GetDrawnCards();
-
-                        if (drawSectionLeft)
-                        {
-                            if (deck.Count == 0 && drawnCards.Count > 0)
-                            {
-                                while (drawnCards.Count > 0)
-                                {
-                                    Card card = drawnCards.Pop();
-                                    card.TurnFaceDown();
-                                    deck.AddCard(card);
-                                }
-                            }
-                            else
-                            {
-                                Card drawn = state.DrawCard();
-                                if (drawn != null) state.AddCardToDrawnCards(drawn);
-                            }
-                        }
-                        else
-                        {
-                            if (drawnCards.Count > 0)
-                            {
-                                Card currentCard = drawnCards.Peek();
-
-                                if (moves.Count > 0)
-                                {
-                                    state.MakeMove(moves[selectedMoveIndex].Item1, currentCard, moves[selectedMoveIndex].Item2, true);
-                                    currentCard.Unhover();
-                                    totallyRedrawScreen = true;
-                                }
-                            }
-                        }
-                    }
-                    
-                    changesMade = true;
-                }
+                HandleInput(state);
             }
-
-
         }
 
-        public static void DisplayCardStacks(Stack<Card>[] cardStacks, Deck gameDeck, bool inDrawSection, Stack<Card> drawnCards, bool drawSectionLeft, KlondikeState state, int currentStack, List<(KlondikeState.MoveType, int)> moves, int selectedMoveIndex)
+        private static void DisplayGameScreen(KlondikeState state)
         {
-            int x = Console.GetCursorPosition().Left;
-            int y = Console.GetCursorPosition().Top;
+            x = Console.GetCursorPosition().Left;
+            y = Console.GetCursorPosition().Top;
 
-            if (inDrawSection && drawSectionLeft) Console.ForegroundColor = ConsoleColor.DarkBlue;
+            DisplayDrawSection(state); // display the draw section in the top-left
+
+            DisplayCardStacks(state); // display the card stacks in the centre of the screen
+
+            DisplaySuitStacks(state); // display the suit stacks in the top-right
+
+        }
+        private static void DisplayDrawSection(KlondikeState state)
+        {
+            Deck gameDeck = state.GetDeck();
+            Stack<Card> drawnCards = state.GetDrawnCards();
+
+            if (state.IsInFaceDownDrawPile()) Console.ForegroundColor = ConsoleColor.DarkBlue;
             if (gameDeck.Count > 0)
             {
+                if (!state.IsInFaceDownDrawPile()) Console.ForegroundColor = ConsoleColor.White;
                 BigCard(gameDeck.GetTopCard());
             }
             else
             {
-                if (!drawSectionLeft) Console.ForegroundColor = ConsoleColor.DarkGray;
+                if (!state.IsInFaceDownDrawPile()) Console.ForegroundColor = ConsoleColor.DarkGray;
                 BigCardOutline();
             }
 
@@ -396,70 +232,85 @@ namespace cardgames.game.klondike
 
             Console.SetCursorPosition(x + CARD_WIDTH, y);
 
-            if (drawnCards.Count > 0)
+            if (drawnCards.Count > 0) // if there are drawn cards, display the top one
             {
-                if (inDrawSection & !drawSectionLeft)
+                if (state.IsInFaceUpDrawPile()) // if the drawn cards are hovered, highlight the top card
                 {
                     drawnCards.Peek().Hover();
                 }
-                else
+                else // if the drawn cards are not hovered, unhighlight the top card
                 {
                     drawnCards.Peek().Unhover();
                 }
 
-                BigCard(drawnCards.Peek());
+                BigCard(drawnCards.Peek()); // display the top card of the drawn cards
             }
-            else
+            else // if there are no drawn cards, display an empty card outline
             {
-                if (drawSectionLeft) Console.ForegroundColor = ConsoleColor.DarkGray;
-                else if (inDrawSection &! drawSectionLeft) Console.ForegroundColor = ConsoleColor.DarkBlue;
-                BigCardOutline();
+                if (state.IsInFaceUpDrawPile()) Console.ForegroundColor = ConsoleColor.DarkBlue; // if the drawn cards are hovered, highlight the empty card outline
+                else Console.ForegroundColor = ConsoleColor.DarkGray; // otherwise, display the empty card outline in dark grey
+                BigCardOutline(); // display it
             }
+
             Util.ResetColor();
 
             y += CARD_HEIGHT + 1;
+        }
+        private static void DisplayCardStacks(KlondikeState state)
+        {
+            Stack<Card>[] cardStacks = state.GetCardStacks();
+            List<(MoveType, int)> moves = state.GetMoves();
 
             for (int i = 0; i < cardStacks.Length; i++)
             {
                 Console.SetCursorPosition(x, y);
 
-                bool isStackSelected = false;
+                bool isEmptyAndHovered = false; // TODO: remove
                 bool displayTopCardAsTarget = false;
 
-                if (i == currentStack &! inDrawSection) isStackSelected = true;
-                
-                if (moves.Count > 0 && moves[selectedMoveIndex].Item2 == i && moves[selectedMoveIndex].Item1 == KlondikeState.MoveType.ToCardStack) displayTopCardAsTarget = true;
+                if (state.IsInCardStacks() && cardStacks[i].Count == 0 && i == state.SelectedCardStack) isEmptyAndHovered = true;
 
-                DisplayIndividualCardStack(cardStacks[i], isStackSelected, displayTopCardAsTarget);
+                if (moves.Count > 0 && moves[state.SelectedMoveIndex].Item2 == i && moves[state.SelectedMoveIndex].Item1 == MoveType.ToCardStack) displayTopCardAsTarget = true;
+
+                DisplayIndividualCardStack(cardStacks[i], isEmptyAndHovered, displayTopCardAsTarget);
 
                 x = Console.GetCursorPosition().Left;
             }
             Console.SetCursorPosition(x - (4 * CARD_WIDTH), y - CARD_HEIGHT - 1);
-
-
-
+        }
+        private static void DisplaySuitStacks(KlondikeState state)
+        {
             Suits[] suits = [Suits.Hearts, Suits.Diamonds, Suits.Clubs, Suits.Spades];
-            for (int i = 0; i < suits.Length; i++)
+            List<(MoveType, int)> moves = state.GetMoves();
+            
+            for (int i = 0; i < suits.Length; i++) // foreach suit
             {
-                Suits suit = suits[i];
-
-                if (state.GetNextRankForSuitStack(suit) == Ranks.Ace)
+                Suits suit = suits[i]; // set the suit
+                Ranks? nextRank = state.GetNextRankForSuitStack(suit); // get the rank that is needed to add to this suit pile
+                if (nextRank == Ranks.Ace) // if it's an ace
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
-                    if (moves.Count > 0 && moves[selectedMoveIndex].Item1 == KlondikeState.MoveType.ToSuitStack && moves[selectedMoveIndex].Item2 == i)
+                    Console.ForegroundColor = ConsoleColor.DarkGray; // set the foreground colour to dark grey (since we know it must be empty)
+                    if (state.IsInSuitStacks() && i == state.SelectedSuitStack)
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkBlue;
+                    }
+                    else if (moves.Count > 0 && moves[state.SelectedMoveIndex].Item1 == MoveType.ToSuitStack && moves[state.SelectedMoveIndex].Item2 == i)
                     {
                         Console.ForegroundColor = ConsoleColor.Magenta;
                     }
+
                     BigCardOutline(suit);
                 }
                 else
                 {
-                    BigCard(state.GetTopCardFromSuitStack(suit));
+                    bool isAMoveOption = false;
+                    if (moves.Count > 0 && moves[state.SelectedMoveIndex].Item1 == MoveType.ToSuitStack && moves[state.SelectedMoveIndex].Item2 == i) isAMoveOption = true;
+                    BigCard(state.GetTopCardFromSuitStack(suit), highlightAsTarget:isAMoveOption);
                 }
                 Util.ResetColor();
             }
         }
-        private static void DisplayIndividualCardStack(Stack<Card> cardStack, bool isSelected = false, bool displayTopCardAsTarget = false)
+        private static void DisplayIndividualCardStack(Stack<Card> cardStack, bool isEmptyAndHovered = false, bool displayTopCardAsTarget = false)
         {
             int xCoord = Console.GetCursorPosition().Left;
             int yCoord = Console.GetCursorPosition().Top;
@@ -467,12 +318,16 @@ namespace cardgames.game.klondike
 
             if (cardStack.Count == 0)
             {
-                Console.ForegroundColor = isSelected ? ConsoleColor.DarkBlue : ConsoleColor.DarkGray; // if selected, dark blue, otherwise dark grey
+                // if the stack is empty and hovered, set it to dark blue. If it is just empty, then dark grey.
+                // if the stack is not emtpy and is hovered, this is already handled.
+                Console.ForegroundColor = isEmptyAndHovered ? ConsoleColor.DarkBlue : ConsoleColor.DarkGray;
+                
+                
                 if (displayTopCardAsTarget) Console.ForegroundColor = ConsoleColor.Magenta;
                 BigCardOutline();
                 Util.ResetColor();
                 return;
-            } 
+            }
 
             for (int cardIndex = cardStack.Count - 1; cardIndex >= 0; cardIndex--) // start from the very bottom card (index 0 = top card)
             {
@@ -480,7 +335,7 @@ namespace cardgames.game.klondike
 
                 if (cardIndex == 0) // if its the top card (index 0)
                 {
-                    BigCard(cardStack.ElementAt(cardIndex), highlightAsTarget:displayTopCardAsTarget); // display it big & magenta
+                    BigCard(cardStack.ElementAt(cardIndex), highlightAsTarget: displayTopCardAsTarget); // display it normally, but highlight it if its the target of a move
                 }
                 else
                 {
@@ -490,6 +345,217 @@ namespace cardgames.game.klondike
                 }
 
                 yCoord += 2;
+            }
+        } // TODO: update to just use state maybe?
+
+        private static void HandleInput(KlondikeState state)
+        {
+            ConsoleKeyInfo inputKey = Console.ReadKey(true);
+
+            HandleDebugInput(state, inputKey);
+
+            if (Util.affirmatives.Contains(inputKey.Key))
+            {
+                HandleConfirmationInput(state);
+            }
+            else if (state.CurrentLocation == Location.CardStacks)
+            {
+                HandleCardStacksInput(state, inputKey);
+            }
+            else if (state.CurrentLocation == Location.SuitStacks)
+            {
+                HandleSuitStacksInput(state, inputKey);
+            }
+            else if (state.CurrentLocation == Location.DrawPiles)
+            {
+                HandleDrawPilesInput(state, inputKey);
+            }
+        }
+
+        private static void HandleCardStacksInput(KlondikeState state, ConsoleKeyInfo inputKey)
+        {
+            if (Util.scrollRight.Contains(inputKey.Key))
+            {
+                if (state.MoveStackSelectionRight()) changesMade = true;
+            }
+            else if (Util.scrollLeft.Contains(inputKey.Key))
+            {
+                if (state.MoveStackSelectionLeft()) changesMade = true;
+            }
+            else if (inputKey.Key == ConsoleKey.UpArrow || inputKey.Key == ConsoleKey.W)
+            {
+                if (state.MoveCardSelectionUp()) changesMade = true;
+                //currentCardInStack = currentCardInStack - 1;
+                //if (currentCardInStack < 0) currentCardInStack = 0;
+                //changesMade = true;
+            }
+            else if (inputKey.Key == ConsoleKey.DownArrow || inputKey.Key == ConsoleKey.S)
+            {
+                if (state.MoveCardSelectionDown()) changesMade = true;
+                //    currentCardInStack = currentCardInStack + 1;
+                //    if (currentCardInStack > cardStacks[currentStack].Count - 1) currentCardInStack = cardStacks[currentStack].Count - 1;
+                //    changesMade = true;
+            }
+            else if (inputKey.Key == ConsoleKey.PageUp)
+            {
+                if (state.MoveToDrawPile()) changesMade = true;
+            }
+            else if (inputKey.Key == ConsoleKey.Tab)
+            {
+                HandleMoveSelectionInput(state, inputKey);
+            }
+            //if (currentCardInStack > cardStacks[currentStack].Count - 1) currentCardInStack = cardStacks[currentStack].Count - 1;
+            //else if (currentCardInStack < 0) currentCardInStack = 0;
+
+        }
+        private static void HandleDrawPilesInput(KlondikeState state, ConsoleKeyInfo inputKey)
+        {
+            if (Util.scrollLeft.Contains(inputKey.Key)) // TODO: move to suit stacks if right arrow pressed while in faceup draw piles
+            {
+                if (state.IsInFaceUpDrawPile())
+                {
+                    if (state.MoveToFaceDownDrawPile()) changesMade = true;
+                }
+            }
+            else if (Util.scrollRight.Contains(inputKey.Key))
+            {
+                if (state.IsInFaceDownDrawPile())
+                {
+                    if (state.MoveToFaceUpDrawPile()) changesMade = true;
+                }
+                else if (state.IsInFaceUpDrawPile())
+                {
+                    if (state.MoveToSuitStacks()) changesMade = true;
+                }
+            }
+            else if (inputKey.Key == ConsoleKey.PageDown)
+            {
+                if (state.MoveToCardStacks()) changesMade = true;
+            }
+            else if (inputKey.Key == ConsoleKey.Tab)
+            {
+                HandleMoveSelectionInput(state, inputKey);
+            }
+        }
+        private static void HandleSuitStacksInput(KlondikeState state, ConsoleKeyInfo inputKey)
+        {
+            if (Util.scrollLeft.Contains(inputKey.Key))
+            {
+                if (state.IsInLeftmostSuitStack())
+                {
+                    if (state.MoveToFaceUpDrawPile()) changesMade = true;
+                }
+                else
+                {
+                    if (state.MoveSuitStackLeft()) changesMade = true;
+                }
+            }
+            else if (Util.scrollRight.Contains(inputKey.Key))
+            {
+                if (state.MoveSuitStackRight()) changesMade = true;
+            }
+            else if (inputKey.Key == ConsoleKey.PageDown)
+            {
+                if (state.MoveToCardStacks()) changesMade = true;
+            }
+            else if (inputKey.Key == ConsoleKey.Tab)
+            {
+                HandleMoveSelectionInput(state, inputKey);
+            }
+        }
+        private static void HandleMoveSelectionInput(KlondikeState state, ConsoleKeyInfo inputKey)
+        {
+            // TODO: INFORM USER HOW MANY OPTIONS AND TELL THEM HOW TO SELECT (E.G. "OPTION 1 OF 2; PRESS TAB TO CYCLE FORWARDS OR SHIFT-TAB TO CYCLE BACKWARDS.")
+            if (inputKey.Key == ConsoleKey.Tab) // allow selecting which move you want to perform if multiple options
+            {
+                if (state.SelectNextMove()) changesMade = true;
+            }
+            else if (inputKey.Modifiers.HasFlag(ConsoleModifiers.Shift) && inputKey.Key == ConsoleKey.Tab)
+            {
+                if (state.SelectPreviousMove()) changesMade = true;
+
+            }
+        }
+        private static void HandleConfirmationInput(KlondikeState state)
+        {
+            if (state.IsInCardStacks())
+            {
+                Card? currentCard = state.GetCurrentCard(); // get the currently selected card
+                if (currentCard == null) return; // if there is no card selected, return
+                if (currentCard.IsFaceUp) // otherwise, if face up, make the move if there is an available selected move.
+                {
+                    if (state.TryMakeSelectedMove()) totallyRedrawScreen = true;
+                }
+
+                else if (currentCard == state.GetTopCardFromStack(state.SelectedCardStack)) // if the card is face down and is the top card of the stack, turn it face up
+                {
+                    currentCard.TurnFaceUp();
+                    changesMade = true;
+                }
+            }
+
+            else if (state.IsInDrawPile())
+            {
+                Deck deck = state.GetDeck();
+                Stack<Card> drawnCards = state.GetDrawnCards();
+                if (state.IsInFaceDownDrawPile())
+                {
+                    if (deck.Count == 0 && drawnCards.Count > 0)
+                    {
+                        while (drawnCards.Count > 0)
+                        {
+                            Card card = drawnCards.Pop();
+                            card.TurnFaceDown();
+                            deck.AddCard(card);
+                        }
+                        changesMade = true;
+                    }
+                    else
+                    {
+                        Card drawn = state.DrawCard();
+                        if (drawn != null) state.AddCardToDrawnCards(drawn);
+                        changesMade = true;
+                    }
+                }
+                else if (state.IsInFaceUpDrawPile())
+                {
+                    if (drawnCards.Count > 0)
+                    {
+                        if (state.TryMakeSelectedMove()) totallyRedrawScreen = true;
+                    }
+                }
+            }
+
+            else if (state.IsInSuitStacks())
+            {
+                Card? currentCard = state.GetCurrentCard();
+                if (currentCard == null) return;
+                if (state.TryMakeSelectedMove()) totallyRedrawScreen = true;
+            }
+        }
+        private static void HandleDebugInput(KlondikeState state, ConsoleKeyInfo inputKey)
+        {
+            if (inputKey.Modifiers.HasFlag(ConsoleModifiers.Control) && inputKey.Modifiers.HasFlag(ConsoleModifiers.Alt)) // TODO: remove maybe? check if i can leave this in.
+            {
+                if (inputKey.Key == ConsoleKey.F7)
+                {
+                    state.ResetGame();
+                    totallyRedrawScreen = true;
+                }
+                else if (inputKey.Key == ConsoleKey.F8)
+                {
+                    while (true)
+                    {
+                        int aceCounter = 0;
+                        int targetAces = 4;
+                        state.ResetGame();
+                        for (int i = 0; i < 7; i++)
+                        {
+                            if (state.GetTopCardFromStack(i).Rank == Ranks.Ace) aceCounter++;
+                        }
+                        if (aceCounter == targetAces) break;
+                    }
+                }
             }
         }
     }
