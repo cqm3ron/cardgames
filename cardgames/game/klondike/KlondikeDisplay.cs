@@ -2,6 +2,7 @@
 using static cardgames.game.klondike.KlondikeState;
 using System.Transactions;
 using System.Resources;
+using System.Runtime.CompilerServices;
 
 namespace cardgames.game.klondike
 {
@@ -555,6 +556,10 @@ namespace cardgames.game.klondike
                         }
                         if (aceCounter == targetAces) break;
                     }
+                }
+                else if (inputKey.Key == ConsoleKey.S)
+                {
+                    // TODO: display moves to solve
                 }
             }
         }

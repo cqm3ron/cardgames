@@ -4,15 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static cardgames.game.klondike.KlondikeState;
 
 namespace cardgames.game.klondike
 {
     internal static class KlondikeSolver
     {
-        private const int MAX_NODES = 10000;
-        private const int MAX_DEPTH = 50;
-
-       // TODO: SOLVER (AHHHH)
-        
+        // TODO: Implement true solver, given state.
+        // TODO: Implement heuristic solver, given state.
+        // TODO: avoid loops in solvers
+        // TODO: GetHint() function that returns the next best move for the player
     }
 }

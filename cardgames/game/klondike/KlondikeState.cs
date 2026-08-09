@@ -10,7 +10,6 @@ namespace cardgames.game.klondike
         private readonly Stack<Card>[] suitStacks = new Stack<Card>[4]; // hearts, diamonds, clubs, spades
         private readonly Stack<Card> drawnCards = [];
         
-
         public enum MoveType
         {
             ToSuitStack,
@@ -242,6 +241,15 @@ namespace cardgames.game.klondike
                 SelectedSuitStack--;
                 HoverCurrentCard();
                 ResetMoves();
+                return true;
+            }
+            return false;
+        }
+        public bool SelectNthMove(int n)
+        {
+            if (n >= 0 && n < Moves.Count)
+            {
+                SelectedMoveIndex = n;
                 return true;
             }
             return false;
