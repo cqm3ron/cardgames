@@ -14,5 +14,12 @@ namespace cardgames.game.klondike
         // TODO: Implement heuristic solver, given state.
         // TODO: avoid loops in solvers
         // TODO: GetHint() function that returns the next best move for the player
-    }
+        // TODO: use state.GetHash() function to compare states
+
+        public static void Solve(KlondikeState state)
+        {
+            if (state.CheckSolveState()) return; // TODO: return the solution path instead of just returning if solved.
+
+        }
+    }       
 }

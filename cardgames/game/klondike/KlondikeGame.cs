@@ -23,7 +23,7 @@ namespace cardgames.game.klondike
 
             State.SetupCards();
 
-            while (true)
+            while (!State.CheckSolveState())
             {
                 KlondikeDisplay.DisplayKlondikeMenu(State);
 

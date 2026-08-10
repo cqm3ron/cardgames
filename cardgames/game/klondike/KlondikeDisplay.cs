@@ -1,5 +1,6 @@
 ﻿using cardgames.core;
 using static cardgames.game.klondike.KlondikeState;
+using static cardgames.core.Language;
 using System.Transactions;
 using System.Resources;
 using System.Runtime.CompilerServices;
@@ -11,8 +12,7 @@ namespace cardgames.game.klondike
         public const int CARD_WIDTH = 11; // public as it could be useful to know how much space to leave
         public const int CARD_HEIGHT = 7; // as above
 
-        private static int x;
-        private static int y;
+        private static int x, y, startX, startY;
         private static bool changesMade = true;
         private static bool totallyRedrawScreen = true;
 
@@ -182,26 +182,14 @@ namespace cardgames.game.klondike
                     changesMade = false;
                 }
 
-                // === TODO: REMOVE TESTING BLOCK BELOW ===
-
-                int tempx = Console.GetCursorPosition().Left, tempy = Console.GetCursorPosition().Top;
-                foreach (var x in state.GetMoves())
-                {
-                    Console.SetCursorPosition(tempx, tempy);
-                    Console.WriteLine(x.Item1 + ", " + x.Item2);
-                    tempy++;
-                }
-
-                if (state.GetMoves().Count == 0) Console.WriteLine("                                             ");
-
-                // === END OF TESTING BLOCK ===
-
                 HandleInput(state);
             }
         }
 
         private static void DisplayGameScreen(KlondikeState state)
         {
+            startX = Console.GetCursorPosition().Left;
+            startY = Console.GetCursorPosition().Top;
             x = Console.GetCursorPosition().Left;
             y = Console.GetCursorPosition().Top;
 
@@ -210,6 +198,8 @@ namespace cardgames.game.klondike
             DisplayCardStacks(state); // display the card stacks in the centre of the screen
 
             DisplaySuitStacks(state); // display the suit stacks in the top-right
+
+            DisplayInformation(state);
 
         }
         private static void DisplayDrawSection(KlondikeState state)
@@ -260,7 +250,7 @@ namespace cardgames.game.klondike
         private static void DisplayCardStacks(KlondikeState state)
         {
             Stack<Card>[] cardStacks = state.GetCardStacks();
-            List<(MoveType, int)> moves = state.GetMoves();
+            List<KlondikeMove> moves = state.GetMoves();
 
             for (int i = 0; i < cardStacks.Length; i++)
             {
@@ -271,7 +261,7 @@ namespace cardgames.game.klondike
 
                 if (state.IsInCardStacks() && cardStacks[i].Count == 0 && i == state.SelectedCardStack) isEmptyAndHovered = true;
 
-                if (moves.Count > 0 && moves[state.SelectedMoveIndex].Item2 == i && moves[state.SelectedMoveIndex].Item1 == MoveType.ToCardStack) displayTopCardAsTarget = true;
+                if (moves.Count > 0 && moves[state.SelectedMoveIndex].TargetIndex == i && moves[state.SelectedMoveIndex].Type == KlondikeMove.MoveType.ToCardStack) displayTopCardAsTarget = true;
 
                 DisplayIndividualCardStack(cardStacks[i], isEmptyAndHovered, displayTopCardAsTarget);
 
@@ -282,7 +272,7 @@ namespace cardgames.game.klondike
         private static void DisplaySuitStacks(KlondikeState state)
         {
             Suits[] suits = [Suits.Hearts, Suits.Diamonds, Suits.Clubs, Suits.Spades];
-            List<(MoveType, int)> moves = state.GetMoves();
+            List<KlondikeMove> moves = state.GetMoves();
             
             for (int i = 0; i < suits.Length; i++) // foreach suit
             {
@@ -295,7 +285,7 @@ namespace cardgames.game.klondike
                     {
                         Console.ForegroundColor = ConsoleColor.DarkBlue;
                     }
-                    else if (moves.Count > 0 && moves[state.SelectedMoveIndex].Item1 == MoveType.ToSuitStack && moves[state.SelectedMoveIndex].Item2 == i)
+                    else if (moves.Count > 0 && moves[state.SelectedMoveIndex].Type == KlondikeMove.MoveType.ToSuitStack && moves[state.SelectedMoveIndex].TargetIndex == i)
                     {
                         Console.ForegroundColor = ConsoleColor.Magenta;
                     }
@@ -305,11 +295,40 @@ namespace cardgames.game.klondike
                 else
                 {
                     bool isAMoveOption = false;
-                    if (moves.Count > 0 && moves[state.SelectedMoveIndex].Item1 == MoveType.ToSuitStack && moves[state.SelectedMoveIndex].Item2 == i) isAMoveOption = true;
+                    if (moves.Count > 0 && moves[state.SelectedMoveIndex].Type == KlondikeMove.MoveType.ToSuitStack && moves[state.SelectedMoveIndex].TargetIndex == i) isAMoveOption = true;
                     BigCard(state.GetTopCardFromSuitStack(suit), highlightAsTarget:isAMoveOption);
                 }
                 Util.ResetColor();
             }
+        }
+        private static void DisplayInformation(KlondikeState state)
+        {
+            int score = state.Score;
+            Console.SetCursorPosition(startX + (CARD_WIDTH * 2) + 1, startY);
+            Console.Write(T("Klondike.Score"));
+            Console.SetCursorPosition(startX + (CARD_WIDTH * 2) + 1, startY + 1);
+            Console.Write(new String(' ', CARD_WIDTH - 1));
+            Console.SetCursorPosition(startX + (CARD_WIDTH * 2) + 1, startY + 1);
+            Console.Write(score);
+
+
+            Console.SetCursorPosition(startX + (CARD_WIDTH * 7) + 1, startY);
+            Console.Write(new String(' ', T("Klondike.Info.SelectMove").Length));
+            Console.SetCursorPosition(startX + (CARD_WIDTH * 7) + 1, startY + 1);
+            Console.Write(new String(' ', T("Klondike.SelectedMove").Length));
+            Console.SetCursorPosition(startX + (CARD_WIDTH * 7) + 1, startY + 2);
+            Console.Write(new String(' ', CARD_WIDTH - 1));
+
+            if (state.GetMoves().Count > 0)
+            {
+                Console.SetCursorPosition(startX + (CARD_WIDTH * 7) + 1, startY);
+                Console.Write(T("Klondike.Info.SelectMove"));
+                Console.SetCursorPosition(startX + (CARD_WIDTH * 7) + 1, startY + 1);
+                Console.Write(T("Klondike.SelectedMove"));
+                Console.SetCursorPosition(startX + (CARD_WIDTH * 7) + 1, startY + 2);
+                Console.Write($"{state.SelectedMoveIndex + 1}/{state.GetMoves().Count}");
+            }
+
         }
         private static void DisplayIndividualCardStack(Stack<Card> cardStack, bool isEmptyAndHovered = false, bool displayTopCardAsTarget = false)
         {
@@ -491,6 +510,7 @@ namespace cardgames.game.klondike
                 else if (currentCard == state.GetTopCardFromStack(state.SelectedCardStack)) // if the card is face down and is the top card of the stack, turn it face up
                 {
                     currentCard.TurnFaceUp();
+                    state.ScoreTurnOverCardStacksCard();
                     changesMade = true;
                 }
             }
@@ -509,6 +529,7 @@ namespace cardgames.game.klondike
                             card.TurnFaceDown();
                             deck.AddCard(card);
                         }
+                        state.MarkDrawPileAsRestocked();
                         changesMade = true;
                     }
                     else
@@ -532,6 +553,7 @@ namespace cardgames.game.klondike
                 Card? currentCard = state.GetCurrentCard();
                 if (currentCard == null) return;
                 if (state.TryMakeSelectedMove()) totallyRedrawScreen = true;
+                state.HoverCurrentCard();
             }
         }
         private static void HandleDebugInput(KlondikeState state, ConsoleKeyInfo inputKey)

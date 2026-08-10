@@ -24,7 +24,11 @@ namespace cardgames.core
 
         public void Shuffle() => cards.Shuffle(); // Calls the fisher-yates shuffle extension method for stacks (extensions/StackExtensions.cs)
 
-        public Card Draw() => cards.Pop(); // TODO: fix empty stack issues
+        public Card? Draw()
+        {
+            if (cards.Count > 0) return cards.Pop();
+            else return null;
+        }// TODO: fix empty stack issues
 
         public Card[,] Deal(int playerCount, int cardsPerPlayer = -1)
         {

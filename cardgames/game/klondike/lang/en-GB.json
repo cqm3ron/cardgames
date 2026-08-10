@@ -1,3 +1,5 @@
 {
-  
+  "Klondike.Score": "Score:",
+  "Klondike.SelectedMove": "Selected Move:",
+  "Klondike.Info.SelectMove": "Press [TAB] to select a move then [ENTER] to execute it."
 }

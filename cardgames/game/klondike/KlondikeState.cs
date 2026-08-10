@@ -1,6 +1,6 @@
 ﻿using cardgames.core;
 using cardgames.core.extension;
-using System.Reflection.Metadata.Ecma335;
+using static cardgames.game.klondike.KlondikeMove;
 
 namespace cardgames.game.klondike
 {
@@ -10,12 +10,6 @@ namespace cardgames.game.klondike
         private readonly Stack<Card>[] suitStacks = new Stack<Card>[4]; // hearts, diamonds, clubs, spades
         private readonly Stack<Card> drawnCards = [];
         
-        public enum MoveType
-        {
-            ToSuitStack,
-            ToCardStack
-        }
-
         public enum Location
         {
             CardStacks,
@@ -59,11 +53,21 @@ namespace cardgames.game.klondike
             get; private set;
         }
 
-        private List<(MoveType, int)> Moves = [];
+        private List<KlondikeMove> Moves = [];
         public int SelectedMoveIndex
         {
             get;
             private set;
+        }
+
+        public int TimesDrawPileRestocked
+        {
+            get; private set;
+        }
+
+        public int Score
+        {
+            get; private set;
         }
 
         private Stack<Card>[] orderToAddToSuitStacks = [];
@@ -97,7 +101,7 @@ namespace cardgames.game.klondike
         public bool IsInFaceUpDrawPile() => CurrentLocation == Location.DrawPiles && CurrentDrawPileRegion == DrawPileRegion.FaceUp;
         public bool IsInFaceDownDrawPile() => CurrentLocation == Location.DrawPiles && CurrentDrawPileRegion == DrawPileRegion.FaceDown;
         
-        public List<(MoveType, int)> GetMoves() => Moves;
+        public List<KlondikeMove> GetMoves() => Moves;
 
         public bool MoveStackSelectionLeft()
         {
@@ -290,6 +294,38 @@ namespace cardgames.game.klondike
             }
             return false;
         }
+
+        public void MarkDrawPileAsRestocked()
+        {
+            TimesDrawPileRestocked++;
+            ScoreRestockDrawPile();
+        }
+        
+        public void ScoreDrawnToCardStacks()
+        {
+            Score += 5;
+        }
+        public void ScoreDrawnToSuitStacks()
+        {
+            Score += 10;
+        }
+        public void ScoreCardStacksToSuitStacks()
+        {
+            Score += 10;
+        }
+        public void ScoreTurnOverCardStacksCard()
+        {
+            Score += 5;
+        }
+        public void ScoreSuitStacksToCardStacks()
+        {
+            Score -= 15;
+        }
+        public void ScoreRestockDrawPile()
+        {
+            Score -= 100;
+        }
+
         
 
         public void SetupCards()
@@ -576,7 +612,19 @@ namespace cardgames.game.klondike
          */
         public void UpdateMoves()
         {
-            List<(MoveType, int)> moves = [];
+            List<KlondikeMove> moves = GetPossibleMovesForCurrentCard();
+            if (moves.Count > 0)
+            {
+                Moves = moves;
+            }
+            else
+            {
+                ResetMoves();
+            }
+        }
+        public List<KlondikeMove> GetPossibleMovesForCurrentCard()
+        {
+            List<KlondikeMove> moves = [];
             Card? card = null;
 
             if (IsInCardStacks())
@@ -593,13 +641,12 @@ namespace cardgames.game.klondike
             }
             else
             {
-                ResetMoves();
+                return [];
             }
 
             if (card == null || !card.IsFaceUp) // if card isn't real or is face down, return no moves (no cheating going on here thank you very much)
             {
-                ResetMoves();
-                return;
+                return [];
             }
 
             Suits[] suitStackOrder = [Suits.Hearts, Suits.Diamonds, Suits.Clubs, Suits.Spades];
@@ -612,24 +659,23 @@ namespace cardgames.game.klondike
             {
                 if (card.Rank == nextRankForSuitStack)
                 {
-                    moves.Add((MoveType.ToSuitStack, Array.IndexOf(suitStackOrder, suit)));
+                    moves.Add(new KlondikeMove(MoveType.ToSuitStack, Array.IndexOf(suitStackOrder, suit)));
                 }
             }
             else if (IsInCardStacks()) // if the card is from a card stack, check if it can be moved to a suit stack
             {
                 if (SelectedCardStack < 0 || SelectedCardStack >= cardStacks.Length)
                 {
-                    Moves = moves; // if the stack index is not in range, return
-                    return;
+                    return moves; // if the stack index is somehow not in range, return
                 }
 
                 if (SelectedCardInStack == cardStacks[SelectedCardStack].Count - 1 && card.Rank == nextRankForSuitStack) // if it can be moved to a suit stack then prioritise that
                 {
-                     moves.Add((MoveType.ToSuitStack, Array.IndexOf(suitStackOrder, suit)));
+                    moves.Add(new KlondikeMove(MoveType.ToSuitStack, Array.IndexOf(suitStackOrder, suit)));
                 }
             }
 
-            moves = moves.OrderBy(move => move.Item1).ToList(); 
+            moves = moves.OrderBy(move => move.Type).ToList();
 
             for (int i = 0; i < cardStacks.Length; i++) // check each card stack to see if the card can be moved there
             {
@@ -639,15 +685,15 @@ namespace cardgames.game.klondike
 
                 if (cardStack.Count == 0 && card.Rank == Ranks.King) // if king, prioritise moving to empty stack
                 {
-                    moves.Add((MoveType.ToCardStack, i));
+                    moves.Add(new KlondikeMove(MoveType.ToCardStack, i));
                 }
                 else if (cardStack.Count > 0) // otherwise, check if the card can be moved to any other stack
                 {
                     Card topCard = cardStack.Peek();
 
                     if (topCard.Rank != Ranks.Ace && topCard.IsFaceUp && topCard.IsRed != card.IsRed && (int)topCard.Rank == (int)card.Rank + 1) // Aces cannot have cards moved on top of them
-                    { 
-                        moves.Add((MoveType.ToCardStack, i));
+                    {
+                        moves.Add(new KlondikeMove(MoveType.ToCardStack, i));
                     }
                 }
             }
@@ -656,15 +702,115 @@ namespace cardgames.game.klondike
             if (moves.Count == 0) SelectedMoveIndex = 0;
             else if (SelectedMoveIndex >= moves.Count) SelectedMoveIndex = moves.Count - 1;
 
-            Moves = moves;
+            return moves;
+        }
+
+        public List<KlondikeMove> GetAllPossibleMoves() // for solver
+        {
+            List<KlondikeMove> moves = [];
+
+            for (int s = 0; s < cardStacks.Length; s++)
+            {
+                Stack<Card> cardStack = cardStacks[s];
+
+                for (int c = 0; c < cardStack.Count; c++)
+                {
+                    moves.AddRange(GetPossibleMovesForGivenCard(Location.CardStacks, c, s));
+                }
+            }
+
+            for (int c = 0; c < drawnCards.Count; c++)
+            {
+                moves.AddRange(GetPossibleMovesForGivenCard(Location.DrawPiles, c));
+            }
+
+            for (int s = 0; s < suitStacks.Length; s++)
+            {
+                Stack<Card> suitStack = suitStacks[s];
+
+                for (int c = 0; c < suitStack.Count; c++)
+                {
+                    moves.AddRange(GetPossibleMovesForGivenCard(Location.SuitStacks, c, s));
+                }
+            }
+
+            return moves;
+        }
+
+        public List<KlondikeMove> GetPossibleMovesForGivenCard(Location location, int cardIndex, int cardStackIndex = -1)
+        {
+            Card? card = GetCardAtLocation(location, cardIndex, cardStackIndex);
+            
+            List<KlondikeMove> moves = [];
+
+            if (card == null || !card.IsFaceUp) // if card isn't real or is face down, return no moves (no cheating going on here thank you very much)
+            {
+                return [];
+            }
+
+            Suits[] suitStackOrder = [Suits.Hearts, Suits.Diamonds, Suits.Clubs, Suits.Spades];
+
+            Suits suit = card.Suit;
+
+            Ranks? nextRankForSuitStack = GetNextRankForSuitStack(suit);
+
+            if (location == Location.DrawPiles) // if the card is from the draw pile, check if it can be moved to a suit stack
+            {
+                if (card.Rank == nextRankForSuitStack)
+                {
+                    moves.Add(new KlondikeMove(MoveType.ToSuitStack, Array.IndexOf(suitStackOrder, suit)));
+                }
+            }
+            else if (location == Location.CardStacks) // if the card is from a card stack, check if it can be moved to a suit stack
+            {
+                if (cardStackIndex < 0 || cardStackIndex >= cardStacks.Length)
+                {
+                    return moves; // if the stack index is somehow not in range, return
+                }
+
+                if (cardIndex == cardStacks[cardStackIndex].Count - 1 && card.Rank == nextRankForSuitStack) // if it can be moved to a suit stack then prioritise that
+                {
+                    moves.Add(new KlondikeMove(MoveType.ToSuitStack, Array.IndexOf(suitStackOrder, suit)));
+                }
+            }
+
+            moves = moves.OrderBy(move => move.Type).ToList();
+
+            for (int i = 0; i < cardStacks.Length; i++) // check each card stack to see if the card can be moved there
+            {
+                if (IsInCardStacks() && i == cardStackIndex) continue;
+
+                Stack<Card> cardStack = cardStacks[i];
+
+                if (cardStack.Count == 0 && card.Rank == Ranks.King) // if king, prioritise moving to empty stack
+                {
+                    moves.Add(new KlondikeMove(MoveType.ToCardStack, i));
+                }
+                else if (cardStack.Count > 0) // otherwise, check if the card can be moved to any other stack
+                {
+                    Card topCard = cardStack.Peek();
+
+                    if (topCard.Rank != Ranks.Ace && topCard.IsFaceUp && topCard.IsRed != card.IsRed && (int)topCard.Rank == (int)card.Rank + 1) // Aces cannot have cards moved on top of them
+                    {
+                        moves.Add(new KlondikeMove(MoveType.ToCardStack, i));
+                    }
+                }
+            }
+
+
+            if (moves.Count == 0) SelectedMoveIndex = 0;
+            else if (SelectedMoveIndex >= moves.Count) SelectedMoveIndex = moves.Count - 1;
+
+            return moves;
         }
 
         public bool TryMakeSelectedMove() // TODO: UPDATE & OPTIIMSE
         {
             if (Moves.Count == 0) return false;
 
-            MoveType type = Moves[SelectedMoveIndex].Item1;
-            int targetIndex = Moves[SelectedMoveIndex].Item2;
+            KlondikeMove move = Moves[SelectedMoveIndex];
+            MoveType type = move.Type;
+            int targetIndex = move.TargetIndex;
             Card? card = GetCurrentCard();
 
             if (card == null) return false;
@@ -686,6 +832,9 @@ namespace cardgames.game.klondike
                     orderToAddToSuitStacks[suitIndex].Pop();
                     UnhoverCurrentCard();
                     suitStacks[suitIndex].Push(card);
+
+                    if (IsInDrawPile()) ScoreDrawnToSuitStacks();
+                    else if (IsInCardStacks()) ScoreCardStacksToSuitStacks();
                 }
             }
             else
@@ -707,6 +856,7 @@ namespace cardgames.game.klondike
                 {
                     UnhoverCurrentCard();
                     cardStacks[targetIndex].Push(card);
+                    ScoreDrawnToCardStacks();
                 }
                 else if (IsInSuitStacks())
                 {
@@ -714,6 +864,7 @@ namespace cardgames.game.klondike
                     AddRankBackToNextSuitStackList(card.Suit, card.Rank);
                     cardStacks[targetIndex].Push(card);
                     suitStacks[SelectedSuitStack].Pop();
+                    ScoreSuitStacksToCardStacks();
                 }
             }
 
@@ -750,9 +901,144 @@ namespace cardgames.game.klondike
             return true;
         }
 
-        public int Hash()
+        public bool CheckSolveState()
         {
-            return GetHashCode();
+            foreach (Stack<Card> suitStack in suitStacks)
+            {
+                if (suitStack.Count < Enum.GetValues<Ranks>().Length)
+                {
+                    HasBeenSolved = false;
+                    return false;
+                }
+                else
+                {
+                    HasBeenSolved = false;
+                    return false;
+                }
+            }
+
+            HasBeenSolved = true;
+            return true;
+        }
+
+        //public (Location?, int?, int?) GetLocationOfCard(Card card) // returns tuple of location, index of card, index of stack (sometimes null)
+        //{
+        //    Location? location = null;
+        //    int? cardStackIndex = null, cardIndex = null;
+
+        //    for (int s = 0; s < cardStacks.Length; s++)
+        //    {
+        //        Stack<Card> cardStack = cardStacks[s];
+
+        //        for (int c = 0; c < cardStack.Count; c++)
+        //        {
+        //            Card cardInStack = cardStack.ElementAt(c);
+
+        //            if (cardInStack.Rank == card.Rank && cardInStack.Suit == card.Suit)
+        //            {
+        //                location = Location.CardStacks;
+        //                cardStackIndex = s;
+        //                cardIndex = c;
+        //                return (location, cardIndex, cardStackIndex);
+        //            }
+        //        }
+        //    }
+
+        //    for (int s = 0; s < suitStacks.Length; s++)
+        //    {
+        //        Stack<Card> suitStack = suitStacks[s];
+
+        //        for (int c = 0; c < suitStack.Count; c++)
+        //        {
+        //            Card cardInStack = suitStack.ElementAt(c);
+
+        //            if (cardInStack.Rank == card.Rank && cardInStack.Suit == card.Suit)
+        //            {
+        //                location = Location.SuitStacks;
+        //                cardStackIndex = s;
+        //                cardIndex = c;
+        //                return (location, cardIndex, cardStackIndex);
+        //            }
+        //        }
+        //    }
+
+        //    for (int c = 0; c < drawnCards.Count; c++)
+        //    {
+        //        Card cardInStack = drawnCards.ElementAt(c);
+
+        //        if (cardInStack.Rank == card.Rank && cardInStack.Suit == card.Suit)
+        //        {
+        //            location = Location.SuitStacks;
+        //            cardIndex = c;
+        //            return (location, cardIndex, null);
+        //        }
+        //    }
+
+        //    return (null, null, null); // not found
+        //}
+
+        public Card? GetCardAtLocation(Location location, int cardIndex, int stackIndex = -1, DrawPileRegion? drawPileRegion = null)
+        {
+            if (cardIndex < 0) return null;
+
+            if (location == Location.CardStacks)
+            {
+                if (stackIndex < 0) return null;
+                if (stackIndex > cardStacks.Length - 1) return null;
+                if (cardIndex > cardStacks[stackIndex].Count - 1) return null;
+
+                return cardStacks[stackIndex].ElementAt(cardIndex);
+            }
+            else if (location == Location.SuitStacks)
+            {
+                if (stackIndex < 0) return null;
+                if (stackIndex > suitStacks.Length - 1) return null;
+                if (cardIndex > suitStacks[stackIndex].Count - 1) return null;
+
+                return suitStacks[stackIndex].ElementAt(cardIndex);
+            }
+            else if (location == Location.DrawPiles)
+            {
+                if (drawPileRegion == null) return null;
+
+                if (drawPileRegion == DrawPileRegion.FaceUp)
+                {
+                    if (cardIndex > drawnCards.Count - 1) return null;
+                    return drawnCards.ElementAt(cardIndex);
+                }
+                else
+                {
+                    if (cardIndex > gameDeck.Count - 1) return null;
+                    return gameDeck.GetCards().ElementAt(cardIndex);
+                }
+            }
+            else return null;
+        }
+
+        public override int GetHashCode() // for solver
+        {
+            HashCode hash = new();
+            for (int i = 0; i < suitStacks.Length; i++) hash.Add(suitStacks[i].Peek()); // add the top card of each suit stack to the hash
+            foreach (Stack<Card> cardStack in cardStacks)
+            {
+                int faceUpCards = 0;
+                foreach (Card card in cardStack)
+                {
+                    if (card.IsFaceUp)
+                    {
+                        hash.Add(card);
+                        faceUpCards++;
+                    }
+                }
+                hash.Add(cardStack.Count - faceUpCards);
+            }
+            hash.Add(gameDeck.Count);
+            if (drawnCards.Count > 0) hash.Add(drawnCards.Peek());
+            foreach (Card card in gameDeck.GetCards()) hash.Add(card);
+
+            hash.Add(TimesDrawPileRestocked);
+
+            return hash.ToHashCode();
         }
     }
 }
