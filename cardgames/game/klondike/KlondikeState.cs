@@ -90,6 +90,9 @@ namespace cardgames.game.klondike
             SelectedCardInStack = 0;
             ResetMoves();
             SelectedMoveIndex = 0;
+            Score = 0;
+            TimesDrawPileRestocked = 0;
+            HasBeenSolved = false;
             SetupDeck(1);
             SetupCards();
         }
@@ -622,6 +625,7 @@ namespace cardgames.game.klondike
                 ResetMoves();
             }
         }
+
         public List<KlondikeMove> GetPossibleMovesForCurrentCard()
         {
             List<KlondikeMove> moves = [];
@@ -906,11 +910,6 @@ namespace cardgames.game.klondike
             foreach (Stack<Card> suitStack in suitStacks)
             {
                 if (suitStack.Count < Enum.GetValues<Ranks>().Length)
-                {
-                    HasBeenSolved = false;
-                    return false;
-                }
-                else
                 {
                     HasBeenSolved = false;
                     return false;

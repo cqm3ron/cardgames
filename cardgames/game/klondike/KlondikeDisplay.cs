@@ -163,27 +163,23 @@ namespace cardgames.game.klondike
         {
             Console.CursorVisible = false;
 
-            while (true)
+            if (changesMade || totallyRedrawScreen)
             {
-
-                if (changesMade || totallyRedrawScreen)
+                if (totallyRedrawScreen)
                 {
-                    if (totallyRedrawScreen)
-                    {
-                        Console.Clear();
-                        totallyRedrawScreen = false;
-                    }
-                    else
-                    {
-                        Console.SetCursorPosition(0, 0);
-                    }
-                    state.UpdateMoves();
-                    DisplayGameScreen(state);
-                    changesMade = false;
+                    Console.Clear();
+                    totallyRedrawScreen = false;
                 }
-
-                HandleInput(state);
+                else
+                {
+                    Console.SetCursorPosition(0, 0);
+                }
+                state.UpdateMoves();
+                DisplayGameScreen(state);
+                changesMade = false;
             }
+
+            HandleInput(state);
         }
 
         private static void DisplayGameScreen(KlondikeState state)
@@ -319,7 +315,7 @@ namespace cardgames.game.klondike
             Console.SetCursorPosition(startX + (CARD_WIDTH * 7) + 1, startY + 2);
             Console.Write(new String(' ', CARD_WIDTH - 1));
 
-            if (state.GetMoves().Count > 0)
+            if (state.GetMoves().Count > 1)
             {
                 Console.SetCursorPosition(startX + (CARD_WIDTH * 7) + 1, startY);
                 Console.Write(T("Klondike.Info.SelectMove"));

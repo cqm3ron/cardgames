@@ -17,7 +17,9 @@ namespace cardgames.game.klondike
         public enum MoveType
         {
             ToSuitStack,
-            ToCardStack
+            ToCardStack,
+            DrawCard,
+            ResetDrawPile
         }
 
         public MoveType Type { get; private set; }
