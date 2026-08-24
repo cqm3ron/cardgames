@@ -1,5 +1,5 @@
 ﻿using cardgames.core;
-using cardgames.game.cheat;
+using static cardgames.core.Language;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,7 +59,7 @@ namespace cardgames.game.klondike
                 // TODO: display keybinding tooltips as it is not immediately obvious how to navigate menu (esp. to the draw pile)
             }
 
-            Console.WriteLine("Util.PressKey");
+            Console.WriteLine(T("Util.PressKey"));
             Console.ReadKey(true);
 
             return _players;

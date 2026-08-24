@@ -13,21 +13,25 @@ namespace cardgames.game.klondike
             Type = type;
             TargetIndex = targetIndex;
         }
-
+        public KlondikeMove(MoveType type)
+        {
+            Type = type;
+        }
         public enum MoveType
         {
             ToSuitStack,
             ToCardStack,
             DrawCard,
-            ResetDrawPile
+            ResetDrawPile,
+            TurnCard
         }
 
         public MoveType Type { get; private set; }
         public int TargetIndex { get; private set; }
 
-        //public static List<KlondikeMove> GetPossibleMoves(KlondikeState state)
-        //{
-
-        //}
+        public override string ToString()
+        {
+            return $"{Type} to index {TargetIndex}";
+        }
     }
 }

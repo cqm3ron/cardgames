@@ -167,7 +167,6 @@ namespace cardgames.core
         }
 
         // Methods for games implementing face-up / face-down cards
-        public void TurnOver() => IsFaceUp = !IsFaceUp;
         public void TurnFaceUp() => IsFaceUp = true;
         public void TurnFaceDown() => IsFaceUp = false;
     }

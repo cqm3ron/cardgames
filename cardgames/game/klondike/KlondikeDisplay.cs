@@ -163,6 +163,8 @@ namespace cardgames.game.klondike
         {
             Console.CursorVisible = false;
 
+            state.UpdateMoves();
+
             if (changesMade || totallyRedrawScreen)
             {
                 if (totallyRedrawScreen)
@@ -174,10 +176,10 @@ namespace cardgames.game.klondike
                 {
                     Console.SetCursorPosition(0, 0);
                 }
-                state.UpdateMoves();
                 DisplayGameScreen(state);
                 changesMade = false;
             }
+
 
             HandleInput(state);
         }
@@ -325,6 +327,12 @@ namespace cardgames.game.klondike
                 Console.Write($"{state.SelectedMoveIndex + 1}/{state.GetMoves().Count}");
             }
 
+            for (int i = 3; i < state.GetMoves().Count + 3; i++)
+            {
+                Console.SetCursorPosition(startX + (CARD_WIDTH * 7) + 1, startY + i);
+                Console.Write(state.GetMoves()[i - 3]);
+            }
+
         }
         private static void DisplayIndividualCardStack(Stack<Card> cardStack, bool isEmptyAndHovered = false, bool displayTopCardAsTarget = false)
         {
@@ -401,16 +409,10 @@ namespace cardgames.game.klondike
             else if (inputKey.Key == ConsoleKey.UpArrow || inputKey.Key == ConsoleKey.W)
             {
                 if (state.MoveCardSelectionUp()) changesMade = true;
-                //currentCardInStack = currentCardInStack - 1;
-                //if (currentCardInStack < 0) currentCardInStack = 0;
-                //changesMade = true;
             }
             else if (inputKey.Key == ConsoleKey.DownArrow || inputKey.Key == ConsoleKey.S)
             {
                 if (state.MoveCardSelectionDown()) changesMade = true;
-                //    currentCardInStack = currentCardInStack + 1;
-                //    if (currentCardInStack > cardStacks[currentStack].Count - 1) currentCardInStack = cardStacks[currentStack].Count - 1;
-                //    changesMade = true;
             }
             else if (inputKey.Key == ConsoleKey.PageUp)
             {
@@ -420,8 +422,6 @@ namespace cardgames.game.klondike
             {
                 HandleMoveSelectionInput(state, inputKey);
             }
-            //if (currentCardInStack > cardStacks[currentStack].Count - 1) currentCardInStack = cardStacks[currentStack].Count - 1;
-            //else if (currentCardInStack < 0) currentCardInStack = 0;
 
         }
         private static void HandleDrawPilesInput(KlondikeState state, ConsoleKeyInfo inputKey)
@@ -498,49 +498,18 @@ namespace cardgames.game.klondike
             {
                 Card? currentCard = state.GetCurrentCard(); // get the currently selected card
                 if (currentCard == null) return; // if there is no card selected, return
-                if (currentCard.IsFaceUp) // otherwise, if face up, make the move if there is an available selected move.
-                {
-                    if (state.TryMakeSelectedMove()) totallyRedrawScreen = true;
-                }
-
-                else if (currentCard == state.GetTopCardFromStack(state.SelectedCardStack)) // if the card is face down and is the top card of the stack, turn it face up
-                {
-                    currentCard.TurnFaceUp();
-                    state.ScoreTurnOverCardStacksCard();
-                    changesMade = true;
-                }
+                if (state.TryMakeSelectedMove()) totallyRedrawScreen = true;
             }
 
             else if (state.IsInDrawPile())
             {
-                Deck deck = state.GetDeck();
-                Stack<Card> drawnCards = state.GetDrawnCards();
                 if (state.IsInFaceDownDrawPile())
                 {
-                    if (deck.Count == 0 && drawnCards.Count > 0)
-                    {
-                        while (drawnCards.Count > 0)
-                        {
-                            Card card = drawnCards.Pop();
-                            card.TurnFaceDown();
-                            deck.AddCard(card);
-                        }
-                        state.MarkDrawPileAsRestocked();
-                        changesMade = true;
-                    }
-                    else
-                    {
-                        Card drawn = state.DrawCard();
-                        if (drawn != null) state.AddCardToDrawnCards(drawn);
-                        changesMade = true;
-                    }
+                    if (state.TryMakeSelectedMove()) changesMade = true;
                 }
                 else if (state.IsInFaceUpDrawPile())
                 {
-                    if (drawnCards.Count > 0)
-                    {
-                        if (state.TryMakeSelectedMove()) totallyRedrawScreen = true;
-                    }
+                    if (state.TryMakeSelectedMove()) totallyRedrawScreen = true;
                 }
             }
 
@@ -577,7 +546,15 @@ namespace cardgames.game.klondike
                 }
                 else if (inputKey.Key == ConsoleKey.S)
                 {
-                    // TODO: display moves to solve
+                    List<KlondikeMove>? movesToMake = KlondikeSolver.Solve(state, [], []);
+
+                    if (movesToMake != null)
+                    {
+                        foreach (KlondikeMove move in movesToMake)
+                        {
+                            Console.WriteLine(move);
+                        }
+                    }
                 }
             }
         }

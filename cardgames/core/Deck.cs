@@ -11,6 +11,15 @@ namespace cardgames.core
         {
             cards = []; // generates an empty deck
         }
+        
+        public Deck Clone()
+        {
+            Deck clone = new Deck
+            {
+                cards = new Stack<Card>(cards.Reverse()) // reverse the stack to make sure the order is right
+            };
+            return clone;
+        }
 
         public void AddCard(Card newCard) => cards.Push(newCard);
 
@@ -84,9 +93,16 @@ namespace cardgames.core
             return cards;
         }
 
-        public Card GetTopCard()
+        public Card? GetTopCard()
         {
-            return cards.Peek();
+            cards.TryPeek(out Card? card);
+            return card;
+        }
+        
+        public Card? GetNthCardFromTop(int index)
+        {
+            if (cards.Count > 0 && index < cards.Count && index >= 0) return cards.ElementAt(index);
+            else return null;
         }
 
         public int Count => cards.Count;
