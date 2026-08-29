@@ -1,4 +1,5 @@
-﻿using static cardgames.core.Language;
+﻿using cardgames.game.klondike;
+using static cardgames.core.Language;
 
 namespace cardgames.core
 {
@@ -169,5 +170,22 @@ namespace cardgames.core
         // Methods for games implementing face-up / face-down cards
         public void TurnFaceUp() => IsFaceUp = true;
         public void TurnFaceDown() => IsFaceUp = false;
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is Card)
+            {
+                return Equals((Card)obj);
+            }
+            else return false;
+        }
+
+        private bool Equals(Card card) // override to comapre cards by suit and rank because that's all I've ever used to compare cards by.
+        {
+            if (card == null) return false;
+            if (this.Suit != card.Suit) return false;
+            if (this.Rank != card.Rank) return false;
+            return true;
+        }
     }
 }

@@ -426,7 +426,7 @@ namespace cardgames.game.klondike
         }
         private static void HandleDrawPilesInput(KlondikeState state, ConsoleKeyInfo inputKey)
         {
-            if (Util.scrollLeft.Contains(inputKey.Key)) // TODO: move to suit stacks if right arrow pressed while in faceup draw piles
+            if (Util.scrollLeft.Contains(inputKey.Key))
             {
                 if (state.IsInFaceUpDrawPile())
                 {
@@ -481,7 +481,6 @@ namespace cardgames.game.klondike
         }
         private static void HandleMoveSelectionInput(KlondikeState state, ConsoleKeyInfo inputKey)
         {
-            // TODO: INFORM USER HOW MANY OPTIONS AND TELL THEM HOW TO SELECT (E.G. "OPTION 1 OF 2; PRESS TAB TO CYCLE FORWARDS OR SHIFT-TAB TO CYCLE BACKWARDS.")
             if (inputKey.Key == ConsoleKey.Tab) // allow selecting which move you want to perform if multiple options
             {
                 if (state.SelectNextMove()) changesMade = true;

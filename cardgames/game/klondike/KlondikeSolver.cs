@@ -38,31 +38,25 @@ namespace cardgames.game.klondike
         public static List<KlondikeMove>? Solve(KlondikeState state, HashSet<KlondikeState> visitedStates, List<KlondikeMove> solutionPath)
         {
             if (state.CheckSolveState()) return solutionPath; // solved; return solution
-            if (visitedStates.Contains(state)) return null; // already explored; skip
+            if (visitedStates.Contains(state)) return null;
 
-            visitedStates.Add(state); // mark visited in a hashset for speeeeed
-
+            visitedStates.Add(state);
+            
             List<KlondikeMove> possibleMoves = state.GetAllPossibleMoves();
-
             if (possibleMoves.Count == 0) return null; // no more moves to try for this state; backtrack to previous state
 
             foreach (KlondikeMove move in possibleMoves)
             {
-                KlondikeState stateSnapshot = state.Clone(); // create a snapshot of the current state
+                KlondikeState nextState = state.Clone();
 
-                bool successfulMove = state.TryMakeMove(move); // make the move
-                
-                List<KlondikeMove>? resultingMovesList = [];
-                
-                if (successfulMove)
+                if (nextState.TryMakeMove(move))
                 {
-                    solutionPath.Add(move);
-                    resultingMovesList = Solve(state, visitedStates, solutionPath); // recursively solve the new state
+                    // KlondikeDisplay.DisplayKlondikeMenu(nextState);
 
-                    if (resultingMovesList != null) return resultingMovesList; // if a solution was found, return it
+                    List<KlondikeMove> nextPath = new(solutionPath) { move };
 
-                    solutionPath.RemoveAt(solutionPath.Count - 1);
-                    state = stateSnapshot;
+                    List<KlondikeMove>? result = Solve(nextState, visitedStates, nextPath);
+                    if (result != null) return result;
                 }
             }
 

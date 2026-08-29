@@ -1,4 +1,5 @@
-﻿using System;
+﻿using cardgames.core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,14 +9,25 @@ namespace cardgames.game.klondike
 {
     internal class KlondikeMove
     {
-        public KlondikeMove(MoveType type, int targetIndex)
+        public KlondikeMove(MoveType type, int targetIndex, Card? card)
         {
             Type = type;
             TargetIndex = targetIndex;
+            Card = card;
         }
-        public KlondikeMove(MoveType type)
+        public KlondikeMove(MoveType type, int targetIndex, KlondikeState.Location? startingLocation, int startingStackIndex, int startingCardIndex, Card? card)
         {
             Type = type;
+            TargetIndex = targetIndex;
+            StartingLocation = startingLocation;
+            StartingStackIndex = startingStackIndex;
+            StartingCardIndex = startingCardIndex;
+            Card = card;
+        }
+        public KlondikeMove(MoveType type, Card? card)
+        {
+            Type = type;
+            Card = card;
         }
         public enum MoveType
         {
@@ -26,12 +38,16 @@ namespace cardgames.game.klondike
             TurnCard
         }
 
+        public KlondikeState.Location? StartingLocation { get; private set; }
         public MoveType Type { get; private set; }
+        public int StartingStackIndex { get; private set; }
+        public int StartingCardIndex { get; private set; }
         public int TargetIndex { get; private set; }
+        public Card? Card { get; private set; }
 
         public override string ToString()
         {
-            return $"{Type} to index {TargetIndex}";
+            return $"Card {Card}, {Type} from stack {StartingStackIndex} card {StartingCardIndex} to stack index {TargetIndex}";
         }
     }
 }
