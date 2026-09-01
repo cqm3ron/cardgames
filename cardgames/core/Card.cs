@@ -53,13 +53,6 @@ namespace cardgames.core
             }
         }
 
-        // Methods for games implementing standard text displays
-
-        public override string ToString()
-        {
-            return $"{T($"Rank.{Rank}")} {T("Card.Of")} {T($"Suit.{Suit}")}";
-        }
-
         // Methods for games implementing ascii art displays
 
         public char GetSuitSymbol()
@@ -171,6 +164,12 @@ namespace cardgames.core
         public void TurnFaceUp() => IsFaceUp = true;
         public void TurnFaceDown() => IsFaceUp = false;
 
+
+        // Overrides
+        public override string ToString()
+        {
+            return $"{T($"Rank.{Rank}")} {T("Card.Of")} {T($"Suit.{Suit}")}";
+        }
         public override bool Equals(object? obj)
         {
             if (obj is Card)

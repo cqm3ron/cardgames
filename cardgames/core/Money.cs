@@ -1,8 +1,7 @@
 ﻿using System.Numerics;
 namespace cardgames.core
 {
-    public readonly struct Money
-                : IComparable<Money>, IEquatable<Money>, IFormattable
+    public readonly struct Money : IComparable<Money>, IEquatable<Money>, IFormattable
     {
         private readonly decimal _value;
         public Money(decimal value)

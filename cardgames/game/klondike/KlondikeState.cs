@@ -7,6 +7,7 @@ namespace cardgames.game.klondike
 {
     internal class KlondikeState(List<KlondikePlayer> _players) : GameState<KlondikePlayer>(_players)
     {
+        private static Suits[] suitStackOrder = [Suits.Hearts, Suits.Diamonds, Suits.Clubs, Suits.Spades];
         private readonly Stack<Card>[] cardStacks = new Stack<Card>[7];
         private readonly Stack<Card>[] suitStacks = new Stack<Card>[4]; // hearts, diamonds, clubs, spades
         private Stack<Card> drawnCards = [];
@@ -448,7 +449,6 @@ namespace cardgames.game.klondike
         private void InitialiseSuitStackOrder() // hearts, diamonds, clubs, spades, A-K
         {
             orderToAddToSuitStacks = new Stack<Card>[4];
-            Suits[] suits = [Suits.Hearts, Suits.Diamonds, Suits.Clubs, Suits.Spades];
             Ranks[] ranks = [Ranks.Ace, Ranks.Two, Ranks.Three, Ranks.Four, Ranks.Five, Ranks.Six, Ranks.Seven, Ranks.Eight, Ranks.Nine, Ranks.Ten, Ranks.Jack, Ranks.Queen, Ranks.King];
 
             for (int i = 0; i < 4; i++)
@@ -456,7 +456,7 @@ namespace cardgames.game.klondike
                 orderToAddToSuitStacks[i] = [];
                 for (int j = ranks.Length - 1; j >= 0; j--)
                 {
-                    orderToAddToSuitStacks[i].Push(new Card(suits[i], ranks[j]));
+                    orderToAddToSuitStacks[i].Push(new Card(suitStackOrder[i], ranks[j]));
                 }
             }
         }
@@ -731,14 +731,11 @@ namespace cardgames.game.klondike
             if (card == null) return []; // if the card is null, return no moves
 
 
-            if (location == Location.CardStacks &! card.IsFaceUp && card == GetTopCardFromStack(cardStackIndex)) // if card can be turned over, always do that.
+            if (location == Location.CardStacks && !card.IsFaceUp && card == GetTopCardFromStack(cardStackIndex)) // if card can be turned over, always do that.
             {
                 moves.Add(new KlondikeMove(MoveType.TurnCard, cardStackIndex, card));
                 return moves;
             }
-
-            Suits[] suitStackOrder = [Suits.Hearts, Suits.Diamonds, Suits.Clubs, Suits.Spades];
-
             Suits suit = card.Suit;
 
             Ranks? nextRankForSuitStack = GetNextRankForSuitStack(suit);
@@ -846,7 +843,6 @@ namespace cardgames.game.klondike
             Card? card = move.Card;
 
 
-            Suits[] suitStackOrder = [Suits.Hearts, Suits.Diamonds, Suits.Clubs, Suits.Spades];
             List<Card> movedCards = [];
 
 
@@ -922,7 +918,7 @@ namespace cardgames.game.klondike
                     card.Unhover(); // unhover it
                     AddRankBackToNextSuitStackList(card.Suit, card.Rank); // add it back to the list of expected cards for teh suit stack
                     cardStacks[targetIndex].Push(card); // push to card stack
-                    suitStacks[SelectedSuitStack].Pop(); // remove from suit stack
+                    suitStacks[move.StartingStackIndex].Pop(); // remove from suit stack
                     ScoreSuitStacksToCardStacks(); // decrease their score cause boooo
                 }
             }
@@ -1073,8 +1069,8 @@ namespace cardgames.game.klondike
                     // If face-up status differs
                     if (stackA[j].IsFaceUp != stackB[j].IsFaceUp) return false;
 
-                    // If face-up, card identity must match
-                    if (stackA[j].IsFaceUp && !stackA[j].Equals(stackB[j])) return false;
+                    // Card identity must match for both face-up AND face-down cards
+                    if (!stackA[j].Equals(stackB[j])) return false;
                 }
             }
 
