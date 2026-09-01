@@ -23,6 +23,8 @@ namespace cardgames.core
         // TODO: remove all instances of "var"; use strongly-typed variables instead.
         // TODO: add a timer to Solitaire; bets based on timer?
         // TODO: "player to place bet:" doesn't specify player in Cheat
+        // TODO: add higher or lower perhaps?
+
         public static void Load()
         {
             //LanGen.GenerateLocalisations(); // gen or update l10n files
