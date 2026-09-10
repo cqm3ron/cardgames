@@ -3,6 +3,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using static cardgames.core.Language;
 
 namespace cardgames.core
@@ -73,20 +74,19 @@ namespace cardgames.core
         // Authentication Credential Initialisation
         private void SetPreferredName()
         {
-            string? input = "";
+            string? input = " ";
+            string regexPattern = "^.*[a-zA-Z]+.*$"; // to match
             Console.Write(T("Auth.Name.Preferred"));
-            while (input == "")
+            do
             {
+                if (input == "")
+                {
+                    Console.WriteLine(T("Auth.Name.Preferred.Invalid"));
+                }
                 input = Console.ReadLine();
-                if (!string.IsNullOrEmpty(input))
-                {
-                    name = input;
-                }
-                else
-                {
-                    input = "";
-                }
-            }
+                if (!string.IsNullOrEmpty(input) && Regex.IsMatch(input, regexPattern)) name = input;
+                else input = "";
+            } while (input == "");
         }
         private void SetUsername()
         {
@@ -114,7 +114,7 @@ namespace cardgames.core
             string? input = "";
             Console.Write(T("Auth.Username.Input"));
 
-            while (input == "")
+            while (input == "" && !input.Contains(' '))
             {
                 input = Console.ReadLine().ToLower();
                 if (!string.IsNullOrEmpty(input))
@@ -131,6 +131,7 @@ namespace cardgames.core
                 }
                 else
                 {
+                    Console.WriteLine(T("Auth.Username.Invalid"));
                     input = "";
                 }
 
@@ -253,6 +254,12 @@ namespace cardgames.core
                 Console.WriteLine(T("Auth.Login.PlayerNotFound"));
                 return null;
             }
+        }
+        
+        public bool LogOut()
+        {
+            SaveUserData();
+
         }
 
         // Authentication Helpers

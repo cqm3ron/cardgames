@@ -43,11 +43,11 @@ namespace cardgames.game.blackjack
 
             string[] options = [T("Blackjack.Hit"), T("Blackjack.Stand")];
 
-            Console.WriteLine(player.CardsInHand);
-            Console.WriteLine(player.GetBalance());
-            Console.WriteLine(player.Bet);
-            Console.WriteLine(player.GetBalance() - player.Bet);
-            if (player.CardsInHand <= 2 && player.GetBalance() >= player.Bet * 2)
+            //Console.WriteLine(player.CardsInHand);
+            //Console.WriteLine(player.GetBalance());
+            //Console.WriteLine(player.Bet);
+            //Console.WriteLine(player.GetBalance() - player.Bet);
+            if (player.CardsInHand <= 2 && player.GetBalance() >= player.Bet * 2) // TODO: check if this works
             {
                 options = [T("Blackjack.Hit"), T("Blackjack.Stand"), T("Blackjack.Double")];
             }
@@ -94,6 +94,8 @@ namespace cardgames.game.blackjack
             {
                 Console.WriteLine(card);
             }
+
+            Console.WriteLine(T("Blackjack.Player.BetAmount") + $"cr{player.Bet}");
 
             Console.WriteLine($"\n{T("Blackjack.HandValueInfo")}" + player.HandValue);
 

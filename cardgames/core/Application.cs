@@ -62,20 +62,20 @@ namespace cardgames.core
 
         private static void LoadDefaultSettings()
         {
-            AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit); // save the game on exit
-            Console.CancelKeyPress += OnCancelKeyPress; // save the game when ctrl+c is performed
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit); // save the game on exit; referenced https://stackoverflow.com/questions/40143822/applicationexit-event-not-being-raised
+            Console.CancelKeyPress += OnCancelKeyPress; // save the game when ctrl+c is performed; referenced https://stackoverflow.com/questions/40143822/applicationexit-event-not-being-raised
             Util.MaximiseWindow();
             Language.Load("en-GB"); // load default language
             Util.ResetColor();
             Console.OutputEncoding = Encoding.UTF8;
         }
 
-        static void OnProcessExit(object sender, EventArgs e)
+        private static void OnProcessExit(object sender, EventArgs e) // referenced https://stackoverflow.com/questions/40143822/applicationexit-event-not-being-raised
         {
             Player.SavePlayers(players);
         }
 
-        static void OnCancelKeyPress(object sender, ConsoleCancelEventArgs e)
+        private static void OnCancelKeyPress(object sender, ConsoleCancelEventArgs e) // referenced https://stackoverflow.com/questions/40143822/applicationexit-event-not-being-raised
         {
             Environment.Exit(0);
         }

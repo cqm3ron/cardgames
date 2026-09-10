@@ -179,8 +179,6 @@ namespace cardgames.game.klondike
                 DisplayGameScreen(state);
                 changesMade = false;
             }
-
-
             HandleInput(state);
         }
 
@@ -546,6 +544,18 @@ namespace cardgames.game.klondike
                 else if (inputKey.Key == ConsoleKey.S)
                 {
                     List<KlondikeMove>? movesToMake = KlondikeSolver.Solve(state, [], []); // TODO: fix (doesnt work lol)
+
+                    if (movesToMake != null)
+                    {
+                        foreach (KlondikeMove move in movesToMake)
+                        {
+                            Console.WriteLine(move);
+                        }
+                    }
+                }
+                else if (inputKey.Key == ConsoleKey.I) // TODO: REMOVE
+                {
+                    List<KlondikeMove>? movesToMake = KlondikeSolver.SolveIteratively(state);
 
                     if (movesToMake != null)
                     {

@@ -754,9 +754,10 @@ namespace cardgames.game.klondike
                     moves.Add(new KlondikeMove(MoveType.ToSuitStack, Array.IndexOf(suitStackOrder, suit), location, cardStackIndex, cardIndex, card));
                 }
             }
+            // TODO: check below
             else if (location == Location.DrawPiles && drawRegion == DrawPileRegion.FaceUp && card.IsFaceUp && card.Rank == nextRankForSuitStack) // if the card is from the face up draw pile, check if it can be moved to a suit stack
             {
-                moves.Add(new KlondikeMove(MoveType.ToSuitStack, Array.IndexOf(suitStackOrder, suit), card));
+                moves.Add(new KlondikeMove(MoveType.ToSuitStack, Array.IndexOf(suitStackOrder, suit), Location.DrawPiles, card));
             }
 
             moves = moves.OrderBy(move => move.Type).ToList();
@@ -923,6 +924,8 @@ namespace cardgames.game.klondike
                 }
             }
 
+            // TODO: fix; this never gets triggered
+            Console.WriteLine(move.StartingLocation);
             if (move.StartingLocation == Location.DrawPiles) // if its starting off from the draw pile, pop the card from the drawn cards stack
             {
                 drawnCards.Pop();

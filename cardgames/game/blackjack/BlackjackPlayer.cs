@@ -183,7 +183,6 @@ namespace cardgames.game.blackjack
 
             Console.WriteLine(T("Util.PressKey"));
             Console.ReadKey();
-
         }
 
         public void Win()

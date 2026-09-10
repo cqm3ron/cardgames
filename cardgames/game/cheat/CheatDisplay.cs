@@ -4,7 +4,7 @@ using static cardgames.core.Language;
 
 namespace cardgames.game.cheat
 {
-    internal class CheatDisplay
+    internal static class CheatDisplay
     {
         public const int CARD_WIDTH = 11; // public as it could be useful to know how much space to leave
         public const int CARD_HEIGHT = 7; // as above

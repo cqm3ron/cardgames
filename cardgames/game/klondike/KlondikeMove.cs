@@ -24,6 +24,13 @@ namespace cardgames.game.klondike
             StartingCardIndex = startingCardIndex;
             Card = card;
         }
+        public KlondikeMove(MoveType type, int targetIndex, KlondikeState.Location? startingLocation, Card? card)
+        {
+            Type = type;
+            TargetIndex = targetIndex;
+            StartingLocation = startingLocation;
+            Card = card;
+        }
         public KlondikeMove(MoveType type, Card? card)
         {
             Type = type;

@@ -6,7 +6,7 @@
   "Cheat.Player.OpenEyes": "All players can now open their eyes again.",
   "Cheat.Player.YourHand": "Your Hand:",
   "Cheat.Menu.Instructions": "Use the arrow keys to navigate & [SPACE] to select cards. Select 1-4 cards and press [ENTER] when finished.\n",
-  "Cheat.Player.RankClaimPrompt": "Now, enter the rank that you want to clam the cards are, 2-10, Jack, Queen, King or Ace.\nPress [ENTER] to submit your claim & move on.",
+  "Cheat.Player.RankClaimPrompt": "Now, enter the rank that you want to claim the cards are, 2-10, Jack, Queen, King or Ace.\nPress [ENTER] to submit your claim & move on.",
   "Cheat.Player.InvalidClaim": "That input didn't look quite right. Please try again.",
   "Cheat.Player.RankConfirmation": "You claimed that the cards you played are of rank {rank}. Is this what you intended?",
   "Cheat.Player.ClaimDisplaySingular": "Player {player} has played {count} {rank}.",
