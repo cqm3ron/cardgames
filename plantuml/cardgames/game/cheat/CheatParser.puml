@@ -1,0 +1,13 @@
+@startuml
+class CheatParser {
+    + CheatParser()
+    + ImportMaps(rankMapPath:string, suitMapPath:string) : void
+    + TryParseCard(input:string, card:Card?) : bool
+    + TryParseRank(input:string, rank:Ranks?) : bool
+}
+class "Dictionary`2"<T1,T2> {
+}
+NaturalLanguageParser <|-- CheatParser
+CheatParser --> "rankMap<string,Ranks>" "Dictionary`2"
+CheatParser --> "suitMap<string,Suits>" "Dictionary`2"
+@enduml

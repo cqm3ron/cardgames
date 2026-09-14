@@ -1,0 +1,30 @@
+@startuml
+enum WinStates {
+    Lost,
+    Drew,
+    Won,
+}
+class BlackjackPlayer {
+    + Bust : bool <<get>>
+    + Standing : bool <<get>>
+    + Doubled : bool <<get>>
+    + HasPlayed : bool <<get>>
+    + HandValue : int <<get>>
+    + CardsInHand : int <<get>>
+    + {static} ConvertTo(player:Player) : BlackjackPlayer
+    + {static} ConvertTo(players:List<Player>) : List<BlackjackPlayer>
+    + {static} ConvertFrom(blackjackPlayer:BlackjackPlayer) : Player
+    + {static} ConvertFrom(blackjackPlayers:List<BlackjackPlayer>) : List<Player>
+    + GoBust() : void
+    + Stand() : void
+    + Double() : void
+    - CalculateHandValue() : int
+    + GetBustChance(state:BlackjackState) : double
+    + EndTurn() : void
+    + Win() : void
+    + Draw() : void
+    + Lose() : void
+}
+Player <|-- BlackjackPlayer
+BlackjackPlayer --> "WinState" WinStates
+@enduml

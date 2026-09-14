@@ -44,6 +44,10 @@ namespace cardgames.game.klondike
         {
             get; private set;
         }
+        public bool GameOver
+        {
+            get; private set;
+        }
 
         public Location CurrentLocation
         {
@@ -443,6 +447,7 @@ namespace cardgames.game.klondike
             cloned.Score = Score;
             cloned.gameDeck = gameDeck.Clone();
             cloned.orderToAddToSuitStacks = orderToAddToSuitStacks;
+            cloned.GameOver = GameOver;
 
             return cloned;
         }
@@ -754,7 +759,6 @@ namespace cardgames.game.klondike
                     moves.Add(new KlondikeMove(MoveType.ToSuitStack, Array.IndexOf(suitStackOrder, suit), location, cardStackIndex, cardIndex, card));
                 }
             }
-            // TODO: check below
             else if (location == Location.DrawPiles && drawRegion == DrawPileRegion.FaceUp && card.IsFaceUp && card.Rank == nextRankForSuitStack) // if the card is from the face up draw pile, check if it can be moved to a suit stack
             {
                 moves.Add(new KlondikeMove(MoveType.ToSuitStack, Array.IndexOf(suitStackOrder, suit), Location.DrawPiles, card));
@@ -837,7 +841,7 @@ namespace cardgames.game.klondike
             return TryMakeMove(move);
         }
 
-        public bool TryMakeMove(KlondikeMove move) // TODO: some way of selecting which card is moved from the solver?
+        public bool TryMakeMove(KlondikeMove move)
         {
             MoveType type = move.Type;
             int targetIndex = move.TargetIndex;
@@ -903,7 +907,7 @@ namespace cardgames.game.klondike
                         movedCards = cardsToAdd;
                         foreach (Card cardToAdd in cardsToAdd) // push each card to the new stack
                         {
-                            cardToAdd.Unhover(); //UnhoverCurrentCard(); // THIS USED TO BE UnhoverCurrentCard() but my midnight logic says that doesnt make sense? TODO: check if this still works
+                            cardToAdd.Unhover();
                             cardStacks[targetIndex].Push(cardToAdd);
                         }
                     }
@@ -924,8 +928,6 @@ namespace cardgames.game.klondike
                 }
             }
 
-            // TODO: fix; this never gets triggered
-            Console.WriteLine(move.StartingLocation);
             if (move.StartingLocation == Location.DrawPiles) // if its starting off from the draw pile, pop the card from the drawn cards stack
             {
                 drawnCards.Pop();
@@ -972,68 +974,10 @@ namespace cardgames.game.klondike
                 }
             }
 
+            GameOver = true;
             HasBeenSolved = true;
             return true;
         }
-
-
-
-        //public (Location?, int?, int?) GetLocationOfCard(Card card) // returns tuple of location, index of card, index of stack (sometimes null)
-        //{
-        //    Location? location = null;
-        //    int? cardStackIndex = null, cardIndex = null;
-
-        //    for (int s = 0; s < cardStacks.Length; s++)
-        //    {
-        //        Stack<Card> cardStack = cardStacks[s];
-
-        //        for (int c = 0; c < cardStack.Count; c++)
-        //        {
-        //            Card cardInStack = cardStack.ElementAt(c);
-
-        //            if (cardInStack.Rank == card.Rank && cardInStack.Suit == card.Suit)
-        //            {
-        //                location = Location.CardStacks;
-        //                cardStackIndex = s;
-        //                cardIndex = c;
-        //                return (location, cardIndex, cardStackIndex);
-        //            }
-        //        }
-        //    }
-
-        //    for (int s = 0; s < suitStacks.Length; s++)
-        //    {
-        //        Stack<Card> suitStack = suitStacks[s];
-
-        //        for (int c = 0; c < suitStack.Count; c++)
-        //        {
-        //            Card cardInStack = suitStack.ElementAt(c);
-
-        //            if (cardInStack.Rank == card.Rank && cardInStack.Suit == card.Suit)
-        //            {
-        //                location = Location.SuitStacks;
-        //                cardStackIndex = s;
-        //                cardIndex = c;
-        //                return (location, cardIndex, cardStackIndex);
-        //            }
-        //        }
-        //    }
-
-        //    for (int c = 0; c < drawnCards.Count; c++)
-        //    {
-        //        Card cardInStack = drawnCards.ElementAt(c);
-
-        //        if (cardInStack.Rank == card.Rank && cardInStack.Suit == card.Suit)
-        //        {
-        //            location = Location.SuitStacks;
-        //            cardIndex = c;
-        //            return (location, cardIndex, null);
-        //        }
-        //    }
-
-        //    return (null, null, null); // not found
-        //}
-
         public override bool Equals(object? obj)
         {
             if (obj is KlondikeState) // first makes sure the object is a klondikestate, then checks if it is equal using the wonderful other function below
@@ -1069,10 +1013,10 @@ namespace cardgames.game.klondike
 
                 for (int j = 0; j < stackA.Length; j++)
                 {
-                    // If face-up status differs
+                    // If face-up-ness differs
                     if (stackA[j].IsFaceUp != stackB[j].IsFaceUp) return false;
 
-                    // Card identity must match for both face-up AND face-down cards
+                    // Card identity must match for both face up AND face-down cards
                     if (!stackA[j].Equals(stackB[j])) return false;
                 }
             }

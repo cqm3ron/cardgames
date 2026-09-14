@@ -1,0 +1,510 @@
+@startuml
+class Program {
+    + + {static} Main() : void
+}
+class Application {
+    + + <<const>> MAX_PLAYERS : int = 8
+    + + {static} Load() : void
+    - - {static} LoadDefaultSettings() : void
+    - - {static} OnProcessExit(sender:object, e:EventArgs) : void
+    - - {static} OnCancelKeyPress(sender:object, e:ConsoleCancelEventArgs) : void
+}
+class Betting {
+    + + {static} BettingMenu(players:List<TPlayer>, betAmounts:decimal[]?) : void
+}
+enum Suits {
+    Hearts= 0x2665,
+    Diamonds= 0x2666,
+    Clubs= 0x2663,
+    Spades= 0x2660,
+}
+enum Ranks {
+    Two= 2,
+    Three,
+    Four,
+    Five,
+    Six,
+    Seven,
+    Eight,
+    Nine,
+    Ten,
+    Jack,
+    Queen,
+    King,
+    Ace,
+}
+class Card {
+    + + IsFaceCard : bool <<get>>
+    + + IsFaceUp : bool <<get>>
+    + + IsRed : bool <<get>>
+    + + Value : int <<get>>
+    + + IsSelected : bool = false
+    + + IsHovered : bool = false
+    + + Card(suit:Suits, rank:Ranks)
+    + + GetSuitSymbol() : char
+    + + GetRankSymbol() : string
+    + + {static} GetSuitSymbol(suit:Suits) : char
+    + + {static} GetRankSymbol(rank:Ranks) : string
+    + + Select() : void
+    + + Deselect() : void
+    + + ToggleSelect() : void
+    + + Hover() : void
+    + + Unhover() : void
+    + + ToggleHover() : void
+    + + {static} GetSelectedCardCount(cards:List<Card>) : int
+    + + {static} GetSelectedCards(cards:List<Card>) : List<Card>
+    + + {static} DeselectCards(cards:List<Card>) : List<Card>
+    + + {static} DeselectCards(deck:Deck) : Deck
+    + + TurnFaceUp() : void
+    + + TurnFaceDown() : void
+    + + <<override>> ToString() : string
+    + + <<override>> Equals(obj:object?) : bool
+    - - Equals(card:Card) : bool
+}
+class Deck {
+    + + Deck()
+    + + Clone() : Deck
+    + + AddCard(newCard:Card) : void
+    + + AddCards(newCards:IEnumerable<Card>) : void
+    + + Shuffle() : void
+    + + Draw() : Card?
+    + + Deal(playerCount:int, cardsPerPlayer:int) : Card[,]
+    - - GenerateStandardDeck() : Stack<Card>
+    + + AddStandardDecks(count:int) : void
+    + + RemoveCard(card:Card) : void
+    + + GetCards() : Stack<Card>
+    + + GetTopCard() : Card?
+    + + GetNthCardFromTop(index:int) : Card?
+    + + Count : int <<get>>
+    + + Empty() : Stack<Card>
+}
+abstract class GameBase<TPlayer> {
+    - - # GameBase()
+    + + <<readonly>> GameName : string
+    + + {abstract} PlayGame(players:List<TPlayer>) : List<Player>
+    - - # {abstract} PlayTurn() : void
+    - - # {abstract} EndGame() : void
+    + + LoadGame() : void
+}
+enum Direction {
+    clockwise,
+    anticlockwise,
+}
+class GameState<TPlayer> {
+    - - # currentPlayer : int
+    + + GameState(_players:IEnumerable<TPlayer>)
+    + + GetCurrentPlayer() : TPlayer
+    + + NextPlayer() : void
+    + + GetPlayerList() : List<TPlayer>
+    + + SetDirection(_direction:Direction) : void
+    + + GetDeck() : Deck
+    + + DrawCard() : Card
+    + + <<virtual>> Deal(cardsToDrawEach:int) : void
+    + + <<virtual>> SetupDeck(deckCount:int) : void
+    + + ChooseRandomStartingPlayer() : int
+}
+class Language {
+    - - <<const>> LANGUAGE_DIRECTORY_PATH : string = "..\\..\\..\\lang\\"
+    - - <<const>> DEFAULT_LANGUAGE_CODE : string = "en-GB"
+    + + {static} CurrentLanguage : string <<get>>
+    + + {static} SelectLanguage() : void
+    - - {static} DetectLanguages() : string[]
+    + + {static} Load(languageCode:string) : void
+    + + {static} LoadGame(gameName:string) : void
+    + + {static} UnloadGame(gameName:string) : void
+    - - {static} T(key:string, parameters:Dictionary<string, string>?) : string
+    + + {static} T(key:string, parameters:(string Key, string Value)[]) : string
+}
+class Menu {
+    - - <<const>> GAMES_FOLDER_PATH : string = "..\\..\\..\\game\\"
+    - - <<const>> LEADERBOARD_PATH : string = "..\\..\\..\\data\\leaderboard.md"
+    + + {static} StartupMenu(players:List<Player>?) : List<Player>
+    - - {static} RechargeBalance(players:List<Player>) : void
+    + + {static} GameMenu() : GameBase<Player>?
+    - - {static} GetGameChoice(games:Dictionary<string, string>, options:string[], selected:int) : object?
+    - - {static} ImportGames() : Dictionary<string, string>
+    - - {static} GetGame(gameClassName:string) : object?
+    - - {static} LeaderboardMenu() : void
+    + + {static} UpdateLeaderboard() : void
+}
+struct Money {
+    - - <<readonly>> _value : decimal
+    + + Money(value:decimal)
+    + + Value : decimal <<get>>
+    + + CompareTo(other:Money) : int
+    + + Equals(other:Money) : bool
+    + + <<override>> Equals(obj:object) : bool
+    + + <<override>> GetHashCode() : int
+    + + <<override>> ToString() : string
+    + + ToString(format:string, formatProvider:IFormatProvider) : string
+}
+class Player {
+    - - <<const>> USER_FOLDER_PATH : string = "..\\..\\..\\data\\user\\"
+    - - # name : string
+    - - # uname : string
+    - - # rechargeCount : int
+    + + GetName() : string
+    + + GetUsername() : string
+    + + GetBalance() : Money
+    + + Player(create:bool)
+    + + Player(name:string)
+    + + Player(_name:string, _uname:string, _balance:decimal, _recharges:int)
+    - - Player(_name:string, _uname:string)
+    - - SetPreferredName() : void
+    - - SetUsername() : void
+    - - SetPassword() : void
+    - - SavePassword(password:string) : void
+    + + {static} LogIn(userName:string, password:string) : Player?
+    + + LogOut() : bool
+    - - {static} ComputeHash(data:string, saltBytes:byte[], iterations:int) : string
+    + + {static} GetLeaderboardPlayerData() : Dictionary<string, Money>
+    + + SaveUserData() : void
+    + + {static} SavePlayers(players:List<Player>) : void
+    + + PlaceBet(amountToBet:Money) : void
+    + + DoubleBet() : void
+    + + AddToBalance(amountToAdd:Money) : void
+    + + DeductFromBalance(amountToDeduct:Money) : void
+    + + DeductBetFromBalance() : Money
+    + + AddBetToBalance() : Money
+    + + RechargeBalance() : void
+    + + GetHand() : List<Card>
+    + + AddToHand(card:Card) : void
+    + + AddToHand(cards:List<Card>) : void
+    + + AddToHand(deck:Deck) : void
+    + + PlayCard(card:Card) : Card
+    + + PlayCards(cards:List<Card>) : List<Card>
+    + + SortHandBySuit() : void
+    + + SortHandByRank() : void
+    + + DeselectAllCards() : void
+}
+class Util {
+    - - {static} loading : Thread?
+    + + {static} IsLoading : bool = false
+    + + {static} UserAgrees() : bool
+    + + {static} GetChoice(options:string[], selected:int) : int
+    + + {static} GetPassword() : string
+    + + {static} ResetColor() : void
+    + + {static} ResetColour() : void
+    + + {static} WriteLineBackwards(input:string) : void
+    + + {static} StartLoading(reason:string) : void
+    + + {static} FinishLoading() : void
+    - - {static} LoadingBar(reason:string) : void
+    + + {static} MaximiseWindow() : void
+}
+struct Rect {
+    + + Left : int
+    + + Top : int
+    + + Right : int
+    + + Bottom : int
+}
+class DictionaryExtensions {
+    + + {static} AddRange(target:IDictionary<TKey, TValue>, source:IEnumerable<KeyValuePair<TKey, TValue>>) : void
+    + + {static} RemoveRange(target:IDictionary<TKey, TValue>, source:IEnumerable<KeyValuePair<TKey, TValue>>) : void
+}
+class StackExtensions {
+    + + {static} Shuffle(stack:Stack<T>) : void
+    + + {static} RemoveFirstOccurrence(stack:Stack<T>, itemToRemove:T) : void
+    + + {static} Empty(collection:Stack<T>) : Stack<T>
+}
+abstract class NaturalLanguageParser {
+    + + ImportMap(path:string) : Dictionary<string, TEnum>
+    - - # ExportMap(map:Dictionary<string, TEnum>, path:string) : void
+    - - # TryFindMatch(token:string, map:Dictionary<string, T>, value:T) : bool
+    - - # TryFuzzyMatch(token:string, map:Dictionary<string, T>, value:T) : bool
+    - - # NormaliseInput(input:string) : string
+    - - # Levenshtein(string1:string, string2:string) : int
+}
+class BlackjackDealer {
+    + + Bust : bool <<get>>
+    + + HandValue : int <<get>>
+    + + AddCardToHand(card:Card) : void
+    - - CalculateHandValue() : int
+    + + Play(deck:Deck) : void
+}
+class BlackjackGame {
+    + + <<const>> DECKCOUNT : int = 6
+    + + BlackjackGame()
+    + + <<override>> PlayGame(players:List<Player>) : List<Player>
+    - - # <<override>> PlayTurn() : void
+    - - DisplayBlackjackData(player:BlackjackPlayer, state:BlackjackState) : void
+    - - # <<override>> EndGame() : void
+    - - CheckWinners() : void
+}
+enum WinStates {
+    Lost,
+    Drew,
+    Won,
+}
+class BlackjackPlayer {
+    + + Bust : bool <<get>>
+    + + Standing : bool <<get>>
+    + + Doubled : bool <<get>>
+    + + HasPlayed : bool <<get>>
+    + + HandValue : int <<get>>
+    + + CardsInHand : int <<get>>
+    + + {static} ConvertTo(player:Player) : BlackjackPlayer
+    + + {static} ConvertTo(players:List<Player>) : List<BlackjackPlayer>
+    + + {static} ConvertFrom(blackjackPlayer:BlackjackPlayer) : Player
+    + + {static} ConvertFrom(blackjackPlayers:List<BlackjackPlayer>) : List<Player>
+    + + GoBust() : void
+    + + Stand() : void
+    + + Double() : void
+    - - CalculateHandValue() : int
+    + + GetBustChance(state:BlackjackState) : double
+    + + EndTurn() : void
+    + + Win() : void
+    + + Draw() : void
+    + + Lose() : void
+}
+class BlackjackState {
+    + + BlackjackState(_players:List<BlackjackPlayer>)
+    + + <<override>> Deal(cardsToDrawEach:int) : void
+    + + PlayerTurnsFinished() : bool
+}
+class CheatDisplay {
+    + + <<const>> CARD_WIDTH : int = 11
+    + + <<const>> CARD_HEIGHT : int = 7
+    + + {static} DisplayScrollMenu(cards:List<Card>, currentCardIndex:int) : void
+    - - {static} DisplayThreeCardView(cards:List<Card>, currentCardIndex:int) : void
+    + + {static} BigCard(card:Card) : void
+    - - {static} ShortCard(rightSide:bool, card:Card?) : void
+    - - {static} SelectedCards(cards:List<Card>) : void
+    - - {static} OwnedCards(cards:List<Card>) : void
+}
+class CheatGame {
+    - - CANCEL_COUNTDOWN : bool = false
+    + + <<const>> DECKCOUNT : int = 1
+    + + CheatGame()
+    + + <<override>> PlayGame(players:List<Player>) : List<Player>
+    - - CheckWinners() : void
+    - - DisplayCallCheatMenu(displayDurationSeconds:int) : void
+    - - CheatCalled(accused:CheatPlayer, accuser:CheatPlayer, playedCards:List<Card>, rankClaimed:Ranks?) : void
+    - - {static} DidCheat(playedCards:List<Card>, rankClaimed:Ranks?) : bool
+    - - # <<override>> PlayTurn() : void
+    - - # <<override>> EndGame() : void
+    - - {static} ScrollMenu(cards:List<Card>) : void
+}
+class CheatParser {
+    + + CheatParser()
+    + + ImportMaps(rankMapPath:string, suitMapPath:string) : void
+    + + TryParseCard(input:string, card:Card?) : bool
+    + + TryParseRank(input:string, rank:Ranks?) : bool
+}
+class CheatPlayer {
+    - - won : bool = false
+    + + HasWon() : bool
+    + + Win() : void
+    + + {static} ConvertTo(player:Player) : CheatPlayer
+    + + {static} ConvertTo(players:List<Player>) : List<CheatPlayer>
+    + + {static} ConvertFrom(cheatPlayer:CheatPlayer) : Player
+    + + {static} ConvertFrom(cheatPlayers:List<CheatPlayer>) : List<Player>
+}
+class CheatState {
+    - - gameOver : bool = false
+    + + IsGameOver() : bool
+    + + GameOver() : void
+    + + Discard(card:Card) : void
+    + + Discard(cards:List<Card>) : int
+    + + {static} Beep() : void
+    + + PrepareDeck() : void
+    + + PlayerPicksUpPile(playerToPickUp:Player) : void
+}
+class KlondikeDisplay {
+    + + <<const>> CARD_WIDTH : int = 11
+    + + <<const>> CARD_HEIGHT : int = 7
+    - - {static} x : int
+    - - {static} y : int
+    - - {static} startX : int
+    - - {static} startY : int
+    - - {static} changesMade : bool = true
+    - - {static} totallyRedrawScreen : bool = true
+    - - {static} BigCardOutline(suit:Suits?) : void
+    - - {static} BigCard(card:Card, justDisplayTopLine:bool, highlightAsTarget:bool) : void
+    + + {static} DisplayKlondikeMenu(state:KlondikeState) : void
+    - - {static} DisplayGameScreen(state:KlondikeState) : void
+    - - {static} DisplayDrawSection(state:KlondikeState) : void
+    - - {static} DisplayCardStacks(state:KlondikeState) : void
+    - - {static} DisplaySuitStacks(state:KlondikeState) : void
+    - - {static} DisplayInformation(state:KlondikeState) : void
+    - - {static} DisplayIndividualCardStack(cardStack:Stack<Card>, isEmptyAndHovered:bool, displayTopCardAsTarget:bool) : void
+    - - {static} HandleInput(state:KlondikeState) : void
+    - - {static} HandleCardStacksInput(state:KlondikeState, inputKey:ConsoleKeyInfo) : void
+    - - {static} HandleDrawPilesInput(state:KlondikeState, inputKey:ConsoleKeyInfo) : void
+    - - {static} HandleSuitStacksInput(state:KlondikeState, inputKey:ConsoleKeyInfo) : void
+    - - {static} HandleMoveSelectionInput(state:KlondikeState, inputKey:ConsoleKeyInfo) : void
+    - - {static} HandleConfirmationInput(state:KlondikeState) : void
+    - - {static} HandleDebugInput(state:KlondikeState, inputKey:ConsoleKeyInfo) : void
+}
+class KlondikeGame {
+    + + KlondikeGame()
+    + + <<override>> PlayGame(_players:List<Player>) : List<Player>
+    - - # <<override>> PlayTurn() : void
+    - - # <<override>> EndGame() : void
+}
+class KlondikeMove {
+    + + KlondikeMove(type:MoveType, targetIndex:int, card:Card?)
+    + + KlondikeMove(type:MoveType, targetIndex:int, startingLocation:KlondikeState.Location?, startingStackIndex:int, startingCardIndex:int, card:Card?)
+    + + KlondikeMove(type:MoveType, targetIndex:int, startingLocation:KlondikeState.Location?, card:Card?)
+    + + KlondikeMove(type:MoveType, card:Card?)
+    + + StartingStackIndex : int <<get>>
+    + + StartingCardIndex : int <<get>>
+    + + TargetIndex : int <<get>>
+    + + <<override>> ToString() : string
+}
+enum MoveType {
+    ToSuitStack,
+    ToCardStack,
+    DrawCard,
+    ResetDrawPile,
+    TurnCard,
+}
+class KlondikePlayer {
+    + + {static} ConvertTo(player:Player) : KlondikePlayer
+    + + {static} ConvertTo(players:List<Player>) : List<KlondikePlayer>
+    + + {static} ConvertFrom(kdp:KlondikePlayer) : Player
+    + + {static} ConvertFrom(klondikePlayers:List<KlondikePlayer>) : List<Player>
+}
+class KlondikeSolver {
+    + + {static} Solve(state:KlondikeState, visitedStates:HashSet<KlondikeState>, solutionPath:List<KlondikeMove>) : List<KlondikeMove>?
+    + + {static} SolveIteratively(initialState:KlondikeState) : List<KlondikeMove>?
+    + + {static} SolveWithDepthLimit(initialState:KlondikeState, maxDepth:int) : List<KlondikeMove>?
+    - - {static} DepthFirstSearch(state:KlondikeState, maxDepth:int, currentDepth:int, visitedStates:HashSet<KlondikeState>) : List<KlondikeMove>?
+    + + {static} SolveWithMemoryLimit(initialState:KlondikeState, maxVisitedStates:int, timeoutMs:int) : List<KlondikeMove>?
+    - - {static} MoveHeuristic(move:KlondikeMove) : int
+}
+class KlondikeState {
+    + + SelectedCardStack : int <<get>>
+    + + SelectedSuitStack : int <<get>>
+    + + SelectedCardInStack : int <<get>>
+    + + HasBeenSolved : bool <<get>>
+    + + SelectedMoveIndex : int <<get>>
+    + + TimesDrawPileRestocked : int <<get>>
+    + + Score : int <<get>>
+    + + IsInCardStacks() : bool
+    + + IsInDrawPile() : bool
+    + + IsInSuitStacks() : bool
+    + + IsInLeftmostSuitStack() : bool
+    + + IsInFaceUpDrawPile() : bool
+    + + IsInFaceDownDrawPile() : bool
+    + + GetMoves() : List<KlondikeMove>
+    + + MoveStackSelectionLeft() : bool
+    + + MoveStackSelectionRight() : bool
+    + + MoveCardSelectionUp() : bool
+    + + MoveCardSelectionDown() : bool
+    + + MoveCardSelectionToTop() : bool
+    + + MoveToDrawPile() : bool
+    + + MoveToFaceDownDrawPile() : bool
+    + + MoveToFaceUpDrawPile() : bool
+    + + MoveToCardStacks() : bool
+    + + MoveToSuitStacks() : bool
+    + + MoveSuitStackRight() : bool
+    + + MoveSuitStackLeft() : bool
+    + + SelectNthMove(n:int) : bool
+    + + SelectNextMove() : bool
+    + + SelectPreviousMove() : bool
+    + + ResetMoves() : bool
+    + + ScoreDrawnToCardStacks() : void
+    + + ScoreDrawnToSuitStacks() : void
+    + + ScoreCardStacksToSuitStacks() : void
+    + + ScoreTurnOverCardStacksCard() : void
+    + + ScoreSuitStacksToCardStacks() : void
+    + + ScoreRestockDrawPile() : void
+    + + MarkDrawPileAsRestocked() : void
+    + + SetupCards() : void
+    + + ResetGame() : void
+    + + Clone() : KlondikeState
+    - - InitialiseSuitStackOrder() : void
+    - - GetCardStack(index:int) : Stack<Card>
+    + + GetCardStacks() : Stack<Card>[]
+    + + GetCurrentCard() : Card?
+    + + GetTopCardFromStack(index:int) : Card?
+    + + GetNthCardFromCardStack(cardStackIndex:int, n:int) : Card?
+    + + GetCardAtLocation(location:Location, cardIndex:int, stackIndex:int, drawPileRegion:DrawPileRegion?) : Card?
+    + + HoverCurrentCard() : void
+    + + UnhoverCurrentCard() : void
+    + + GetNthCardAndAboveFromStack(currentStack:int, currentCardInStack:int) : List<Card>
+    + + AddCardToDrawnCards(card:Card) : void
+    + + GetDrawnCards() : Stack<Card>
+    + + GetNextRankForSuitStack(suit:Suits) : Ranks?
+    + + AddRankBackToNextSuitStackList(suit:Suits, rank:Ranks) : void
+    + + GetTopCardFromSuitStack(suit:Suits) : Card
+    + + UpdateMoves() : void
+    + + GetPossibleMovesForCurrentCard() : List<KlondikeMove>
+    + + GetMovesByLocation(location:Location, cardIndex:int, cardStackIndex:int, drawRegion:DrawPileRegion?) : List<KlondikeMove>
+    + + GetAllPossibleMoves() : List<KlondikeMove>
+    + + TryMakeSelectedMove() : bool
+    + + TryMakeMove(move:KlondikeMove) : bool
+    + + CheckSolveState() : bool
+    + + <<override>> Equals(obj:object?) : bool
+    + + Equals(other:KlondikeState?) : bool
+    + + <<override>> GetHashCode() : int
+}
+enum Location {
+    CardStacks,
+    SuitStacks,
+    DrawPiles,
+}
+enum DrawPileRegion {
+    FaceDown,
+    FaceUp,
+}
+
+Program --- Application
+Application o-- Player
+Application --- Menu
+Application --- GameBase
+Application --- Language
+Application --- Util
+Betting --- Player
+Card --- Suits
+Card --- Ranks
+Deck *-- Card
+GameBase --- Player
+GameBase <|-- BlackjackGame
+GameBase <|-- CheatGame
+GameBase <|-- KlondikeGame
+GameState *-- Deck
+GameState o-- Player
+GameState --- Direction
+Language --- Menu
+Menu --- Player
+Menu --- GameBase
+Player o-- Card
+Player --- Money
+Util --- Rect
+NaturalLanguageParser <|-- CheatParser
+CheatParser *-- Ranks
+CheatParser *-- Suits
+CheatParser --- Card
+BlackjackDealer o-- Card
+BlackjackDealer --- Deck
+BlackjackPlayer <|-- Player
+BlackjackPlayer --- WinStates
+BlackjackPlayer --- BlackjackState
+BlackjackState <|-- GameState
+BlackjackState *-- BlackjackDealer
+BlackjackGame *-- BlackjackState
+CheatPlayer <|-- Player
+CheatState <|-- GameState
+CheatState *-- Deck
+CheatState o-- Card
+CheatState o-- Player
+CheatGame *-- CheatState
+CheatDisplay --- Card
+KlondikePlayer <|-- Player
+KlondikeState <|-- GameState
+KlondikeState o-- Card
+KlondikeState *-- KlondikeMove
+KlondikeState --- Suits
+KlondikeState --- Location
+KlondikeState --- DrawPileRegion
+KlondikeState --- KlondikePlayer
+KlondikeMove --- MoveType
+KlondikeMove --- KlondikeState
+KlondikeMove --- Card
+KlondikeGame *-- KlondikeState
+KlondikeDisplay --- KlondikeState
+KlondikeDisplay --- Card
+KlondikeSolver --- KlondikeState
+KlondikeSolver --- KlondikeMove
+@enduml

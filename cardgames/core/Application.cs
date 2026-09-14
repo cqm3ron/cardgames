@@ -43,14 +43,14 @@ namespace cardgames.core
                 {
                     if (players.Count == 0)
                     {
-                        players = Menu.StartupMenu();
+                        players = Menu.StartupMenu(); // display the pre-login menu
                     }
                     else
                     {
-                        Menu.StartupMenu(players);
+                        Menu.StartupMenu(players); // display the post-login menu
                     }
 
-                    game = Menu.GameMenu();
+                    game = Menu.GameMenu(players);
                 }
                 game.LoadGame();
                 players = game.PlayGame(players);

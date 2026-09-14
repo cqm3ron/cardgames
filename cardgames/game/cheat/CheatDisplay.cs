@@ -143,7 +143,7 @@ namespace cardgames.game.cheat
                     Console.SetCursorPosition(x + (int)Math.Ceiling(CARD_WIDTH / 2.0f), y - (CARD_HEIGHT - 1));
                 }
 
-                Util.ResetColour();
+                Util.ResetColor();
             }
             else // empty card
             {

@@ -1,0 +1,9 @@
+@startuml
+class KlondikePlayer {
+    + {static} ConvertTo(player:Player) : KlondikePlayer
+    + {static} ConvertTo(players:List<Player>) : List<KlondikePlayer>
+    + {static} ConvertFrom(kdp:KlondikePlayer) : Player
+    + {static} ConvertFrom(klondikePlayers:List<KlondikePlayer>) : List<Player>
+}
+Player <|-- KlondikePlayer
+@enduml

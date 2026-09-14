@@ -7,14 +7,18 @@ namespace cardgames.game.blackjack
     {
         public const int DECKCOUNT = 6;
         public BlackjackState State { get; set; } = null!;
-        public BlackjackGame() : base() { }
+        public BlackjackGame() : base()
+        {
+            MAX_PLAYERS = Application.MAX_PLAYERS;
+            MIN_PLAYERS = 1;
+        }
         public override List<Player> PlayGame(List<Player> players)
         {
             List<BlackjackPlayer> blackjackPlayers = BlackjackPlayer.ConvertTo(players);
 
             State = new(blackjackPlayers);
 
-            Betting.BettingMenu(players);
+            Betting.BettingMenu(blackjackPlayers);
 
             const int CARDS_TO_DRAW = 2;
             State.SetupDeck(DECKCOUNT);
@@ -30,8 +34,8 @@ namespace cardgames.game.blackjack
 
             EndGame();
 
-            Console.WriteLine(T("Util.PressKey"));
-            Console.ReadKey(true);
+            Console.WriteLine();
+            Util.PressAnyKey();
 
             players = BlackjackPlayer.ConvertFrom(State.GetPlayerList());
             return players;
@@ -43,10 +47,6 @@ namespace cardgames.game.blackjack
 
             string[] options = [T("Blackjack.Hit"), T("Blackjack.Stand")];
 
-            //Console.WriteLine(player.CardsInHand);
-            //Console.WriteLine(player.GetBalance());
-            //Console.WriteLine(player.Bet);
-            //Console.WriteLine(player.GetBalance() - player.Bet);
             if (player.CardsInHand <= 2 && player.GetBalance() >= player.Bet * 2) // TODO: check if this works
             {
                 options = [T("Blackjack.Hit"), T("Blackjack.Stand"), T("Blackjack.Double")];
@@ -106,7 +106,7 @@ namespace cardgames.game.blackjack
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(T("Blackjack.Player.WentBust"));
-                Util.ResetColour();
+                Util.ResetColor();
             }
 
             if (!player.Bust)
@@ -118,6 +118,12 @@ namespace cardgames.game.blackjack
         {
             CheckWinners();
             Console.Clear();
+            Console.WriteLine(T("Blackjack.Dealer.FinalHand") + ":");
+            foreach (Card card in State.dealer.Hand)
+            {
+                Console.WriteLine(card);
+            }
+            Console.WriteLine(T("Blackjack.HandValueInfo") + State.dealer.HandValue); Console.WriteLine();
             foreach (BlackjackPlayer player in State.GetPlayerList())
             {
                 Console.WriteLine(T("Blackjack.Player.WinSummary", ("player", player.GetName()), ("bet", player.Bet.ToString())));

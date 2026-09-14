@@ -55,3 +55,4 @@ D:\cardgames-master\cardgames\obj\Debug\net9.0\refint\cardgames.dll
 D:\cardgames-master\cardgames\obj\Debug\net9.0\cardgames.pdb
 D:\cardgames-master\cardgames\obj\Debug\net9.0\cardgames.genruntimeconfig.cache
 D:\cardgames-master\cardgames\obj\Debug\net9.0\ref\cardgames.dll
+D:\Documents\Visual Studio 2022\Programs\cardgames-NEA\cardgames\obj\Debug\net9.0\cardgames.csproj.Up2Date

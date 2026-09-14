@@ -1,0 +1,12 @@
+@startuml
+class CheatDisplay <<static>> {
+    + <<const>> CARD_WIDTH : int = 11
+    + <<const>> CARD_HEIGHT : int = 7
+    + {static} DisplayScrollMenu(cards:List<Card>, currentCardIndex:int) : void
+    - {static} DisplayThreeCardView(cards:List<Card>, currentCardIndex:int) : void
+    + {static} BigCard(card:Card) : void
+    - {static} ShortCard(rightSide:bool, card:Card?) : void
+    - {static} SelectedCards(cards:List<Card>) : void
+    - {static} OwnedCards(cards:List<Card>) : void
+}
+@enduml

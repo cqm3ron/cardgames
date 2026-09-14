@@ -1,0 +1,12 @@
+@startuml
+class CheatPlayer {
+    - won : bool = false
+    + HasWon() : bool
+    + Win() : void
+    + {static} ConvertTo(player:Player) : CheatPlayer
+    + {static} ConvertTo(players:List<Player>) : List<CheatPlayer>
+    + {static} ConvertFrom(cheatPlayer:CheatPlayer) : Player
+    + {static} ConvertFrom(cheatPlayers:List<CheatPlayer>) : List<Player>
+}
+Player <|-- CheatPlayer
+@enduml

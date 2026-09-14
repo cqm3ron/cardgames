@@ -1,43 +1,38 @@
 ﻿using cardgames.core;
-using static cardgames.core.Language;
+using cardgames.game.cheat;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static cardgames.core.Language;
 
 namespace cardgames.game.klondike
 {
     internal class KlondikeGame : GameBase<Player>
     {
         public KlondikeState State { get; set; }
-        public KlondikeGame() : base() { }
-
-        public override List<Player> PlayGame(List<Player> _players)
+        public KlondikeGame() : base()
         {
-            List<KlondikePlayer> klondikePlayers = KlondikePlayer.ConvertTo(_players);
+            MIN_PLAYERS = 1;
+            MAX_PLAYERS = 1;
+        }
 
-            State = new(klondikePlayers); // TODO: solitaire should be a singleplayer game only.
+        public override List<Player> PlayGame(List<Player> players)
+        {
+            List<KlondikePlayer> klondikePlayers = KlondikePlayer.ConvertTo(players);
+
+            State = new(klondikePlayers);
 
             State.SetupDeck(1); // Solitaire always uses one deck of cards.
 
             State.SetupCards();
 
-            while (!State.CheckSolveState())
+            Betting.BettingMenu(klondikePlayers);
+
+            while (!State.GameOver)
             {
                 KlondikeDisplay.DisplayKlondikeMenu(State);
-
-                /* GAME PLAN:
-                 * 1. allow user to traverse menu [X]
-                 * 2. if they select a card, the game should move the card to the most sensible place [X]
-                 * 3. the user should be able to choose this also; some kind of manual override? [x]
-                 *      > there apparently can be more than two possible moves. this causes me great upset as i am now going to have to add a way to choose which of the possible moves to complete.
-                 * 4. ensure the option to draw a new card exists (the pile thingy) [x]
-                 * 5. HANDLE EVERYTHING IF EMPTY (IF EMPTY = DISPLAY CARD OUTLINE) [x]
-                 * 6. AUTOSOLVE
-                 * 7. DETECT WHEN IMPOSSIBLE / GAME IS LOST
-                 * 8. ADD BETTING TO START OF GAME (BETTING ON ABILITY TO WIN IF I CANT COME UP WITH A BETTER OPTION)
-                 */
 
                 // TODO: ADD BETTING TO START OF GAME (BETTING ON SCORE MAYBE?)
                 // TODO: SCORE MECHANICS
@@ -59,10 +54,10 @@ namespace cardgames.game.klondike
                 // TODO: display keybinding tooltips as it is not immediately obvious how to navigate menu (esp. to the draw pile)
             }
 
-            Console.WriteLine(T("Util.PressKey"));
-            Console.ReadKey(true);
+            Util.PressAnyKey();
 
-            return _players;
+            players = KlondikePlayer.ConvertFrom(State.GetPlayerList());
+            return players;
         }
         private protected override void PlayTurn()
         {

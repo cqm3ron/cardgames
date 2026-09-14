@@ -1,0 +1,18 @@
+@startuml
+class CheatState {
+    - gameOver : bool = false
+    + IsGameOver() : bool
+    + GameOver() : void
+    + Discard(card:Card) : void
+    + Discard(cards:List<Card>) : int
+    + {static} Beep() : void
+    + PrepareDeck() : void
+    + PlayerPicksUpPile(playerToPickUp:Player) : void
+}
+class "List`1"<T> {
+}
+class "GameState`1"<T> {
+}
+"GameState`1" "<CheatPlayer>" <|-- CheatState
+CheatState o-> "discard" Deck
+@enduml

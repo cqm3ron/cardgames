@@ -1,0 +1,22 @@
+@startuml
+class KlondikeMove {
+    + KlondikeMove(type:MoveType, targetIndex:int, card:Card?)
+    + KlondikeMove(type:MoveType, targetIndex:int, startingLocation:KlondikeState.Location?, startingStackIndex:int, startingCardIndex:int, card:Card?)
+    + KlondikeMove(type:MoveType, targetIndex:int, startingLocation:KlondikeState.Location?, card:Card?)
+    + KlondikeMove(type:MoveType, card:Card?)
+    + StartingStackIndex : int <<get>>
+    + StartingCardIndex : int <<get>>
+    + TargetIndex : int <<get>>
+    + <<override>> ToString() : string
+}
+enum MoveType {
+    ToSuitStack,
+    ToCardStack,
+    DrawCard,
+    ResetDrawPile,
+    TurnCard,
+}
+KlondikeMove --> "Type" MoveType
+KlondikeMove --> "Card" Card
+KlondikeMove +-- MoveType
+@enduml

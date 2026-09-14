@@ -1,0 +1,14 @@
+@startuml
+class Menu <<static>> {
+    - <<const>> GAMES_FOLDER_PATH : string = "..\\..\\..\\game\\"
+    - <<const>> LEADERBOARD_PATH : string = "..\\..\\..\\data\\leaderboard.md"
+    + {static} StartupMenu(players:List<Player>?) : List<Player>
+    - {static} RechargeBalance(players:List<Player>) : void
+    + {static} GameMenu() : GameBase<Player>?
+    - {static} GetGameChoice(games:Dictionary<string, string>, options:string[], selected:int) : object?
+    - {static} ImportGames() : Dictionary<string, string>
+    - {static} GetGame(gameClassName:string) : object?
+    - {static} LeaderboardMenu() : void
+    + {static} UpdateLeaderboard() : void
+}
+@enduml

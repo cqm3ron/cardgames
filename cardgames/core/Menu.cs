@@ -34,7 +34,7 @@ namespace cardgames.core
                 {
                     options = [T("Menu.Login"), T("Menu.CreateUser"), T("Menu.LanguageSelect"), T("Menu.Exit")];
                     int choice = Util.GetChoice(options);
-                    switch (choice) // fix this please for the love of god its awful
+                    switch (choice)
                     {
                         case 0:
                             Console.WriteLine();
@@ -48,8 +48,7 @@ namespace cardgames.core
                             string password = Util.GetPassword()!;
                             player = Player.LogIn(username, password);
 
-                            Console.WriteLine(T("Util.PressKey"));
-                            Console.ReadKey(true);
+                            Util.PressAnyKey();
                             break;
 
                         case 1:
@@ -70,11 +69,11 @@ namespace cardgames.core
                             throw new NotImplementedException();
                     }
                 }
-                else
+                else if (players.Count > 0 && players.Count < Application.MAX_PLAYERS)
                 {
-                    options = [T("Menu.AddPlayer"), T("Menu.CreateUser"), T("Menu.GameSelection"), T("Menu.ViewLeaderboard"), T("Menu.RechargeBalance"), T("Menu.LanguageSelect"), T("Menu.Exit")];
+                    options = [T("Menu.AddPlayer"), T("Menu.CreateUser"), T("Menu.GameSelection"), T("Menu.ViewLeaderboard"), T("Menu.RechargeBalance"), T("Menu.LanguageSelect"), T("Menu.Logout"), T("Menu.Exit")];
                     int choice = Util.GetChoice(options);
-                    switch (choice) // please also fix this oh god its horrible
+                    switch (choice)
                     {
                         case 0:
                             Console.WriteLine();
@@ -90,9 +89,8 @@ namespace cardgames.core
                             {
                                 if (playerToCheck.GetUsername() == username)
                                 {
-                                    Console.WriteLine(T("Err.AlreadyLoggedIn")); // TODO: add translation key to dictionary
-                                    Console.WriteLine(T("Util.PressKey"));
-                                    Console.ReadKey(true);
+                                    Console.WriteLine(T("Err.AlreadyLoggedIn"));
+                                    Util.PressAnyKey();
                                     loggedInAlready = true;
                                     break;
                                 }
@@ -107,8 +105,7 @@ namespace cardgames.core
                             string password = Util.GetPassword();
                             player = Player.LogIn(username, password);
 
-                            Console.WriteLine(T("Util.PressKey"));
-                            Console.ReadKey(true);
+                            Util.PressAnyKey();
                             break;
 
                         case 1:
@@ -117,6 +114,16 @@ namespace cardgames.core
 
                         case 2:
                             goToGames = true;
+                            foreach (Player playerToCheckBalance in players)
+                            {
+                                if (playerToCheckBalance.GetBalance() <= 0)
+                                {
+                                    Console.WriteLine(T("Err.PlayerBankrupt", ("name", playerToCheckBalance.GetName())));
+                                    Util.PressAnyKey();
+                                    goToGames = false;
+                                    break;
+                                }
+                            }
                             break;
 
                         case 3:
@@ -133,6 +140,86 @@ namespace cardgames.core
                             break;
 
                         case 6:
+                            if (players.Count > 0) // condition is here just in case, but this should never be an option if there are no players logged in
+                            {
+                                Console.Clear();
+                                Console.WriteLine(T("Menu.LogoutSelect"));
+                                Player[] playerOptions = players.ToArray();
+                                string[] playerNames = new string[playerOptions.Length + 1]; // 1 greater than the number of players to accommodate a back button
+                                foreach (Player playerToGetNameOf in playerOptions)
+                                {
+                                    playerNames[players.IndexOf(playerToGetNameOf)] = playerToGetNameOf.GetName();
+                                }
+                                playerNames[playerNames.Length - 1] = T("Menu.Back");
+                                int playerChoice = Util.GetChoice(playerNames);
+                                if (playerChoice == playerNames.Length - 1) break;
+                                Player playerToLogout = players[playerChoice];
+                                players.Remove(playerToLogout.LogOut());
+                                Console.WriteLine(T("Menu.LoggedOut", ("name", playerToLogout.GetName())));
+                                Util.PressAnyKey();
+                            }
+                            break;
+
+                        case 7:
+                            Environment.Exit(0);
+                            break;
+
+                        default:
+                            throw new NotImplementedException();
+                    }
+                }
+                else if (players.Count == Application.MAX_PLAYERS)
+                {
+                    options = [T("Menu.GameSelection"), T("Menu.ViewLeaderboard"), T("Menu.RechargeBalance"), T("Menu.LanguageSelect"), T("Menu.Logout"), T("Menu.Exit")];
+                    int choice = Util.GetChoice(options);
+                    switch (choice)
+                    {
+                        case 0:
+                            goToGames = true;
+                            foreach (Player playerToCheckBalance in players)
+                            {
+                                if (playerToCheckBalance.GetBalance() <= 0)
+                                {
+                                    Console.WriteLine(T("Err.PlayerBankrupt", ("name", playerToCheckBalance.GetName())));
+                                    Util.PressAnyKey();
+                                    goToGames = false;
+                                    break;
+                                }
+                            }
+                            break;
+
+                        case 1:
+                            LeaderboardMenu();
+                            break;
+
+                        case 2:
+                            RechargeBalance(players);
+                            break;
+
+                        case 3:
+                            Console.WriteLine();
+                            SelectLanguage();
+                            break;
+
+                        case 4:
+                            if (players.Count > 0) // condition is here just in case, but this should never be an option if there are no players logged in
+                            {
+                                Console.Clear();
+                                Console.WriteLine(T("Menu.LogoutSelect"));
+                                Player[] playerOptions = players.ToArray();
+                                string[] playerNames = new string[playerOptions.Length];
+                                foreach (Player playerToGetNameOf in playerOptions)
+                                {
+                                    playerNames[players.IndexOf(playerToGetNameOf)] = playerToGetNameOf.GetName();
+                                }
+                                Player playerToLogout = players[Util.GetChoice(playerNames)];
+                                players.Remove(playerToLogout.LogOut());
+                                Console.WriteLine(T("Menu.LoggedOut", ("name", playerToLogout.GetName())));
+                                Util.PressAnyKey();
+                            }
+                            break;
+
+                        case 5:
                             Environment.Exit(0);
                             break;
 
@@ -160,7 +247,7 @@ namespace cardgames.core
             {
                 if (player.GetBalance() <= 0)
                 {
-                    options.Add(player.GetName() + " has balance cr" + player.GetBalance()); // TODO: LANG
+                    options.Add(T("Player.ToRecharge", ("name", player.GetName()), ("balance", player.GetBalance().ToString())));
                     playerOptions.Add(players.IndexOf(player));
                 }
             }
@@ -173,7 +260,7 @@ namespace cardgames.core
             else players[playerOptions[option]].RechargeBalance();
         }
 
-        public static GameBase<Player>? GameMenu()
+        public static GameBase<Player>? GameMenu(List<Player> players)
         {
             Dictionary<string, string> games = ImportGames();
 
@@ -207,9 +294,9 @@ namespace cardgames.core
 
                 object choice = GetGameChoice(games, options, ref selected);
 
-                object temp = new();
+                object emptyObject = new();
 
-                if (choice != null && choice.GetType() == temp.GetType())
+                if (choice != null && choice.GetType() == emptyObject.GetType())
                 {
                     Console.Clear();
                     Console.CursorVisible = true;
@@ -222,7 +309,26 @@ namespace cardgames.core
                 {
                     Console.Clear();
                     Console.CursorVisible = true;
-                    return game;
+
+                    if (players.Count <= game.MAX_PLAYERS && players.Count >= game.MIN_PLAYERS) return game;
+                    else if (players.Count > game.MAX_PLAYERS)
+                    {
+                        Console.Clear();
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine(T("Err.TooManyPlayers", ("max", game.MAX_PLAYERS.ToString())));
+                        Util.ResetColor();
+                        Util.PressAnyKey();
+                        Console.Clear();
+                    }
+                    else if (players.Count < game.MIN_PLAYERS)
+                    {
+                        Console.Clear();
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine(T("Err.NotEnoughPlayers", ("min", game.MIN_PLAYERS.ToString())));
+                        Util.ResetColor();
+                        Util.PressAnyKey();
+                        Console.Clear();
+                    }
                 }
             }
 
@@ -293,16 +399,38 @@ namespace cardgames.core
         {
             Console.Clear();
             UpdateLeaderboard();
-            const int ITEMS_TO_DISPLAY = 10;
+            int ITEMS_TO_DISPLAY = Console.WindowHeight - 5;
             string[] leaderboard = File.ReadAllLines(LEADERBOARD_PATH);
 
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(T("Leaderboard.Title")); // TODO: LANG (--# LEADERBOARD #--)
-            Util.ResetColor();
-            for (int i = 1; i < Math.Min(ITEMS_TO_DISPLAY + 1, leaderboard.Length); i++) Console.WriteLine(leaderboard[i]);
+
+            Console.WriteLine(new string('=', T("Leaderboard.Title").Length));
+            Console.WriteLine(T("Leaderboard.Title"));
+            Console.WriteLine(new string('=', T("Leaderboard.Title").Length));
             Console.WriteLine();
-            Console.WriteLine(T("Util.PressKey"));
-            Console.ReadKey(true);
+            Util.ResetColor();
+            for (int i = 1; i < Math.Min(ITEMS_TO_DISPLAY + 1, leaderboard.Length); i++)
+            {
+                switch (i)
+                {
+                    case 1:
+                        Console.ForegroundColor = ConsoleColor.DarkYellow;
+                        break;
+                    case 2:
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                        break;
+                    case 3:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        break;
+                    default:
+                        Util.ResetColor();
+                        break;
+                }
+                Console.WriteLine(leaderboard[i]);
+            }
+            if (leaderboard.Length == 0) Console.WriteLine(T("Leaderboard.Empty"));
+            Console.WriteLine();
+            Util.PressAnyKey();
 
         }
 

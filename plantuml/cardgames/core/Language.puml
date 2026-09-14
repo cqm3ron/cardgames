@@ -1,0 +1,17 @@
+@startuml
+class Language <<static>> {
+    - <<const>> LANGUAGE_DIRECTORY_PATH : string = "..\\..\\..\\lang\\"
+    - <<const>> DEFAULT_LANGUAGE_CODE : string = "en-GB"
+    + {static} CurrentLanguage : string <<get>>
+    + {static} SelectLanguage() : void
+    - {static} DetectLanguages() : string[]
+    + {static} Load(languageCode:string) : void
+    + {static} LoadGame(gameName:string) : void
+    + {static} UnloadGame(gameName:string) : void
+    - {static} T(key:string, parameters:Dictionary<string, string>?) : string
+    + {static} T(key:string, parameters:(string Key, string Value)[]) : string
+}
+class "Dictionary`2"<T1,T2> {
+}
+Language o-> "translations<string,string>" "Dictionary`2"
+@enduml

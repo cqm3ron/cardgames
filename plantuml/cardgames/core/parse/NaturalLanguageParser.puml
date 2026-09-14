@@ -1,0 +1,10 @@
+@startuml
+abstract class NaturalLanguageParser {
+    + ImportMap(path:string) : Dictionary<string, TEnum>
+    - # ExportMap(map:Dictionary<string, TEnum>, path:string) : void
+    - # TryFindMatch(token:string, map:Dictionary<string, T>, value:T) : bool
+    - # TryFuzzyMatch(token:string, map:Dictionary<string, T>, value:T) : bool
+    - # NormaliseInput(input:string) : string
+    - # Levenshtein(string1:string, string2:string) : int
+}
+@enduml

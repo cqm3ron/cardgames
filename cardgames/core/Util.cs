@@ -21,6 +21,12 @@ namespace cardgames.core
             }
         }
 
+        public static void PressAnyKey()
+        {
+            Console.WriteLine(T("Util.PressKey"));
+            Console.ReadKey(true);
+        }
+
         public static int GetChoice(string[] options, int selected = 0)
         {
             Console.CursorVisible = false;
@@ -111,11 +117,6 @@ namespace cardgames.core
         {
             Console.ForegroundColor = DEFAULT_FOREGROUND;
             Console.BackgroundColor = DEFAULT_BACKGROUND;
-        }
-
-        public static void ResetColour()
-        {
-            ResetColor();
         }
 
         public static void WriteLineBackwards(string input) // error handling non-existent?

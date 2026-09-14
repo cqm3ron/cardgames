@@ -324,13 +324,6 @@ namespace cardgames.game.klondike
                 Console.SetCursorPosition(startX + (CARD_WIDTH * 7) + 1, startY + 2);
                 Console.Write($"{state.SelectedMoveIndex + 1}/{state.GetMoves().Count}");
             }
-
-            for (int i = 3; i < state.GetMoves().Count + 3; i++)
-            {
-                Console.SetCursorPosition(startX + (CARD_WIDTH * 7) + 1, startY + i);
-                Console.Write(state.GetMoves()[i - 3]);
-            }
-
         }
         private static void DisplayIndividualCardStack(Stack<Card> cardStack, bool isEmptyAndHovered = false, bool displayTopCardAsTarget = false)
         {
@@ -368,7 +361,7 @@ namespace cardgames.game.klondike
 
                 yCoord += 2;
             }
-        } // TODO: update to just use state maybe?
+        }
 
         private static void HandleInput(KlondikeState state)
         {
@@ -376,7 +369,11 @@ namespace cardgames.game.klondike
 
             HandleDebugInput(state, inputKey);
 
-            if (Util.affirmatives.Contains(inputKey.Key))
+            if (inputKey.Key == ConsoleKey.Escape && inputKey.Modifiers.HasFlag(ConsoleModifiers.Control)) // ctrl + esc to forfeit 
+            {
+                
+            }
+            else if (Util.affirmatives.Contains(inputKey.Key))
             {
                 HandleConfirmationInput(state);
             }

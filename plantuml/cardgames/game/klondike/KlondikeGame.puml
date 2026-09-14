@@ -1,0 +1,12 @@
+@startuml
+class KlondikeGame {
+    + KlondikeGame()
+    + <<override>> PlayGame(_players:List<Player>) : List<Player>
+    - # <<override>> PlayTurn() : void
+    - # <<override>> EndGame() : void
+}
+class "GameBase`1"<T> {
+}
+"GameBase`1" "<Player>" <|-- KlondikeGame
+KlondikeGame --> "State" KlondikeState
+@enduml

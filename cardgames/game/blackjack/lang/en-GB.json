@@ -12,7 +12,9 @@
   "Blackjack.Player.WinSummary": "Player {player} bet cr{bet}.",
   "Blackjack.Player.WinSummary.Doubled": "They also chose to double down.",
   "Blackjack.Dealer.FaceUpCard": "Dealer's face-up card",
-  "Blackjack.Player.BustChance": "/!\\ If you choose to hit, you have a {playerBustChance}% chance of going bust!",
+  "Blackjack.Dealer.Hand": "Dealer's face-up card",
+  "Blackjack.Dealer.FinalHand": "Dealer's hand",
+  "Blackjack.Player.BustChance": "/!\\ If you choose to hit, you have a ~{playerBustChance}% chance of going bust!",
   "Blackjack.Player.WentBust": "Uh-oh! You went bust.",
   "Blackjack.Player.BetAmount": "You placed a bet of "
 }

@@ -1,0 +1,12 @@
+@startuml
+class Application <<static>> {
+    + <<const>> MAX_PLAYERS : int = 8
+    + {static} Load() : void
+    - {static} LoadDefaultSettings() : void
+    - {static} OnProcessExit(sender:object, e:EventArgs) : void
+    - {static} OnCancelKeyPress(sender:object, e:ConsoleCancelEventArgs) : void
+}
+class "List`1"<T> {
+}
+Application o-> "players<Player>" "List`1"
+@enduml

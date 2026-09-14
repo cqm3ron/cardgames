@@ -13,7 +13,11 @@ namespace cardgames.game.cheat
         public const int DECKCOUNT = 1;
         private readonly decimal[] BETTING_AMOUNTS = [0.01m, 0.05m, 0.1m, 0.2m, 0.33m, 0.5m, 0.75m, 0.9m, 1m];
         public CheatState State { get; set; }
-        public CheatGame() : base() { }
+        public CheatGame() : base()
+        {
+            MIN_PLAYERS = 2;
+            MAX_PLAYERS = Application.MAX_PLAYERS;
+        }
         public override List<Player> PlayGame(List<Player> players)
         {
             List<CheatPlayer> cheatPlayers = CheatPlayer.ConvertTo(players);
@@ -40,8 +44,7 @@ namespace cardgames.game.cheat
 
             EndGame();
 
-            Console.WriteLine(T("Util.PressKey"));
-            Console.ReadKey(true);
+            Util.PressAnyKey();
 
             players = CheatPlayer.ConvertFrom(State.GetPlayerList());
             return players;
@@ -77,8 +80,7 @@ namespace cardgames.game.cheat
             Console.Clear();
             Console.WriteLine(T("Cheat.CheatCalled.LookAway", ("accused", accused.GetName()), ("accuser", accuser.GetName())));
             
-            Console.WriteLine(T("Util.PressKey"));
-            Console.ReadKey(true);
+            Util.PressAnyKey();
             Console.Clear();
 
 
@@ -100,8 +102,7 @@ namespace cardgames.game.cheat
             }
 
 
-            Console.WriteLine(T("Util.PressKey"));
-            Console.ReadKey(true);
+            Util.PressAnyKey();
 
             Console.Clear();
             Console.WriteLine(T("Cheat.Player.OpenEyes"));
@@ -120,14 +121,13 @@ namespace cardgames.game.cheat
         private protected override void PlayTurn()
         {
             Console.Clear();
-            const int CHEAT_DISPLAY_DURATION_SECONDS = 5;
+            const int CHEAT_DISPLAY_DURATION_SECONDS = 10;
 
             State.PrepareDeck();
             CheatPlayer current = State.GetCurrentPlayer();
             Console.WriteLine(T("Cheat.Player.Current", ("name", current.GetName()))); // Current Player
             Console.WriteLine(T("Cheat.Player.LookAway")); // Prompt for other players to look away
-            Console.WriteLine(T("Util.PressKey"));
-            Console.ReadKey(true);
+            Util.PressAnyKey();
             current.SortHandByRank();
             current.DeselectAllCards();
             ScrollMenu(current.GetHand());
@@ -174,8 +174,7 @@ namespace cardgames.game.cheat
                 }
             }
 
-            Console.WriteLine(T("Util.PressKey"));
-            Console.ReadKey(true);
+            Util.PressAnyKey();
 
             Console.Clear();
 
@@ -184,8 +183,7 @@ namespace cardgames.game.cheat
             Console.WriteLine();
 
             Console.WriteLine(T("Cheat.Player.EyesOpenContinue"));
-            Console.WriteLine(T("Util.PressKey"));
-            Console.ReadKey(true);
+            Util.PressAnyKey();
             Console.Clear();
 
             if (playedCards.Count == 1) Console.WriteLine(T("Cheat.Player.ClaimDisplaySingular", ("player", current.GetName()), ("count", playedCards.Count.ToString()), ("rank", rank.ToString()!)));
@@ -234,8 +232,7 @@ namespace cardgames.game.cheat
                 break;
             }
 
-            Console.WriteLine(T("Util.PressKey"));
-            Console.ReadKey(true);
+            Util.PressAnyKey();
         }
 
         private protected override void EndGame()

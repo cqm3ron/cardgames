@@ -1,0 +1,53 @@
+@startuml
+enum Suits {
+    Hearts= 0x2665,
+    Diamonds= 0x2666,
+    Clubs= 0x2663,
+    Spades= 0x2660,
+}
+enum Ranks {
+    Two= 2,
+    Three,
+    Four,
+    Five,
+    Six,
+    Seven,
+    Eight,
+    Nine,
+    Ten,
+    Jack,
+    Queen,
+    King,
+    Ace,
+}
+class Card {
+    + IsFaceCard : bool <<get>>
+    + IsFaceUp : bool <<get>>
+    + IsRed : bool <<get>>
+    + Value : int <<get>>
+    + IsSelected : bool = false
+    + IsHovered : bool = false
+    + Card(suit:Suits, rank:Ranks)
+    + GetSuitSymbol() : char
+    + GetRankSymbol() : string
+    + {static} GetSuitSymbol(suit:Suits) : char
+    + {static} GetRankSymbol(rank:Ranks) : string
+    + Select() : void
+    + Deselect() : void
+    + ToggleSelect() : void
+    + Hover() : void
+    + Unhover() : void
+    + ToggleHover() : void
+    + {static} GetSelectedCardCount(cards:List<Card>) : int
+    + {static} GetSelectedCards(cards:List<Card>) : List<Card>
+    + {static} DeselectCards(cards:List<Card>) : List<Card>
+    + {static} DeselectCards(deck:Deck) : Deck
+    + TurnFaceUp() : void
+    + TurnFaceDown() : void
+    + <<override>> ToString() : string
+    + <<override>> Equals(obj:object?) : bool
+    - Equals(card:Card) : bool
+}
+Card --> "Suit" Suits
+Card --> "Rank" Ranks
+@enduml

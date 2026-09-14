@@ -1,0 +1,19 @@
+@startuml
+class CheatGame {
+    - CANCEL_COUNTDOWN : bool = false
+    + <<const>> DECKCOUNT : int = 1
+    + CheatGame()
+    + <<override>> PlayGame(players:List<Player>) : List<Player>
+    - CheckWinners() : void
+    - DisplayCallCheatMenu(displayDurationSeconds:int) : void
+    - CheatCalled(accused:CheatPlayer, accuser:CheatPlayer, playedCards:List<Card>, rankClaimed:Ranks?) : void
+    - {static} DidCheat(playedCards:List<Card>, rankClaimed:Ranks?) : bool
+    - # <<override>> PlayTurn() : void
+    - # <<override>> EndGame() : void
+    - {static} ScrollMenu(cards:List<Card>) : void
+}
+class "GameBase`1"<T> {
+}
+"GameBase`1" "<Player>" <|-- CheatGame
+CheatGame --> "State" CheatState
+@enduml

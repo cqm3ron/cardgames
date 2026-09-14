@@ -256,10 +256,10 @@ namespace cardgames.core
             }
         }
         
-        public bool LogOut()
+        public Player LogOut()
         {
             SaveUserData();
-
+            return this;
         }
 
         // Authentication Helpers

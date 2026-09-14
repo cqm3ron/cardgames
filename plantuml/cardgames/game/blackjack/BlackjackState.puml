@@ -1,0 +1,11 @@
+@startuml
+class BlackjackState {
+    + BlackjackState(_players:List<BlackjackPlayer>)
+    + <<override>> Deal(cardsToDrawEach:int) : void
+    + PlayerTurnsFinished() : bool
+}
+class "GameState`1"<T> {
+}
+"GameState`1" "<BlackjackPlayer>" <|-- BlackjackState
+BlackjackState --> "dealer" BlackjackDealer
+@enduml

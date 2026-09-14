@@ -5,7 +5,7 @@ namespace cardgames.game.blackjack
     internal class BlackjackDealer
     {
         public bool Bust { get; private set; }
-        private List<Card> Hand { get; } = [];
+        public List<Card> Hand { get; private set; } = [];
         public Card PublicCard => Hand[0];
         public int HandValue => CalculateHandValue();
 

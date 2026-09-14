@@ -1,0 +1,23 @@
+@startuml
+class Deck {
+    + Deck()
+    + Clone() : Deck
+    + AddCard(newCard:Card) : void
+    + AddCards(newCards:IEnumerable<Card>) : void
+    + Shuffle() : void
+    + Draw() : Card?
+    + Deal(playerCount:int, cardsPerPlayer:int) : Card[,]
+    - GenerateStandardDeck() : Stack<Card>
+    + AddStandardDecks(count:int) : void
+    + RemoveCard(card:Card) : void
+    + GetCards() : Stack<Card>
+    + GetTopCard() : Card?
+    + GetNthCardFromTop(index:int) : Card?
+    + Count : int <<get>>
+    + Empty() : Stack<Card>
+}
+class "Stack`1"<T> {
+}
+Deck --> "cards<Card>" "Stack`1"
+Deck o-> "rand" Random
+@enduml
