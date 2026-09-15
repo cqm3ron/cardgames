@@ -8,10 +8,6 @@ namespace cardgames.core
         // Map File Management
         public Dictionary<string, TEnum> ImportMap<TEnum>(string path) where TEnum : struct, Enum
         {
-            Console.WriteLine(Path.GetRelativePath(Directory.GetCurrentDirectory(), path)); // remove when testing finished
-
-
-
             Dictionary<string, TEnum> map = [];
             string jsonMap = null;
 

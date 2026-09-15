@@ -37,7 +37,7 @@ namespace cardgames.core
         {
             if (cards.Count > 0) return cards.Pop();
             else return null;
-        }// TODO: fix empty stack issues
+        }
 
         public Card[,] Deal(int playerCount, int cardsPerPlayer = -1)
         {

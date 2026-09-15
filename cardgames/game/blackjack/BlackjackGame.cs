@@ -3,7 +3,7 @@ using static cardgames.core.Language;
 
 namespace cardgames.game.blackjack
 {
-    internal class BlackjackGame : GameBase<Player> // TODO: show dealer's total when game ends so users know they aren't being scammed lolol
+    internal class BlackjackGame : GameBase<Player>
     {
         public const int DECKCOUNT = 6;
         public BlackjackState State { get; set; } = null!;
@@ -47,7 +47,7 @@ namespace cardgames.game.blackjack
 
             string[] options = [T("Blackjack.Hit"), T("Blackjack.Stand")];
 
-            if (player.CardsInHand <= 2 && player.GetBalance() >= player.Bet * 2) // TODO: check if this works
+            if (player.CardsInHand <= 2 && player.GetBalance() >= player.Bet * 2
             {
                 options = [T("Blackjack.Hit"), T("Blackjack.Stand"), T("Blackjack.Double")];
             }

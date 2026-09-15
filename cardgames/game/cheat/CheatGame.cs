@@ -25,7 +25,6 @@ namespace cardgames.game.cheat
             State = new(cheatPlayers);
 
             // 1 deck default, 1 deck for every 4 players over 4.
-            // TODO: link to number of selectable cards. Should this be higher with more decks? not sure.
             State.SetupDeck(DECKCOUNT + (int)Math.Ceiling((cheatPlayers.Count - 4.0) / 4.0f)); // floats specified to ensure float division not integer division
             State.Deal(-1); // deal ALL cards out, not worrying about it being even between players
 

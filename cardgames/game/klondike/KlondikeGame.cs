@@ -32,40 +32,42 @@ namespace cardgames.game.klondike
 
             while (!State.GameOver)
             {
-                KlondikeDisplay.DisplayKlondikeMenu(State);
-
-                // TODO: ADD BETTING TO START OF GAME (BETTING ON SCORE MAYBE?)
-                // TODO: SCORE MECHANICS
-
-
-                // 1 - FUNCTIONAL
-
-                // TODO: AUTO SOLVER
-                // TODO: WIN DETECTION
-
-
-                // 2 - NON-FUNCTIONAL
-
-                // TODO: MOVE INPUT HANDLING LOGIC OUT OF DISPLAY CLASS - THE DISPLAY CLASS SHOULD ONLY BE RESPONSIBLE FOR DISPLAYING INFORMATION, NOT HANDLING INPUT. MOVE TO GAME OR STATE CLASS.
-
-                
-                // 3 - BUG FIXES
-
-                // TODO: display keybinding tooltips as it is not immediately obvious how to navigate menu (esp. to the draw pile)
+                PlayTurn();
             }
 
             Util.PressAnyKey();
+            Console.Clear();
+
+            EndGame();
+
+            Util.PressAnyKey();
+            Console.Clear();
 
             players = KlondikePlayer.ConvertFrom(State.GetPlayerList());
             return players;
         }
         private protected override void PlayTurn()
         {
-
+            KlondikeDisplay.DisplayKlondikeMenu(State);
         }
         private protected override void EndGame()
         {
+            KlondikePlayer player = State.GetPlayerList()[0];
+            Money bet = player.DeductBetFromBalance();
+            Money betReturnPerCard = bet / 25; // 25 is a fixed value; adjust to change the house edge. This should make a solve return ~2x the player's bet
+            Stack<Card>[] suitStacks = State.GetSuitStacks();
 
+            int movedCards = 0;
+
+            for (int stack = 0; stack < suitStacks.Length; stack++)
+            {
+                foreach (Card card in suitStacks[stack]) movedCards++;
+            }
+
+            Money betToReturn = betReturnPerCard * movedCards;
+            player.AddToBalance(betToReturn);
+
+            Console.WriteLine(T("Klondike.Score.Info", ("movedCards", movedCards.ToString()), ("moneyAddedToBalance", betToReturn.ToString()), ("balance", player.GetBalance().ToString()), ("bet", bet.ToString())));
         }
     }
 }

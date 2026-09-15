@@ -12,31 +12,6 @@ namespace cardgames.game.klondike
 {
     internal static class KlondikeSolver
     {
-        // TODO: Implement true solver, given state.
-        // TODO: Implement heuristic solver, given state.
-        // TODO: avoid loops in solvers
-        // TODO: GetHint() function that returns the next best move for the player
-        // TODO: use state.GetHash() function to compare states
-
-        //public static void Solve(KlondikeState state, int moveNumber = 0)
-        //{
-        //    if (state.CheckSolveState()) return; // TODO: return the solution path instead of just returning if solved.
-        //    if (visitedStates.Contains(state)) return;
-        //    visitedStates.Add(state);
-
-        //    List<KlondikeMove> possibleMoves = state.GetAllPossibleMoves();
-
-        //    if (moveNumber >= possibleMoves.Count) return; // no more moves to try for this state; now must try the next move in the previous state.
-
-        //    state.SelectNthMove(moveNumber);
-        //    state.TryMakeSelectedMove();
-
-
-
-        //    Solve(state);
-        //}
-
-
         public static List<KlondikeMove>? Solve(KlondikeState state, HashSet<KlondikeState> visitedStates, List<KlondikeMove> solutionPath)
         {
             if (state.CheckSolveState()) return solutionPath; // solved; return solution
@@ -66,8 +41,9 @@ namespace cardgames.game.klondike
         }
 
 
-        // TODO: remove the functions below.
-        // The below code was written using Generative AI, in order to test various solve routines. I do not take credit for this work and it will be removed before submission.
+        // ============================================================================================================================
+        // The below code was written using Generative AI, in order to test various solve routines. I do not take credit for this work.
+        // ============================================================================================================================
         public static List<KlondikeMove>? SolveIteratively(KlondikeState initialState)
         {
             HashSet<KlondikeState> visitedStates = [];

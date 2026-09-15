@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
@@ -311,10 +312,9 @@ namespace cardgames.core
                     balance = Convert.ToDecimal(userData[2]);
                     recharges = Convert.ToInt32(userData[3]);
                 }
-                catch (Exception ex)
+                catch (Exception e)
                 {
-                    // error in importing data; do not show this player on the leaderboard
-                    // TODO: display an error message
+                    continue; // if an error occurs (e.g. corrupted user data), skip displaying the problematic line
                 }
 
                 balance -= DEFAULT_BALANCE * recharges;
@@ -354,7 +354,7 @@ namespace cardgames.core
                 return;
             }
 
-            Util.StartLoading(T("Info.SavingData")); // TODO: LANG
+            Util.StartLoading(T("Info.SavingData"));
 
             foreach (Player player in players)
             {

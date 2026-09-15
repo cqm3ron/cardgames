@@ -1,5 +1,5 @@
 # Leaderboard
-1. cam -> cr2925.00
+1. cam -> cr2945.74
 2. zaineb -> cr1515.15
 3. a -> cr1500.00
 4. b -> cr1500.00

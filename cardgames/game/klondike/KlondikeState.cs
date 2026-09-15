@@ -44,10 +44,7 @@ namespace cardgames.game.klondike
         {
             get; private set;
         }
-        public bool GameOver
-        {
-            get; private set;
-        }
+        public bool GameOver;
 
         public Location CurrentLocation
         {
@@ -486,6 +483,11 @@ namespace cardgames.game.klondike
         public Stack<Card>[] GetCardStacks()
         {
             return cardStacks;
+        }
+
+        public Stack<Card>[] GetSuitStacks()
+        {
+            return suitStacks;
         }
 
         public Card? GetCurrentCard()

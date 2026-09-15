@@ -252,7 +252,7 @@ namespace cardgames.game.klondike
             {
                 Console.SetCursorPosition(x, y);
 
-                bool isEmptyAndHovered = false; // TODO: remove
+                bool isEmptyAndHovered = false;
                 bool displayTopCardAsTarget = false;
 
                 if (state.IsInCardStacks() && cardStacks[i].Count == 0 && i == state.SelectedCardStack) isEmptyAndHovered = true;
@@ -269,7 +269,7 @@ namespace cardgames.game.klondike
         {
             Suits[] suits = [Suits.Hearts, Suits.Diamonds, Suits.Clubs, Suits.Spades];
             List<KlondikeMove> moves = state.GetMoves();
-            
+
             for (int i = 0; i < suits.Length; i++) // foreach suit
             {
                 Suits suit = suits[i]; // set the suit
@@ -292,7 +292,7 @@ namespace cardgames.game.klondike
                 {
                     bool isAMoveOption = false;
                     if (moves.Count > 0 && moves[state.SelectedMoveIndex].Type == KlondikeMove.MoveType.ToSuitStack && moves[state.SelectedMoveIndex].TargetIndex == i) isAMoveOption = true;
-                    BigCard(state.GetTopCardFromSuitStack(suit), highlightAsTarget:isAMoveOption);
+                    BigCard(state.GetTopCardFromSuitStack(suit), highlightAsTarget: isAMoveOption);
                 }
                 Util.ResetColor();
             }
@@ -336,8 +336,8 @@ namespace cardgames.game.klondike
                 // if the stack is empty and hovered, set it to dark blue. If it is just empty, then dark grey.
                 // if the stack is not emtpy and is hovered, this is already handled.
                 Console.ForegroundColor = isEmptyAndHovered ? ConsoleColor.DarkBlue : ConsoleColor.DarkGray;
-                
-                
+
+
                 if (displayTopCardAsTarget) Console.ForegroundColor = ConsoleColor.Magenta;
                 BigCardOutline();
                 Util.ResetColor();
@@ -369,9 +369,9 @@ namespace cardgames.game.klondike
 
             HandleDebugInput(state, inputKey);
 
-            if (inputKey.Key == ConsoleKey.Escape && inputKey.Modifiers.HasFlag(ConsoleModifiers.Control)) // ctrl + esc to forfeit 
+            if (inputKey.Key == ConsoleKey.F && inputKey.Modifiers.HasFlag(ConsoleModifiers.Control)) // ctrl + F to forfeit 
             {
-                
+                state.GameOver = true;
             }
             else if (Util.affirmatives.Contains(inputKey.Key))
             {
@@ -517,7 +517,7 @@ namespace cardgames.game.klondike
         }
         private static void HandleDebugInput(KlondikeState state, ConsoleKeyInfo inputKey)
         {
-            if (inputKey.Modifiers.HasFlag(ConsoleModifiers.Control) && inputKey.Modifiers.HasFlag(ConsoleModifiers.Alt)) // TODO: remove maybe? check if i can leave this in.
+            if (inputKey.Modifiers.HasFlag(ConsoleModifiers.Control) && inputKey.Modifiers.HasFlag(ConsoleModifiers.Alt))
             {
                 if (inputKey.Key == ConsoleKey.F7)
                 {
@@ -538,21 +538,9 @@ namespace cardgames.game.klondike
                         if (aceCounter == targetAces) break;
                     }
                 }
-                else if (inputKey.Key == ConsoleKey.S)
+                else if (inputKey.Key == ConsoleKey.S) // runs the (albeit broken) solver
                 {
-                    List<KlondikeMove>? movesToMake = KlondikeSolver.Solve(state, [], []); // TODO: fix (doesnt work lol)
-
-                    if (movesToMake != null)
-                    {
-                        foreach (KlondikeMove move in movesToMake)
-                        {
-                            Console.WriteLine(move);
-                        }
-                    }
-                }
-                else if (inputKey.Key == ConsoleKey.I) // TODO: REMOVE
-                {
-                    List<KlondikeMove>? movesToMake = KlondikeSolver.SolveIteratively(state);
+                    List<KlondikeMove>? movesToMake = KlondikeSolver.Solve(state, [], []);
 
                     if (movesToMake != null)
                     {
@@ -564,7 +552,5 @@ namespace cardgames.game.klondike
                 }
             }
         }
-
-
     }
 }
