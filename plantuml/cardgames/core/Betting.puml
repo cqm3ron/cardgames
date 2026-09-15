@@ -1,5 +1,0 @@
-@startuml
-class Betting <<static>> {
-    + {static} BettingMenu(players:List<TPlayer>, betAmounts:decimal[]?) : void
-}
-@enduml

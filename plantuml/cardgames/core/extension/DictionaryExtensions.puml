@@ -1,6 +1,0 @@
-@startuml
-class DictionaryExtensions <<static>> {
-    + {static} AddRange(target:IDictionary<TKey, TValue>, source:IEnumerable<KeyValuePair<TKey, TValue>>) : void
-    + {static} RemoveRange(target:IDictionary<TKey, TValue>, source:IEnumerable<KeyValuePair<TKey, TValue>>) : void
-}
-@enduml

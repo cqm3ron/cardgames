@@ -1,7 +1,0 @@
-@startuml
-class StackExtensions <<static>> {
-    + {static} Shuffle(stack:Stack<T>) : void
-    + {static} RemoveFirstOccurrence(stack:Stack<T>, itemToRemove:T) : void
-    + {static} Empty(collection:Stack<T>) : Stack<T>
-}
-@enduml
