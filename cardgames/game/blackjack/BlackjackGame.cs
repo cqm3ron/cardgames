@@ -47,7 +47,7 @@ namespace cardgames.game.blackjack
 
             string[] options = [T("Blackjack.Hit"), T("Blackjack.Stand")];
 
-            if (player.CardsInHand <= 2 && player.GetBalance() >= player.Bet * 2
+            if (player.CardsInHand <= 2 && player.GetBalance() >= player.Bet * 2)
             {
                 options = [T("Blackjack.Hit"), T("Blackjack.Stand"), T("Blackjack.Double")];
             }
