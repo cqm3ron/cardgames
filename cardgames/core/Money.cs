@@ -47,7 +47,7 @@ namespace cardgames.core
         public static bool operator <=(Money a, Money b) => a._value <= b._value;
 
 
-        // These exist for use if required; delete if not maybe??
+        // These exist for use if required in games
         public int CompareTo(Money other) => _value.CompareTo(other._value);
         public bool Equals(Money other) => _value == other._value;
         public override bool Equals(object obj) => obj is Money other && Equals(other);

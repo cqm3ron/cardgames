@@ -182,8 +182,8 @@ namespace cardgames.core
         private bool Equals(Card card) // override to comapre cards by suit and rank because that's all I've ever used to compare cards by.
         {
             if (card == null) return false;
-            if (this.Suit != card.Suit) return false;
-            if (this.Rank != card.Rank) return false;
+            if (Suit != card.Suit) return false;
+            if (Rank != card.Rank) return false;
             return true;
         }
     }

@@ -362,7 +362,6 @@ namespace cardgames.game.klondike
                 yCoord += 2;
             }
         }
-
         private static void HandleInput(KlondikeState state)
         {
             ConsoleKeyInfo inputKey = Console.ReadKey(true);
@@ -390,7 +389,6 @@ namespace cardgames.game.klondike
                 HandleDrawPilesInput(state, inputKey);
             }
         }
-
         private static void HandleCardStacksInput(KlondikeState state, ConsoleKeyInfo inputKey)
         {
             if (Util.scrollRight.Contains(inputKey.Key))
